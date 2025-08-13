@@ -1,4 +1,7 @@
-<h1 class="text-3xl font-bold underline">
-    Driver BR-Food
-</h1>
-<router-outlet></router-outlet>
+<app-header *ngIf="!hideLayout" [title]="pageTitle"></app-header>
+
+<main class="container flex-fill overflow-auto">
+  <router-outlet></router-outlet>
+</main>
+
+<app-footer *ngIf="!hideLayout"></app-footer>

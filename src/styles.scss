@@ -1,0 +1,39 @@
+// src/styles.scss (or wherever your global styles are stored)
+
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.badge-green {
+  background-color: #d1f5dd;
+  color: #1b7b3e;
+}
+
+.badge-red {
+  background-color: #ffe1e1;
+  color: #d93025;
+}
+
+
+
+.fs-7 {
+    font-size: 0.8rem;
+}
+
+.fs-8 {
+    font-size: 0.7rem
+}

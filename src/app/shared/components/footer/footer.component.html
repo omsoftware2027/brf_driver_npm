@@ -1,0 +1,29 @@
+<footer class="footer-nav d-flex justify-content-around align-items-center py-2">
+  <a class="nav-item" 
+     routerLink="/dashboard" 
+     routerLinkActive="active" 
+     [routerLinkActiveOptions]="{ exact: true }">
+    <div class="nav-icon">
+      <i class="bi bi-grid-fill"></i>
+    </div>
+    <div class="nav-label">Dashboard</div>
+  </a>
+
+  <a class="nav-item" 
+     routerLink="/my-orders" 
+     routerLinkActive="active">
+    <div class="nav-icon">
+      <i class="bi bi-box-seam"></i>
+    </div>
+    <div class="nav-label">My Orders</div>
+  </a>
+
+  <a class="nav-item" 
+     routerLink="/order-report" 
+     routerLinkActive="active">
+    <div class="nav-icon">
+      <i class="bi bi-file-text"></i>
+    </div>
+    <div class="nav-label">Order Report</div>
+  </a>
+</footer>
