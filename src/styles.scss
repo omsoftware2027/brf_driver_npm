@@ -19,16 +19,31 @@
 }
 
 .badge-green {
-  background-color: #d1f5dd;
-  color: #1b7b3e;
+  background-color: #29A3291A;
+  color: #29A329;
 }
 
 .badge-red {
   background-color: #ffe1e1;
   color: #d93025;
 }
+.badge-orange {
+  background-color: #FF8D2852;
+  color: #FF8D28;
+}
 
 
+
+.btn-success {
+  background: #29A329 !important;
+  border-color: #29A329 !important;
+}
+.text-success {
+  color: #29A329 !important;
+}
+.text-danger {
+  color: #E61A1A !important;
+}
 
 .fs-7 {
     font-size: 0.8rem;

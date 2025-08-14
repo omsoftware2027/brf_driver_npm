@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { HttpClientModule, provideHttpClient } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import { CommonModule } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,6 +21,7 @@ export const appConfig: ApplicationConfig = {
         progressBar: false
       }),
     ),
-    provideHttpClient()
+    provideHttpClient(),
+    CommonModule
   ]
 };

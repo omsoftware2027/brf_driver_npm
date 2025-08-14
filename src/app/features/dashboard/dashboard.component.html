@@ -58,7 +58,7 @@
                 <div class="card-body p-2">
                     <div class="fs-7">Assigned For Tomorrow </div>
                     <div class="py-2 d-flex justify-content-between align-items-center">
-                        <span class="badge badge-red px-3"><b class="fs-6 ">{{orderStatisticsCount?.tomorrow ?? '...'}}</b></span>
+                        <span class="badge badge-orange px-3"><b class="fs-6 ">{{orderStatisticsCount?.tomorrow ?? '...'}}</b></span>
                         <div>
                             <img src="assets/icons/clock.png" alt="icon" width="20" height="20">
                         </div>
@@ -118,12 +118,23 @@
                         </div>
                     </div>
                     <div class="row pb-2 mt-4 border-bottom">
-
                         <div class="col-9 p-0 fs-7 d-flex gap-2">
                             <div class="vertical-green-pill"></div>
                             <div class="text-black">
                                 <div>New Order STB3K7JFBW5HHD</div>
                                 <div>Assigned</div>
+                            </div>
+                        </div>
+                        <div class="col-3 p-0 d-flex justify-content-end align-items-center">
+                            <span class="text-muted fs-8 text-center">2h ago</span>
+                        </div>
+                    </div>
+                    <div class="row pb-2 mt-4 border-bottom">
+                        <div class="col-9 p-0 fs-7 d-flex gap-2">
+                            <div class="vertical-red-pill"></div>
+                            <div class="text-black">
+                                <div>Order STB3K7JFBW5HHD requires</div>
+                                <div>attention</div>
                             </div>
                         </div>
                         <div class="col-3 p-0 d-flex justify-content-end align-items-center">
