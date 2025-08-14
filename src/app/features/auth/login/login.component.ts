@@ -41,7 +41,13 @@ export class LoginComponent {
           this.isLoading = false;
           if (data && data.status === 0) {
             if (data.response && data.response.token) {
-              // this.toastr.success('Login successful', 'Success');
+              const userInfo = {
+                name: data.response.name,
+                id: data.response.teamId,
+                token: data.response.token,
+                // role: data.response.role,
+              }
+              this.authService.setUser(userInfo);
               // this.router.navigate(['/dashboard'], {
               //   queryParams: { dId: data.response.teamId }
               // })
