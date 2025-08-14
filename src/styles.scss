@@ -37,3 +37,18 @@
 .fs-8 {
     font-size: 0.7rem
 }
+
+// Make toast smaller and mobile-friendly
+.toast {
+  font-size: 14px;
+  border-radius: 10px;
+}
+.toast-container {
+  max-width: 90% !important;
+  left: 50% !important;
+  transform: translateX(-50%);
+}
+
+.toast-container .ngx-toastr {
+  padding: 7px 7px 7px 50px !important;
+}

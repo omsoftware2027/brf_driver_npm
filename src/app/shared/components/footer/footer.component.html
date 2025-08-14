@@ -1,28 +1,45 @@
 <footer class="footer-nav d-flex justify-content-around align-items-center py-2">
   <a class="nav-item" 
      routerLink="/dashboard" 
-     routerLinkActive="active" 
-     [routerLinkActiveOptions]="{ exact: true }">
+     routerLinkActive="active"
+     #rla="routerLinkActive">
     <div class="nav-icon">
-      <i class="bi bi-grid-fill"></i>
+      <!-- <i class="bi bi-grid-fill"></i> -->
+      <div>
+        <img *ngIf="!rla.isActive" src="assets/icons/dashboard-inactive.png" alt="icon" width="20" height="20">
+      </div>
+      <div>
+        <img *ngIf="rla.isActive" src="assets/icons/dashboard-active.png" alt="icon" width="20" height="20">
+      </div>
     </div>
     <div class="nav-label">Dashboard</div>
   </a>
-
-  <a class="nav-item" 
-     routerLink="/my-orders" 
-     routerLinkActive="active">
-    <div class="nav-icon">
-      <i class="bi bi-box-seam"></i>
+<a class="nav-item" routerLink="/my-orders" routerLinkActive="active" #drla="routerLinkActive">
+  <div class="nav-icon">
+    <!-- <i class="bi bi-box-seam"></i> -->
+    <div>
+      <img *ngIf="!drla.isActive" src="assets/icons/parcel-inactive.png" alt="icon" width="20" height="20">
     </div>
-    <div class="nav-label">My Orders</div>
-  </a>
+    <div>
+      <img *ngIf="drla.isActive" src="assets/icons/parcel-active.png" alt="icon" width="20" height="20">
+    </div>
+  </div>
+  <div class="nav-label">My Orders</div>
+</a>
 
   <a class="nav-item" 
      routerLink="/order-report" 
-     routerLinkActive="active">
+     routerLinkActive="active"
+     #orla="routerLinkActive"
+     >
     <div class="nav-icon">
-      <i class="bi bi-file-text"></i>
+      <!-- <i class="bi bi-file-text"></i> -->
+      <div>
+        <img *ngIf="!orla.isActive" src="assets/icons/report-inactive.png" alt="icon" width="20" height="20">
+      </div>
+      <div>
+        <img *ngIf="orla.isActive" src="assets/icons/report-active.png" alt="icon" width="20" height="20">
+      </div>
     </div>
     <div class="nav-label">Order Report</div>
   </a>

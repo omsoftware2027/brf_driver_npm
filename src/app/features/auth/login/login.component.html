@@ -1,1 +1,59 @@
-<p>login works!</p>
+<div class="d-flex justify-content-center align-items-center pt-3">
+    <div class="card border rounded-4 p-4 shadow-sm" style="max-width: 380px; width: 100%;">
+
+        <!-- Logo -->
+        <div class="text-center">
+            <img src="assets/images/brand-logo.png" alt="B&R Food Services" style="max-width: 150px;">
+        </div>
+
+        <!-- Title -->
+        <h4 class="text-center fw-bold pt-4">BRFood Driver Login</h4>
+        <p class="text-center text-muted small mb-4">Enter your username/email and password</p>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+            <div class="mb-1">
+                <div class="position-relative w-100">
+                    <span class="position-absolute" style="top: 7px; left: 10px">
+                        <i class="bi bi-person"></i>
+                    </span>
+                    <input type="text" formControlName="email" class="form-control" style="padding-left: 2rem;"
+                        placeholder="Enter email">
+                </div>
+                <div class="text-danger small">
+                    <div class="fs-8"
+                        [ngStyle]="{'visibility': (email?.touched &&(email?.errors?.['email'] || email?.errors?.['required'])) ? 'visible' : 'hidden'}">
+                        Enter a valid email</div>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-1">
+                <div class="position-relative w-100">
+                    <span class="position-absolute" style="top: 7px; left: 10px">
+                        <i class="bi bi-lock"></i>
+                    </span>
+                    <input type="password" formControlName="password" class="form-control" style="padding-left: 2rem;"
+                        placeholder="Enter your password">
+                </div>
+                <div class="text-danger small"
+                    [ngStyle]="{ 'visibility': (password?.touched && (password?.errors?.['required'] || password?.errors?.['minlength'] )) ? 'visible' : 'hidden' }">
+                    <div *ngIf="password?.errors?.['required']" class="fs-8"> Password is required </div>
+                    <div *ngIf="password?.errors?.['minlength']" class="fs-8"> Password must be at least characters
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid" [ngClass]="{'pt-3': !password?.errors}">
+                <button class="btn btn-success rounded-3" type="submit" [disabled]="isLoading || loginForm.invalid">
+                    <span *ngIf="!isLoading">Sign In</span>
+                    <span *ngIf="isLoading" class="d-flex align-items-center justify-content-center">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Authenticating...
+                    </span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
