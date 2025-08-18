@@ -23,6 +23,14 @@ export class AuthService {
     return this.http.post<any>(`${environment.baseUrl}/auth/login`, credentials);
   }
 
+  sendOtp(): Observable<any>{
+    return this.http.post<any>(`${environment.baseUrl}/auth/sendOtp`,{});
+  }
+
+  verifyOtp(otp: string): Observable<any> {
+    return this.http.post<any>(`${environment.baseUrl}/auth/verifyOTP`, { otp });
+  }
+
   // Manage userinfo in local storage
   setUser(user: any) {
     localStorage.setItem('userInfo', JSON.stringify(user));
