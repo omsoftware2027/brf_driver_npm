@@ -23,12 +23,13 @@ export class AuthService {
     return this.http.post<any>(`${environment.baseUrl}/auth/login`, credentials);
   }
 
-  sendOtp(): Observable<any>{
-    return this.http.post<any>(`${environment.baseUrl}/auth/sendOtp`,{});
+  sendOtp(email: string): Observable<any>{
+    return this.http.post<any>(`${environment.baseUrl}/auth/sendOtpForLogin?email=${encodeURIComponent(email)}`,{});
   }
 
-  verifyOtp(otp: string): Observable<any> {
-    return this.http.post<any>(`${environment.baseUrl}/auth/verifyOTP`, { otp });
+
+  verifyOtp(otp: string, email: string): Observable<any> {
+    return this.http.post<any>(`${environment.baseUrl}/auth/verifyOTPForLogin?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`, {});
   }
 
   // Manage userinfo in local storage

@@ -50,11 +50,23 @@
             </form>
         </div>
 
-        <div *ngIf="step === 'otp'">
-            <h4 class="text-center fw-bold pt-4">Email Verification</h4>
-            <p class="text-center text-muted small mb-4">Enter the 6-digit code sent to {{userEmail}}</p>
-            <input type="text" [(ngModel)]="otp" placeholder="Enter OTP" class="form-control" />
-            <button (click)="onVerifyOtp()">Verify OTP</button>
+        <div *ngIf="step === 'otp'" class="text-center">
+            <h4 class="fw-bold pt-4">Email Verification</h4>
+            <p class="text-muted small mb-4">
+                Enter the 4-digit code sent to {{userEmail}}
+            </p>
+        
+            <div class="d-flex justify-content-center gap-2 mb-4">
+                <input *ngFor="let digit of otpArray; let i = index" type="text" maxlength="1" class="form-control text-center"
+                    style="width: 45px; font-size: 20px;" [(ngModel)]="otpValues[i]" (input)="onOtpInput($event, i)"
+                    (keydown)="onOtpKeyDown($event, i)" #otpInput />
+            </div>
+            <p class="text-muted small mb-3">
+                OTP will expire in <b>1 min</b>
+            </p>
+        
+            <button class="btn btn-primary w-100" (click)="onVerifyOtp()">Verify & Sign In</button>
+            <button class="btn btn-outline-danger w-100 mt-3" (click)="onBackToLogin()">Back to Login</button>
         </div>
     </div>
 </div>
