@@ -1,7 +1,12 @@
 <header class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
   <!-- Logo -->
-  <div class="header-logo" routerLink="/dashboard">
-    <img src="assets/images/brand-logo.png" alt="Brand Logo" style="height: 32px;" />
+  <div>
+    <span *ngIf="showBack" class="p-0 me-2" (click)="goBack()">
+      <i class="bi bi-arrow-left"></i> Back
+    </span>
+    <div *ngIf="!showBack" class="header-logo" routerLink="/dashboard">
+      <img src="assets/images/brand-logo.png" alt="Brand Logo" style="height: 32px;" />
+    </div>
   </div>
 
   <!-- Page title -->
@@ -10,7 +15,15 @@
   </div>
 
   <!-- User profile -->
-  <div class="header-profile">
-    <img src="assets/images/profile.image1.jpg" alt="User Profile" class="rounded-circle" style="width: 36px; height: 36px;" />
+  <div class="header-profile position-relative">
+    <img src="assets/images/profile.image1.jpg" alt="User Profile" class="rounded-circle"
+      style="width: 36px; height: 36px;" (click)="toggleMenu()" />
+    <div *ngIf="menuOpen" class="position-absolute end-0 mt-1 bg-white shadow rounded-2 p-2 border"
+      style="min-width: 140px; z-index: 1050;">
+      <button class="dropdown-item text-danger fw-medium" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i>
+        Logout
+      </button>
+    </div>
   </div>
 </header>

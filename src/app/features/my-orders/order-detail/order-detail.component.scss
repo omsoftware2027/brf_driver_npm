@@ -1,0 +1,52 @@
+.form-control:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.accordion-button:focus {
+    box-shadow: none !important;
+}
+
+.segments-container {
+    background-color: #eeeeee;
+    display: flex;
+    justify-content: space-between;
+    gap: 1px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 7px 4px 7px;
+    border-radius: 10px;
+}
+
+.segment-tab {
+    flex: 1 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 7px;
+    min-width: auto;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.segment-tab.active {
+    background: #FFF;
+    color: #000;
+}
+
+.segments-tab-count {
+    width: 15px;
+    height: 15px;
+    background: #0088FF;
+    color: #FFF;
+    border-radius: 100%;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -35,7 +35,7 @@
     <div class="pt-3">
         <div *ngIf="orders && orders.length > 0; else noOrders">
             <div *ngFor="let order of orders" class="order-card px-3 py-4 mb-3 border rounded bg-white">
-                <div class="row">
+                <div class="row" [routerLink]="['/my-orders/order-detail', order?.trasactionId]">
                     <div class="col-2 p-0">
                         <span class="badge-green rounded-3 d-flex justify-content-center \" style="padding: 0.7rem;">
                             <img src="assets/icons/parcel-active.png" width="24" height="24" />
@@ -50,7 +50,7 @@
                                 <i class="bi bi-clock pe-1"></i> {{ order?.deliveryTimeInterval }}
                             </small>
                         </div>
-                        <div class="fw-bold text-uppercase py-1">{{ order?.transactionId }}</div>
+                        <div class="fw-bold text-uppercase py-1">{{ order?.trasactionId }}</div>
                         <div class="text-muted"><b>{{ order?.items }}</b>/{{ order?.totalItems }} Items</div>
                     </div>
                 </div>

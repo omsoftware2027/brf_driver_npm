@@ -53,7 +53,6 @@ export class LoginComponent {
           this.isLoading = false;
           if (data && data.status === 0) {
             if (data.response && data.response.token) {
-              debugger
               const userInfo = {
                 name: data.response.name,
                 id: data.response.teamId,

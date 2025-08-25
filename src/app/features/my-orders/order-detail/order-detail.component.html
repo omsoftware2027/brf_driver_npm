@@ -1,0 +1,62 @@
+<div class="container-fluid p-0">
+  <!-- Search -->
+  <div class="input-group mt-2 mb-3 border rounded position-relative">
+    <span class="input-group-text bg-white border-0 pe-0">
+      <i class="bi bi-search"></i>
+    </span>
+    <input type="text" [(ngModel)]="searchText" (input)="onSearch()" class="form-control border-0"
+      placeholder="Search items by name, SKU, or BIN..." />
+    <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
+      <i class="bi bi-x" (click)="searchText = ''"></i>
+    </span>
+    <div *ngIf="searchResults.length > 0 && searchText"
+      class="list-group position-absolute w-100 shadow bg-white mt-5 rounded z-10"
+      style="max-height: 250px; overflow-y: auto;">
+      <button type="button" class="list-group-item list-group-item-action" *ngFor="let order of searchResults"
+        (click)="true">
+        <div class="fw-bold text-black">{{ order.transactionId }}</div>
+        <small class="text-muted">{{ order.customerName }} • {{ order.address }}</small>
+      </button>
+    </div>
+  </div>
+  <!-- Order Info -->
+  <div class="card border-0 mb-3 rounded-4">
+    <div class="card-body p-3 d-flex justify-content-between align-items-center rounded-4"
+      style="background-color: #FF383C24;">
+      <div>
+        <div class="text-uppercase small text-muted">ORDER NO</div>
+        <div class="fw-bold text-dark">#STB3K7JFBW5HHD</div>
+      </div>
+      <span class="badge bg-danger rounded-pill px-3 py-2">HIGH</span>
+    </div>
+  </div>
+  <!-- Customer Details -->
+  <div class="accordion mb-3" id="customerDetails">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed fw-medium  small" type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
+          <i class="bi bi-person-lines-fill pe-2"></i>
+          Customer Details
+        </button>
+      </h2>
+      <div id="collapseDetails" class="accordion-collapse collapse" data-bs-parent="#customerDetails">
+        <div class="accordion-body small">
+          <p class="mb-1"><b>Name:</b> qwerty zxcvbn</p>
+          <p class="mb-1"><b>Address:</b> 123 Main St, NY</p>
+          <p class="mb-0"><b>Phone:</b> +91 1234567890</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Tabs -->
+  <div class="segments-container">
+    <div class="segment-tab" *ngFor="let tab of tabs" [class.active]="activeTab === tab.key"
+      (click)="setActiveTab(tab.key)">
+      <span class="fs-7">{{tab.label}}</span>
+      <span class="segments-tab-count">{{tab.count}}</span>
+    </div>
+  </div>
+  <!-- Product Card -->
+
+</div>

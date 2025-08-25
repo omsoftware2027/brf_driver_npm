@@ -1,4 +1,6 @@
-<app-header *ngIf="!hideLayout" [title]="pageTitle"></app-header>
+<app-loader></app-loader>
+
+<app-header *ngIf="!hideLayout" [title]="pageTitle" [showBack]="showBack"></app-header>
 
 <main class="container flex-fill overflow-auto">
   <router-outlet></router-outlet>
