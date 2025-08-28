@@ -1,6 +1,7 @@
 <div class="container-fluid p-0">
   <!-- Search -->
-  <div class="input-group mt-2 mb-3 border rounded position-relative">
+   <div class="search-container">
+  <div class="input-group mt-2 mb-3 border rounded">
     <span class="input-group-text bg-white border-0 pe-0">
       <i class="bi bi-search"></i>
     </span>
@@ -9,15 +10,16 @@
     <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
       <i class="bi bi-x" (click)="searchText = ''"></i>
     </span>
-    <div *ngIf="searchResults.length > 0 && searchText"
-      class="list-group position-absolute w-100 shadow bg-white mt-5 rounded z-10"
-      style="max-height: 250px; overflow-y: auto;">
-      <button type="button" class="list-group-item list-group-item-action" *ngFor="let order of searchResults"
+    <!-- <div *ngIf="orderDetail.length > 0 && searchText"
+      class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
+      style="max-height: 250px; overflow-y: auto; z-index:1030">
+      <button type="button" class="list-group-item list-group-item-action" *ngFor="let product of orderDetail"
         (click)="true">
-        <div class="fw-bold text-black">{{ order.transactionId }}</div>
-        <small class="text-muted">{{ order.customerName }} • {{ order.address }}</small>
+        <small class="text-muted">{{ product.productCode }} • {{ product.title }}</small>
+        <div class="fw-bold text-black">{{ product.confirmStatus }}</div>
       </button>
-    </div>
+    </div> -->
+  </div>
   </div>
   <!-- Order Info -->
   <div class="card border-0 mb-3 rounded-4">
@@ -25,7 +27,7 @@
       style="background-color: #FF383C24;">
       <div>
         <div class="text-uppercase small text-muted">ORDER NO</div>
-        <div class="fw-bold text-dark">#STB3K7JFBW5HHD</div>
+        <div class="fw-bold text-dark">{{orderId}}</div>
       </div>
       <span class="badge bg-danger rounded-pill px-3 py-2">HIGH</span>
     </div>
@@ -42,9 +44,10 @@
       </h2>
       <div id="collapseDetails" class="accordion-collapse collapse" data-bs-parent="#customerDetails">
         <div class="accordion-body small">
-          <p class="mb-1"><b>Name:</b> qwerty zxcvbn</p>
-          <p class="mb-1"><b>Address:</b> 123 Main St, NY</p>
-          <p class="mb-0"><b>Phone:</b> +91 1234567890</p>
+          <p class="mb-1"><span class="fw-medium">Name: </span>{{customerDetails?.userName ?? '...'}}</p>
+          <p class="mb-1"><span class="fw-medium">Address: </span>{{customerDetails?.shippingAddress ?? '...'}} </p>
+          <p class="mb-1"><span class="fw-medium">Phone: </span>{{customerDetails?.contact ?? '...'}}</p>
+          <p class="mb-0"><span class="fw-medium">Delivery Date: </span>{{customerDetails?.deliveryDate ?? '...'}}</p>
         </div>
       </div>
     </div>
@@ -52,11 +55,97 @@
   <!-- Tabs -->
   <div class="segments-container">
     <div class="segment-tab" *ngFor="let tab of tabs" [class.active]="activeTab === tab.key"
-      (click)="setActiveTab(tab.key)">
+      (click)="setActiveTab(tab)">
       <span class="fs-7">{{tab.label}}</span>
-      <span class="segments-tab-count">{{tab.count}}</span>
+      <span class="segments-tab-count">{{tab.key === 'all'? totalProductCount : tab.count}}</span>
     </div>
   </div>
   <!-- Product Card -->
 
+  <div class="pt-3">
+    <div *ngIf="orderDetail?.length; else noProducts">
+      <div *ngFor="let product of orderDetail" class="order-card px-3 py-4 mb-3 border rounded bg-white">
+        <div class="row">
+          <div class="col-2 p-0">
+            <span class="badge-green rounded-3 d-flex justify-content-center \" style="padding: 0.7rem;">
+              <img src="assets/icons/parcel-active.png" width="24" height="24" />
+            </span>
+          </div>
+          <div class="col-10 p-0 ps-2">
+            <div class="fs-8 text-muted"><span class="text-success">{{product?.productCode}}</span> - <span
+                class="text-black fw-medium">{{product?.title}}</span></div>
+            <!-- qty and price -->
+            <div class="d-flex align-items-center fs-7 pb-2 gap-2">
+              <span class="text-muted">Qty: {{product?.qty}}</span>
+              <span class="text-muted fs-6">•</span>
+              <span class="text-muted">$ {{product?.price}}</span>
+            </div>
+            <!-- badges -->
+            <div class="d-flex gap-2 w-100 overflow-auto hiden-scrollbar">
+              <span *ngIf="product?.confirmStatus === 'Pending'" class="badge badge-red fs-8">PENDING</span>
+              <span *ngIf="product?.confirmStatus === 'Confirmed'" class="badge badge-green fs-8">CONFIRMED</span>
+              <span *ngIf="product?.confirmStatus === 'Missing'" class="badge badge-orange fs-8">Missing</span>
+              <span *ngIf="product?.remark" class="badge badge-outlined fs-8">Remark: Quality <span>T</span></span>
+            </div>
+          </div>
+        </div>
+        <!-- status change sec -->
+        <div class="row my-3">
+          <div class="col-12 p-0">
+            <div class="d-flex w-100">
+              <label class="status-option flex-fill" [class.active]="product.confirmStatus === 'Pending'"
+                style="border-radius: 10px 0 0 10px;">
+                <input type="radio" [(ngModel)]="product.confirmStatus" [value]="'Pending'"
+                  name="status{{product.id}}" (change)="onStatusChange(product)" />
+                <i class="bi bi-clock me-1"></i>
+                <span>Pending</span>
+                <i class="bi ms-auto"
+                  [ngClass]="product.confirmStatus === 'Pending' ? 'bi-record-circle' : 'bi-circle'"></i>
+              </label>
+              <label class="status-option flex-fill" [class.active]="product.confirmStatus === 'Confirmed'"
+                style="border-radius: 0 10px 10px 0;">
+                <input type="radio" [(ngModel)]="product.confirmStatus" [value]="'Confirmed'"
+                  name="status{{product.id}}" (change)="onStatusChange(product)" />
+                <i class="bi bi-check-circle me-1"></i>
+                <span>Confirm</span>
+                <i class="bi ms-auto"
+                  [ngClass]="product.confirmStatus === 'Confirmed' ? 'bi-record-circle' : 'bi-circle'"></i>
+              </label>
+            </div>
+            <div class="mt-3">
+              <label class="status-option w-100" [class.active]="product.confirmStatus === 'Missing'"
+                style="border-radius: 10px;">
+                <input type="radio" [(ngModel)]="product.confirmStatus" [value]="'Missing'"
+                  name="status{{product.id}}" (change)="onStatusChange(product)" />
+                <i class="bi bi-x-circle me-1"></i>
+                <span>Missing</span>
+                <i class="bi ms-auto"
+                  [ngClass]="product.confirmStatus === 'Missing' ? 'bi-record-circle' : 'bi-circle'"></i>
+              </label>
+            </div>
+          </div>
+        </div>
+        <!-- Action buttons -->
+        <div class="d-flex justify-content-between mt-3">
+          <button class="btn btn-success btn-responsive">
+            <img src="assets/icons/outline_scale.png" alt="icon" width="15" height="15">
+            weight
+          </button>
+          <button class="btn btn-success btn-responsive">
+            <img src="assets/icons/pajamas_time-out.png" alt="icon" width="15" height="15">
+            Expiry
+          </button>
+          <button class="btn btn-success btn-responsive">
+            <i class="bi bi-pencil"></i>
+            Remark
+          </button>
+        </div>
+      </div>
+    </div>
+    <ng-template #noProducts>
+      <div class="text-center text-muted py-5">
+        No Products!
+      </div>
+    </ng-template>
+  </div>
 </div>

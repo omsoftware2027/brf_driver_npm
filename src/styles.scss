@@ -17,12 +17,10 @@
   font-weight: 600;
   line-height: 1;
 }
-
 .badge-green {
   background-color: #29A3291A;
   color: #29A329;
 }
-
 .badge-red {
   background-color: #ffe1e1;
   color: #d93025;
@@ -30,6 +28,11 @@
 .badge-orange {
   background-color: #FF8D2852;
   color: #FF8D28;
+}
+.badge-outlined {
+  background-color: #fff;
+  color: #222;
+  border: 1px solid #b5bbb5;
 }
 
 
@@ -48,7 +51,6 @@
 .fs-7 {
     font-size: 0.8rem;
 }
-
 .fs-8 {
     font-size: 0.7rem
 }
@@ -66,4 +68,10 @@
 
 .toast-container .ngx-toastr {
   padding: 7px 7px 7px 50px !important;
+}
+
+
+.hiden-scrollbar {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }

@@ -24,9 +24,9 @@
             class="list-group position-absolute w-100 shadow bg-white mt-5 rounded z-10"
             style="max-height: 250px; overflow-y: auto;">
             <button type="button" class="list-group-item list-group-item-action" *ngFor="let order of searchResults"
-                (click)="true">
-                <div class="fw-bold text-black">{{ order.transactionId }}</div>
-                <small class="text-muted">{{ order.customerName }} • {{ order.address }}</small>
+                [routerLink]="['/my-orders/order-detail', order?.orderId]">
+                <div class="fw-bold text-black">{{ order?.trasactionId }}</div>
+                <small class="text-muted">{{ order?.customerName }} • {{ order?.address }}</small>
             </button>
         </div>
     </div>
@@ -35,7 +35,7 @@
     <div class="pt-3">
         <div *ngIf="orders && orders.length > 0; else noOrders">
             <div *ngFor="let order of orders" class="order-card px-3 py-4 mb-3 border rounded bg-white">
-                <div class="row" [routerLink]="['/my-orders/order-detail', order?.trasactionId]">
+                <div class="row" [routerLink]="['/my-orders/order-detail', order?.orderId]">
                     <div class="col-2 p-0">
                         <span class="badge-green rounded-3 d-flex justify-content-center \" style="padding: 0.7rem;">
                             <img src="assets/icons/parcel-active.png" width="24" height="24" />
@@ -51,13 +51,18 @@
                             </small>
                         </div>
                         <div class="fw-bold text-uppercase py-1">{{ order?.trasactionId }}</div>
-                        <div class="text-muted"><b>{{ order?.items }}</b>/{{ order?.totalItems }} Items</div>
+                        <div class="text-muted"><b>{{ order?.confirmCount }}</b>/{{ order?.pendingCount }} Items</div>
                     </div>
                 </div>
                 <button class="btn btn-success w-100 mt-2 rounded-2 d-flex align-items-center justify-content-center">
                     <i class="bi bi-geo-alt-fill me-2"></i>
                     <span class="fs-7">{{ order.address }}</span>
                 </button>
+                <!-- <button class="btn btn-success w-100 mt-2 rounded-2 d-flex align-items-center justify-content-center text-truncate"
+                    [title]="order.address">
+                    <i class="bi bi-geo-alt-fill me-2"></i>
+                    <span class="fs-7 text-truncate">{{ order.address }}</span>
+                </button> -->
             </div>
         </div>
         <ng-template #noOrders>
