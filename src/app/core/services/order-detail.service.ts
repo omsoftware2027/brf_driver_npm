@@ -30,4 +30,23 @@ export class OrderDetailService {
     return this.http.get<any>(`${environment.baseUrl}/order/changeStatusOfProduct?orderItemId=${orderItemId}&confirmStatus=${confirmStatus}&remark=${remark}`);
   }
 
+  saveWeight(orderItemId: number, weight: string) {
+    return this.http.post<any>(`${environment.baseUrl}/order/saveWeight?orderItemId=${orderItemId}&weight=${weight}`, {});
+  }
+
+  saveRemark(orderItemId: number, remark: string) {
+    return this.http.post<any>(`${environment.baseUrl}/order/updateRemarkByOrderItemsId?orderItemId=${orderItemId}&remark=${remark}`, {});
+  }
+  
+  setProductExpiryDate(data: any){
+    return this.http.post(`${environment.baseUrl}/order/saveOrUpdateOrderItemDate`, data);
+  }
+  getProductExpiryDates(ordersIdOrders: number, productId: number) {
+    return this.http.get(`${environment.baseUrl}/order/getOrderItemDate?ordersIdOrders=${ordersIdOrders}&productId=${productId}`);
+  }
+
+  getProductsCounts(orderId: number): Observable<any> {
+    return this.http.get(`${environment.baseUrl}/driver/getProductsCountByOrderId?OrderId=${orderId}`);
+  }
+
 }

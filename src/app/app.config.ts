@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { loaderInterceptor } from './core/interceptors/loader.interceptor';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +22,7 @@ export const appConfig: ApplicationConfig = {
         preventDuplicates: true,
         progressBar: false
       }),
+      ModalModule.forRoot(),
     ),
     provideHttpClient(withInterceptors([loaderInterceptor])),
     CommonModule

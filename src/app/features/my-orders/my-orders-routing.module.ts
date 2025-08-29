@@ -12,7 +12,7 @@ const routes: Routes = [
   {
     path: 'order-detail/:id',
     component: OrderDetailComponent,
-    data: { title: 'Order Detail', showBack: true }
+    data: { title: 'Order Details', showBack: true }
   }
 ];
 

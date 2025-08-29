@@ -17,9 +17,9 @@
         </span>
         <input type="text" [(ngModel)]="searchText" (input)="onSearch()" class="form-control border-0"
             placeholder="Search orders by number, customer & ..." />
-            <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
-                <i class="bi bi-x" (click)="searchText = ''"></i>
-            </span>
+        <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
+            <i class="bi bi-x" (click)="searchText = ''"></i>
+        </span>
         <div *ngIf="searchResults.length > 0 && searchText"
             class="list-group position-absolute w-100 shadow bg-white mt-5 rounded z-10"
             style="max-height: 250px; overflow-y: auto;">
@@ -34,7 +34,9 @@
 
     <div class="pt-3">
         <div *ngIf="orders && orders.length > 0; else noOrders">
-            <div *ngFor="let order of orders" class="order-card px-3 py-4 mb-3 border rounded bg-white">
+            <div *ngFor="let order of orders"
+                class="order-card px-3 py-4 mb-3 border rounded bg-white position-relative">
+                <span class="orderid-case">{{order?.orderId}}</span>
                 <div class="row" [routerLink]="['/my-orders/order-detail', order?.orderId]">
                     <div class="col-2 p-0">
                         <span class="badge-green rounded-3 d-flex justify-content-center \" style="padding: 0.7rem;">
