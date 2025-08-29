@@ -36,6 +36,13 @@ export class OrderDetailComponent {
 
   modalRef?: BsModalRef;
   selectedProduct: any;
+  selectedProductQuantity: number = 0;
+  inputValues: string[] = [];
+  checkInventoryStatus: boolean[] = [];
+  inventoryIds:any;
+  inputIndexToInventoryId: { [key: number]: number } = {};
+  selectedInventoryIds: number[] = [];
+  inventorylist:any;
   weightInput: any = null;
   expiryDateInput: any;
   remarkInput: any
@@ -77,11 +84,14 @@ export class OrderDetailComponent {
   }
 
   onSearch() {
-    if (!this.searchText) {
-      this.getAllProducts();
-      return;
+    let pickupFilter = '';
+    let routeFilter = '';
+    if (this.activeTab === 'pickup') {
+      pickupFilter = this.activeTab
+    } else if(this.activeTab === '1' || this.activeTab === '2') {
+      routeFilter = this.activeTab
     }
-    this.orderDetailService.searchProduct(this.orderId, this.searchText).subscribe({
+    this.orderDetailService.searchProduct(this.orderId, this.searchText, routeFilter, pickupFilter).subscribe({
       next: (res) => {
         this.orderDetail = res?.response?.products?.dataSet ?? [];
         console.log('searched', this.orderDetail)
@@ -95,29 +105,31 @@ export class OrderDetailComponent {
   setActiveTab(tab: any) {
     this.orderDetail = [];
     this.activeTab = tab.key;
-    if (tab?.label === 'All') {
+    if (tab?.label === 'All' && this.searchText==='') {
       this.getAllProducts();
     }
-    if (tab?.label === 'Jetro One' || tab?.label === 'Jetro Two') {
-      this.orderDetailService.getProductsByRoute(this.orderId, this.activeTab).subscribe({
-        next: (res) => {
-          this.orderDetail = res?.response?.products?.dataSet || [];
-        },
-        error: (err) => {
-          this.orderDetail = [];
-        }
-      })
-    }
-    if (tab?.label === 'Pickup') {
-      this.orderDetailService.getProductsByBinNo(this.orderId, this.activeTab).subscribe({
-        next: (res) => {
-          this.orderDetail = res?.response?.products?.dataSet || [];
-        },
-        error: (err) => {
-          this.orderDetail = [];
-        }
-      })
-    }
+
+    this.onSearch();
+    // if (tab?.label === 'Jetro One' || tab?.label === 'Jetro Two') {
+    //   this.orderDetailService.getProductsByRoute(this.orderId, this.activeTab).subscribe({
+    //     next: (res) => {
+    //       this.orderDetail = res?.response?.products?.dataSet || [];
+    //     },
+    //     error: (err) => {
+    //       this.orderDetail = [];
+    //     }
+    //   })
+    // }
+    // if (tab?.label === 'Pickup') {
+    //   this.orderDetailService.getProductsByBinNo(this.orderId, this.activeTab).subscribe({
+    //     next: (res) => {
+    //       this.orderDetail = res?.response?.products?.dataSet || [];
+    //     },
+    //     error: (err) => {
+    //       this.orderDetail = [];
+    //     }
+    //   })
+    // }
   }
 
   getAllProducts() {
@@ -151,7 +163,25 @@ export class OrderDetailComponent {
 
   openWeightModal(template: TemplateRef<any>, product: any) {
     this.selectedProduct = product;
-    this.weightInput = product.weight || null;
+    this.selectedProductQuantity = parseInt(product?.qty, 10);
+    this.inputValues = new Array(parseInt(product?.qty, 10)).fill('');
+    this.checkInventoryStatus = new Array(this.inputValues.length).fill(true);
+    this.orderDetailService.getOrderProductInventoryedit(product?.productId, product?.orderItemId).subscribe(
+      (res) => {
+        if (res['status'] == 0) {
+          this.inventorylist = res.response.inventoryCodeAndWeightProjections;
+          let isSold = false;
+          if (res.response?.inventoryCodeAndWeightProjections) {
+            res.response.inventoryCodeAndWeightProjections.forEach((element: any) => {
+              if (element.isSold === true) {
+                isSold = true;
+              }
+            });
+          }
+          this.patchInventoryWeights(product?.inventoryItems);
+        }
+      })
+
     this.modalRef = this.modalService.show(template, {
       class: 'modal-dialog-centered modal-sm'
     });
@@ -168,6 +198,88 @@ export class OrderDetailComponent {
     //     }
     //   });
   }
+    sumbitInventory() {
+    const weights: number[] = [];
+    const inventoryIds: number[] = [];
+    const maxQuantity = this.selectedProductQuantity;
+    for (let i = 0; i < maxQuantity; i++) {
+      const value = this.inputValues[i];
+      const weight = this.isValidNumber(value) ? parseFloat(value) : 0;
+      const inventoryId = this.selectedInventoryIds[i] || this.inputIndexToInventoryId[i] || 0;
+      weights.push(weight);
+      inventoryIds.push(inventoryId);
+    }
+    // Log the extracted inventory IDs and weights
+    console.log('Inventory IDs:', inventoryIds);
+    console.log('Weights:', weights);
+    // Use the limited inventoryIds and weights arrays when calling the service
+    this.orderDetailService.changeweight(weights, inventoryIds, this.selectedProduct?.orderItemId).subscribe((res) => {
+      this.getAllProducts();
+      this.modalRef?.hide();
+    });
+  }
+  generateArray(length: number): any[] {
+    return new Array(length);
+  }
+  patchInventoryWeights(inventoryItems: any) {
+    console.log('Starting patchInventoryWeights');
+    const seenWeights = new Set<string>();
+    for (const inventoryItem of inventoryItems) {
+      const weight = String(inventoryItem.weight);
+      const inventoryId = (inventoryItem.inventoryId);
+      const index = this.inventorylist.findIndex((item: any) => item.inventoryId === inventoryId);
+      if (index !== -1) {
+        if (!seenWeights.has(weight)) {
+          seenWeights.add(weight);
+          this.inputValues[index] = weight;
+        } else {
+          this.inputValues[index] = weight;
+          console.log('Duplicate Record:', weight);
+        }
+        console.log('Patched Weight:', weight);
+      } else {
+        console.log('Inventory item not found:', inventoryItem);
+      }
+    }
+    console.log('Finished patchInventoryWeights');
+    console.log('Updated inputValues:', this.inputValues);
+  }
+  checkInventory(weightValue: any, index: number) {
+    console.log('Checking Inventory for weight:', weightValue);
+    const weight = this.isValidNumber(weightValue) ? parseFloat(weightValue) : 0;
+    if (!this.inventoryIds) {
+      this.inventoryIds = [];
+    }
+    if (!this.checkInventoryStatus) {
+      this.checkInventoryStatus = [];
+    }
+    if (!this.inputIndexToInventoryId) {
+      this.inputIndexToInventoryId = [];
+    }
+    if (weightValue === '' || weightValue === null || weightValue === undefined) {
+      // Clear the input value and reset the inventory status when weightValue is empty
+      this.inputValues[index] = '';
+      this.checkInventoryStatus[index] = undefined as unknown as boolean; // Use 'undefined as boolean' to explicitly set it as boolean or undefined
+      this.inputIndexToInventoryId[index] = 0;
+    } else {
+      // Perform inventory check when weightValue is not empty
+      this.inputValues[index] = weightValue;
+      this.orderDetailService.checkWeightExists(weight, this.selectedProduct?.productCode, this.selectedProduct?.orderItemId).subscribe((res) => {
+        this.checkInventoryStatus[index] = !!res.response; // Convert to boolean
+        const inventoryId = res.response !== undefined ? res.response : 0;
+        console.log('Received inventoryId:', inventoryId);
+        this.inputIndexToInventoryId[index] = inventoryId;
+      });
+    }
+  }
+  isValidNumber(value: any) {
+    return !isNaN(parseFloat(value));
+  }
+  get totalWeight(): number {
+  return this.inputValues.reduce((sum, val) => sum + (+val || 0), 0);
+}
+
+
 
   openExpiryDateModal(template: TemplateRef<any>, product: any) {
     this.expiryDateInput = null;

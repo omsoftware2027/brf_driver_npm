@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <div class="input-group my-2 border rounded position-relative">
+    <div class="input-group my-2 border rounded position-relative"  [ngStyle]="{ 'z-index': searchText ? 1060 : ''}">
         <span class="input-group-text bg-white border-0 pe-0">
             <i class="bi bi-search"></i>
         </span>
@@ -21,8 +21,8 @@
             <i class="bi bi-x" (click)="searchText = ''"></i>
         </span>
         <div *ngIf="searchResults.length > 0 && searchText"
-            class="list-group position-absolute w-100 shadow bg-white mt-5 rounded z-10"
-            style="max-height: 250px; overflow-y: auto;">
+            class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
+            style="max-height: 250px; overflow-y: auto; z-index: 30">
             <button type="button" class="list-group-item list-group-item-action" *ngFor="let order of searchResults"
                 [routerLink]="['/my-orders/order-detail', order?.orderId]">
                 <div class="fw-bold text-black">{{ order?.trasactionId }}</div>

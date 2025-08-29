@@ -1,6 +1,6 @@
 <div class="container-fluid p-0">
   <!-- Search -->
-  <div class="search-container">
+  <div class="search-container"  [ngStyle]="{ 'z-index': searchText ? 1062 : 1029}">
     <div class="input-group mt-2 mb-3 border rounded">
       <span class="input-group-text bg-white border-0 pe-0">
         <i class="bi bi-search"></i>
@@ -8,7 +8,7 @@
       <input type="text" [(ngModel)]="searchText" (input)="onSearch()" class="form-control border-0"
         placeholder="Search items by name, SKU, or BIN..." />
       <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
-        <i class="bi bi-x" (click)="searchText = ''"></i>
+        <i class="bi bi-x" (click)="searchText = ''; activeTab === 'all'? getAllProducts() : onSearch()"></i>
       </span>
       <!-- <div *ngIf="orderDetail.length > 0 && searchText"
       class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
@@ -86,6 +86,7 @@
               <span *ngIf="product?.confirmStatus === 'Confirm'" class="badge badge-green fs-8">CONFIRMED</span>
               <span *ngIf="product?.confirmStatus === 'Missing'" class="badge badge-orange fs-8">Missing</span>
               <span *ngIf="product?.remark" class="badge badge-outlined fs-8">Remark: {{product?.remark}}</span>
+              <span *ngIf="product?.weight" class="badge badge-outlined fs-8">⚖️ {{product?.weight}}LBS</span>
               <span *ngIf="product?.expOrProdDate" class="badge badge-red fs-8">Expiry</span>
             </div>
           </div>
@@ -164,14 +165,32 @@
   <div class="modal-body p-4 position-relative">
     <i class="bi bi-x position-absolute fs-3" style="top: 6px; right: 6px" aria-label="Close"
       (click)="modalRef?.hide()"></i>
-    <p class="modal-title fs-6 fw-semibold">Update Weight - <span
-        class="text-light-emphasis fs-7">{{selectedProduct?.title}}</span></p>
+    <p class="modal-title fs-6 fw-semibold">Update Weight
+       <!-- - <span
+        class="text-light-emphasis fs-7">{{selectedProduct?.title}}
+      </span> -->
+      </p>
     <p class="fs-7 text-muted">{{selectedProduct?.productCode}}</p>
-    <label for="wight" class="fw-semibold pb-1">Weight(lbs)</label>
+    <p class="text-muted fw-medium">Enter weight for each item (Quantity: {{selectedProductQuantity}})</p>
+    <!-- <label for="wight" class="fw-semibold pb-1">Weight(lbs)</label>
     <input type="number" [(ngModel)]="weightInput" class="form-control" placeholder="Enter weight"
-      (keypress)="($event.charCode === 45) ? $event.preventDefault() : null">
+      (keypress)="($event.charCode === 45) ? $event.preventDefault() : null"> -->
+      <div class="row">
+        <div class="col-12 px-0 pb-2" *ngFor="let _ of generateArray(selectedProductQuantity); let i = index">
+          <label for="wight" class="fw-semibold pb-0 fs-7">Item{{i+1}}/Weight(lbs)</label>
+          <input type="text" id="Property-title-input" class="form-control" placeholder="Enter weight"
+            [(ngModel)]="inputValues[i]" (keyup)="checkInventory(inputValues[i], i)">
+          <span *ngIf="!checkInventoryStatus[i]" class="text-danger fs-8 fw-medium">
+            Weight is not matching with the inventory in hand - Do you still want to proceed?
+          </span>
+        </div>
+        <div class="mt-2 fw-medium p-2 fs-7" style="background-color: #29A3291A; border-radius: 6px;">
+          Total Weight: {{ totalWeight }} lbs
+        </div>
+      </div>
+
     <div class="d-flex pt-3 gap-2">
-      <button class="btn btn-success flex-fill" [disabled]="!weightInput" (click)="saveWeight()">Update Weight</button>
+      <button class="btn btn-success flex-fill" (click)="sumbitInventory()">Update Weight</button>
       <button class="btn btn-outline-danger flex-fill" (click)="modalRef?.hide()">Cancel</button>
     </div>
   </div>

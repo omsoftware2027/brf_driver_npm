@@ -22,8 +22,12 @@ export class OrderDetailService {
     return this.http.get<any>(`${environment.baseUrl}/driver/getAllProductsByOrderIdAndBinFilter?OrderId=${orderId}&binNumber=${binNumber}`)
   }
 
-  searchProduct(orderId: any, search: string): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getAllProductsByOrderIdAndBinFilter?OrderId=${orderId}&search=${search}`);
+  searchProduct(orderId: any, search?: string, route?: any, binNumber?: any): Observable<any> {
+    let params: any = { OrderId: orderId };
+    if (search) params.search = search; 
+    if (route) params.route = route;
+    if (binNumber) params.binNumber = binNumber;
+    return this.http.get<any>(`${environment.baseUrl}/driver/getAllProductsByOrderIdAndBinFilter`, {params});
   }
 
   changeStatusOfProduct(orderItemId: number, confirmStatus: string, remark: string) {
@@ -47,6 +51,18 @@ export class OrderDetailService {
 
   getProductsCounts(orderId: number): Observable<any> {
     return this.http.get(`${environment.baseUrl}/driver/getProductsCountByOrderId?OrderId=${orderId}`);
+  }
+
+  getOrderProductInventoryedit(productId:any, orderItemId:any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/order/getOrderProductInventory?productId=${productId}&orderItemId=${orderItemId}`)
+  }
+  checkWeightExists(weight: any, sku: any, orderItemId: any) {
+    return this.http.get<any>(`${environment.baseUrl}/order/checkWeightExists?weight=${weight}&sku=${sku}&orderItemId=${orderItemId}`)
+  }
+
+  changeweight(weight: any, inventoryId: any, orderItemId: any) {
+    const url = `${environment.baseUrl}/order/saveWeight?weight=${weight}&inventoryId=${inventoryId}&orderItemId=${orderItemId}`;
+    return this.http.post(url, {});
   }
 
 }
