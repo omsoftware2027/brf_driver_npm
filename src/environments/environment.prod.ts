@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  baseUrl: 'https://api.brfood.us:4101/api'
+  baseUrl: 'https://api-brfood.omsdev.in:4101/api'
 };
