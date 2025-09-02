@@ -85,12 +85,12 @@
                                 <span class="text-success">{{ product?.sku }}</span> -
                                 <span class="text-black fw-medium">{{ product?.title }}</span>
                             </div>
-                            <div class="d-flex align-items-center fs-7 py-1 gap-2">
+                            <div class="d-flex align-items-center fs-7 py-1 gap-3">
                                 <span class="text-muted">Price: <span class="text-black">{{ product?.price || '...'
                                         }}</span></span>
                                 <span class="badge badge-green">{{ product?.binNumber }}</span>
                             </div>
-                            <div class="d-flex align-items-center fs-7 pb-2 gap-2">
+                            <div class="d-flex align-items-center fs-7 pb-2 gap-3">
                                 <span class="text-muted">Cost: <span class="text-black">{{ product?.costPrice || '...'
                                         }}</span></span>
                                 <span class="text-muted">Qty: {{ product?.quantity ? product?.quantity : '...'}}</span>
@@ -114,13 +114,13 @@
                     <div class="row mt-3 g-2">
                         <div class="col-6 p-0 mt-0 pe-1">
                             <button class="btn btn-success w-100"
-                                [disabled]="product?.unit != 'LBS' || product?.qty === 0" (click)="true">
+                                [disabled]="product?.unit != 'LBS' || product?.quantity === 0" (click)="openWeightModal(weightModal, product)">
                                 <img src="assets/icons/outline_scale.png" alt="icon" width="15" height="15">
                                 weight
                             </button>
                         </div>
                         <div class="col-6 p-0 mt-0 ps-1">
-                            <button class="btn btn-success w-100" [disabled]="!product?.dateType" (click)="true">
+                            <button class="btn btn-success w-100" [disabled]="!product?.dateType" (click)="openExpiryDateModal(expiryDateModal, product)">
                                 <img src="assets/icons/pajamas_time-out.png" alt="icon" width="15" height="15">
                                 Expiry
                             </button>
@@ -138,3 +138,55 @@
     </div>
 
 </div>
+
+<!-- Modals -->
+<ng-template #expiryDateModal>
+  <div class="modal-body p-4 position-relative">
+    <i class="bi bi-x position-absolute fs-3" style="top: 6px; right: 6px" aria-label="Close"
+      (click)="modalRef?.hide()"></i>
+    <p class="modal-title fs-6 fw-semibold">Expiry Date - <span
+        class="text-light-emphasis fs-7">{{selectedProduct?.title}}</span></p>
+    <p class="fs-7 text-muted">{{selectedProduct?.productCode}}</p>
+    <label for="expiryDate" class="fw-semibold pb-1">Expiry Date</label>
+    <input type="text"
+       class="form-control"
+       bsDatepicker
+       [container]="'body'"
+       [bsConfig]="{ dateInputFormat: 'MM/DD/YYYY' }"
+       [(ngModel)]="expiryDateInput"
+       placeholder="MM/DD/YYYY" />
+    <div class="d-flex pt-3 gap-2">
+      <button class="btn btn-success flex-fill" [disabled]="!expiryDateInput" (click)="saveExpiryDate()">Add Expiry
+        Date</button>
+      <button class="btn btn-outline-danger flex-fill" (click)="modalRef?.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #weightModal>
+  <div class="modal-body p-4 position-relative">
+    <i class="bi bi-x position-absolute fs-3" style="top: 6px; right: 6px" aria-label="Close"
+      (click)="modalRef?.hide()"></i>
+    <p class="modal-title fs-6 fw-semibold">Update Weight</p>
+    <p class="fs-7 text-muted">{{selectedProduct?.productCode}}</p>
+    <div class="text-muted fw-medium m-0 p-0">Enter weight for each item (Quantity: {{selectedProductQuantity}})</div>
+    <p *ngIf="selectedProduct?.weight" class="fs-8 text-muted mb-3 fw-medium">Previous weight: {{selectedProduct?.weight}}</p>
+      <div class="row">
+        <div class="col-12 px-0 pb-2" *ngFor="let _ of generateArray(selectedProductQuantity); let i = index">
+          <label for="wight" class="fw-semibold pb-0 fs-7">Item{{i+1}}/Weight(lbs)</label>
+          <input type="text" id="Property-title-input" class="form-control" placeholder="Enter weight"
+            [(ngModel)]="inputValues[i]" (keyup)="checkInventory(inputValues[i], i)">
+          <span *ngIf="!checkInventoryStatus[i]" class="text-danger fs-8 fw-medium">
+            Weight is not matching with the inventory in hand - Do you still want to proceed?
+          </span>
+        </div>
+        <div class="mt-2 fw-medium p-2 fs-7" style="background-color: #29A3291A; border-radius: 6px;">
+          Total Weight: {{ totalWeight }} lbs
+        </div>
+      </div>
+    <div class="d-flex pt-3 gap-2">
+      <button class="btn btn-success flex-fill" (click)="sumbitInventory()">Update Weight</button>
+      <button class="btn btn-outline-danger flex-fill" (click)="modalRef?.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
