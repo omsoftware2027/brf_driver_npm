@@ -1,1 +1,140 @@
-<p>order-report works!</p>
+<div class="container-fluid p-0">
+    <p class="fw-medium">Order Report</p>
+    <!-- accordian -->
+    <div class="accordion mb-3" id="orderType">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-medium small" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
+                    <!-- <i class="bi bi-card-text pe-2"></i> -->
+                    <img src="assets/icons/report-inactive.png" width="24" height="24" class="me-2" />
+                    {{selectedOrderReportType}}
+                </button>
+            </h2>
+            <div id="collapseDetails" class="accordion-collapse collapse" data-bs-parent="#orderType">
+                <div class="accordion-body small">
+                    <p class="pb-2 mb-2 border-bottom" (click)="setOrderReportType('Pickup')" data-bs-toggle="collapse"
+                        data-bs-target="#collapseDetails">
+                        <span class="fw-medium"
+                            [ngClass]="{ 'text-success fw-semibold': selectedOrderReportType === 'Pickup' }">Pickup</span>
+                    </p>
+                    <p class="pb-2 mb-2 border-bottom" (click)="setOrderReportType('Jetro One')"
+                        data-bs-toggle="collapse" data-bs-target="#collapseDetails">
+                        <span class="fw-medium"
+                            [ngClass]="{ 'text-success fw-semibold': selectedOrderReportType === 'Jetro One' }">Jetro
+                            One</span>
+                    </p>
+                    <p class="pb-2 mb-2 border-bottom" (click)="setOrderReportType('Jetro Two')"
+                        data-bs-toggle="collapse" data-bs-target="#collapseDetails">
+                        <span class="fw-medium"
+                            [ngClass]="{ 'text-success fw-semibold': selectedOrderReportType === 'Jetro Two' }">Jetro
+                            Two</span>
+                    </p>
+                    <p class="pb-2 mb-2 border-bottom" (click)="setOrderReportType('Warehouse')"
+                        data-bs-toggle="collapse" data-bs-target="#collapseDetails">
+                        <span class="fw-medium"
+                            [ngClass]="{ 'text-success fw-semibold': selectedOrderReportType === 'Warehouse' }">Warehouse</span>
+                    </p>
+                    <p class="pb-2 mb-2 border-bottom" (click)="setOrderReportType('Freezer One')"
+                        data-bs-toggle="collapse" data-bs-target="#collapseDetails">
+                        <span class="fw-medium"
+                            [ngClass]="{ 'text-success fw-semibold': selectedOrderReportType === 'Freezer One' }">Freezer
+                            One</span>
+                    </p>
+                    <p class="m-0" (click)="setOrderReportType('Freezer Two')" data-bs-toggle="collapse"
+                        data-bs-target="#collapseDetails">
+                        <span class="fw-medium"
+                            [ngClass]="{ 'text-success fw-semibold': selectedOrderReportType === 'Freezer Two' }">Freezer
+                            Two</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row align-content-between">
+        <div class="col-8 p-0">
+            <b class="fw-bold fs-3">{{selectedOrderReportType}} Reports</b>
+            <p class="text-muted fs-7">Filtered items for pending orders assigned to current driver</p>
+        </div>
+        <div class="col-4 p-0">
+            <div class="d-flex justify-content-end mt-2">
+                <span class="badge badge-green">{{reports.length>0 ? reports.length : 0}} items</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="pt-3">
+        <div *ngIf="reports?.length; else noReport">
+            <div *ngFor="let group of reports" class="mb-4 border rounded-3 pt-3 pb-1">
+                <div class="d-flex justify-content-between align-items-center pb-3 border-bottom px-2">
+                    <h6 class="fw-semibold mb-0 fs-5">{{ group.vendor }}</h6>
+                    <span class="badge badge-outlined">{{ group.items.length }} items</span>
+                </div>
+
+                <div *ngFor="let product of group.items; let last = last" class="p-3 mb-2 bg-white"
+                    [ngClass]="{ 'border-bottom mb-2': !last }">
+                    <div class="row">
+                        <div class="col-2 p-0">
+                            <span class="badge-green rounded-3 d-flex justify-content-center" style="padding: 0.7rem;">
+                                <img src="assets/icons/closed-box.png" width="24" height="24" />
+                            </span>
+                        </div>
+                        <div class="col-10 p-0 ps-2">
+                            <div class="fs-8 text-muted">
+                                <span class="text-success">{{ product?.sku }}</span> -
+                                <span class="text-black fw-medium">{{ product?.title }}</span>
+                            </div>
+                            <div class="d-flex align-items-center fs-7 py-1 gap-2">
+                                <span class="text-muted">Price: <span class="text-black">{{ product?.price || '...'
+                                        }}</span></span>
+                                <span class="badge badge-green">{{ product?.binNumber }}</span>
+                            </div>
+                            <div class="d-flex align-items-center fs-7 pb-2 gap-2">
+                                <span class="text-muted">Cost: <span class="text-black">{{ product?.costPrice || '...'
+                                        }}</span></span>
+                                <span class="text-muted">Qty: {{ product?.quantity ? product?.quantity : '...'}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card border-0 mb-3 rounded-3">
+                        <div class="card-body px-3 py-2 row justify-content-between align-items-center rounded-3"
+                            style="background-color: #FF383C24;">
+                            <div class="col-6 p-0">
+                                <div class="text-muted fs-7">Customer :</div>
+                                <div class="fw-bold text-dark fs-7">{{product?.userName}}</div>
+                            </div>
+                            <div class="col-6 p-0">
+                                <div class="text-muted fs-7">OrderId :</div>
+                                <div class="fw-bold text-dark fs-7">{{product?.orderId}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action buttons -->
+                    <div class="row mt-3 g-2">
+                        <div class="col-6 p-0 mt-0 pe-1">
+                            <button class="btn btn-success w-100"
+                                [disabled]="product?.unit != 'LBS' || product?.qty === 0" (click)="true">
+                                <img src="assets/icons/outline_scale.png" alt="icon" width="15" height="15">
+                                weight
+                            </button>
+                        </div>
+                        <div class="col-6 p-0 mt-0 ps-1">
+                            <button class="btn btn-success w-100" [disabled]="!product?.dateType" (click)="true">
+                                <img src="assets/icons/pajamas_time-out.png" alt="icon" width="15" height="15">
+                                Expiry
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ng-template #noReport>
+            <div class="text-center text-muted py-5">
+                No Data Available
+            </div>
+        </ng-template>
+    </div>
+
+</div>

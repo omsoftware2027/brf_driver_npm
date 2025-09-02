@@ -288,7 +288,7 @@ export class OrderDetailComponent {
         if (res?.status === 0) {
           this.expiryDateInput = res?.response?.expOrProdDate ? this.datePipe.transform(res?.response?.expOrProdDate, 'MM/dd/yyyy') : '';
         } else {
-          this.expiryDateInput = null;
+          this.expiryDateInput = product?.expOrProdDate ? this.datePipe.transform(product?.expOrProdDate, 'MM/dd/yyyy') : null;
         }
       }
     })
@@ -329,7 +329,7 @@ export class OrderDetailComponent {
       .subscribe({
         next: (res) => {
           this.modalRef?.hide();
-          this.getAllProducts();
+          this.onSearch();
         },
         error: (err) => {
           console.error('Error saving weight', err);

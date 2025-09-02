@@ -134,7 +134,7 @@
             <img src="assets/icons/outline_scale.png" alt="icon" width="15" height="15">
             weight
           </button>
-          <button class="btn btn-success btn-responsive" [disabled]="!product?.dateType" (click)="openExpiryDateModal(expiryDateModal, product)">
+          <button class="btn btn-success btn-responsive" [disabled]="!product?.dateType" (click)="openExpiryDateModal(expiryDateModal, product)"> 
             <img src="assets/icons/pajamas_time-out.png" alt="icon" width="15" height="15">
             Expiry
           </button>
@@ -171,7 +171,8 @@
       </span> -->
       </p>
     <p class="fs-7 text-muted">{{selectedProduct?.productCode}}</p>
-    <p class="text-muted fw-medium">Enter weight for each item (Quantity: {{selectedProductQuantity}})</p>
+    <div class="text-muted fw-medium m-0 p-0">Enter weight for each item (Quantity: {{selectedProductQuantity}})</div>
+    <p *ngIf="selectedProduct?.weight" class="fs-8 text-muted mb-3 fw-medium">Previous weight: {{selectedProduct?.weight}}</p>
     <!-- <label for="wight" class="fw-semibold pb-1">Weight(lbs)</label>
     <input type="number" [(ngModel)]="weightInput" class="form-control" placeholder="Enter weight"
       (keypress)="($event.charCode === 45) ? $event.preventDefault() : null"> -->
