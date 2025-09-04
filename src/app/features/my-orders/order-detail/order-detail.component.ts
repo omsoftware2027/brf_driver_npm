@@ -1,14 +1,16 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, TemplateRef } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { OrderDetailService } from '../../../core/services/order-detail.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { NgSelectModule } from '@ng-select/ng-select';
+
 
 @Component({
   selector: 'app-order-detail',
-  imports: [RouterModule, CommonModule, FormsModule, BsDatepickerModule],
+  imports: [RouterModule, CommonModule, FormsModule, BsDatepickerModule, ReactiveFormsModule, NgSelectModule],
   templateUrl: './order-detail.component.html',
   styleUrl: './order-detail.component.scss',
   providers: [DatePipe]
@@ -47,19 +49,31 @@ export class OrderDetailComponent {
   expiryDateInput: any;
   remarkInput: any
 
+  itemsList: any[] = [];
+  productList: any[] = [];
+
+  productform!:FormGroup
+
 
   constructor(
     private route: ActivatedRoute,
     public orderDetailService: OrderDetailService,
     private modalService: BsModalService,
-    private datePipe: DatePipe
-  ) { }
+    private datePipe: DatePipe,
+    private formBuilder: FormBuilder
+  ) {
+        this.productform = this.formBuilder.group({
+      productId:[''],
+      quantity: [''],
+    });
+   }
 
   ngOnInit() {
     this.orderId = this.route.snapshot.paramMap.get('id')!;
     if (this.orderId) {
       this.getProductsCountsForTabs(this.orderId);
       this.getAllProducts();
+      this.getAllProductList()
     }
   }
 
@@ -132,6 +146,22 @@ export class OrderDetailComponent {
     // }
   }
 
+  getAllProductList() {
+    this.orderDetailService.getallproductlist(0, 600).subscribe((res) => {
+      if (res['status'] === 0) {
+        this.productList = res['response']['dataSet'];
+        this.itemsList = this.productList.map((product) => {
+          return {
+            name: product.productName,
+            productId: product.productId,
+            description: product.description,
+            shortDescription: product.shortDescription
+          };
+        });
+      }
+    });
+  }
+
   getAllProducts() {
     if (this.orderId) {
       this.orderDetailService.getAllproducts(this.orderId).subscribe({
@@ -154,6 +184,7 @@ export class OrderDetailComponent {
       .subscribe({
         next: (res) => {
           console.log('Product status updated successfully', res);
+          this.onSearch();
         },
         error: (err) => {
           console.error('Error updating product status', err);
@@ -337,4 +368,36 @@ export class OrderDetailComponent {
       });
   }
 
+
+  allowOnlyNumbers(event: KeyboardEvent) {
+    const charCode = event.key.charCodeAt(0);
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
+  }
+  customSearchFn(term: string, item: any): boolean {
+    term = term.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(term) ||
+      item.productId?.toString().toLowerCase().includes(term) ||
+      item.description?.toLowerCase().includes(term) ||
+      item.shortDescription?.toLowerCase().includes(term)
+    );
+  }
+  
+  showProductReplaceModal(template: TemplateRef<any>, product: any) {
+    this.selectedProduct = product;
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-dialog-centered modal-sm'
+    });
+  }
+  changeproduct() {
+    this.orderDetailService.changeproduct(this.orderId, this.selectedProduct?.productId, this.productform.value.productId, this.selectedProduct?.orderItemId, this.productform.value.quantity).subscribe((res) => {
+      if (res['status'] == 0) {
+        this.modalRef?.hide();
+        this.onSearch();
+        this.productform.reset();
+      }
+    });
+  }
 }

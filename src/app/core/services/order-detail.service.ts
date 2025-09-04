@@ -65,4 +65,12 @@ export class OrderDetailService {
     return this.http.post(url, {});
   }
 
+  getallproductlist(page: any, size: any) {
+    return this.http.get<any>(`${environment.baseUrl}/order/getAllProduct?pageNo=${page}&pageSize=${size}`);
+  }
+
+  changeproduct(orderId: any, originalProductId: any, replaceProductId: any, orderItemId: any, quantity: any) {
+    return this.http.get<any>(`${environment.baseUrl}/order/changeProduct?orderId=${orderId}&originalProductId=${originalProductId}&replaceProductId=${replaceProductId}&orderItemId=${orderItemId}&quantity=${quantity}`);
+  }
+
 }
