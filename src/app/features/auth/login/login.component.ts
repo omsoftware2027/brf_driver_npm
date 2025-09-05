@@ -20,7 +20,7 @@ export class LoginComponent {
 
   otpArray = Array(4).fill(0);  // For 6 boxes
   otpValues: string[] = Array(4).fill('');
-  
+
 
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef>;
 
@@ -53,23 +53,26 @@ export class LoginComponent {
           this.isLoading = false;
           if (data && data.status === 0) {
             if (data.response && data.response.token) {
-              const userInfo = {
-                name: data.response.name,
-                id: data.response.teamId,
-                token: data.response.token,
-                // role: data.response.role,
-              }
-              this.authService.setUser(userInfo);
-              this.authService.sendOtp(this.loginForm.value.email).subscribe({
-                next: ()=>{
-                  this.step = 'otp';
-                  this.toastr.info('OTP sent to your registered contact', 'Info');
-                },
-                error: ()=> {
-                  this.toastr.error('Failed to send OTP', 'Error');
+              if (data?.response?.role?.toLowerCase() === 'driver') {
+                const userInfo = {
+                  name: data.response.name,
+                  id: data.response.teamId,
+                  token: data.response.token,
+                  // role: data.response.role,
                 }
-              })
-              // this.router.navigate(['/dashboard'])
+                this.authService.setUser(userInfo);
+                this.authService.sendOtp(this.loginForm.value.email).subscribe({
+                  next: () => {
+                    this.step = 'otp';
+                    this.toastr.info('OTP sent to your registered contact', 'Info');
+                  },
+                  error: () => {
+                    this.toastr.error('Failed to send OTP', 'Error');
+                  }
+                })
+              } else {
+                this.toastr.error('You are not authorized as a driver', 'Access Denied');
+              }
             }
           }
         },
