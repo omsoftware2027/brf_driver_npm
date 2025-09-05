@@ -155,7 +155,8 @@ export class OrderDetailComponent {
             name: product.productName,
             productId: product.productId,
             description: product.description,
-            shortDescription: product.shortDescription
+            shortDescription: product.shortDescription,
+            code: product.code
           };
         });
       }
@@ -381,7 +382,8 @@ export class OrderDetailComponent {
       item.name?.toLowerCase().includes(term) ||
       item.productId?.toString().toLowerCase().includes(term) ||
       item.description?.toLowerCase().includes(term) ||
-      item.shortDescription?.toLowerCase().includes(term)
+      item.shortDescription?.toLowerCase().includes(term) ||
+      item.code?.toLowerCase().includes(term)
     );
   }
   

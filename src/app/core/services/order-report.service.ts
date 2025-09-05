@@ -14,10 +14,10 @@ export class OrderReportService {
     return this.http.get<any>(`${environment.baseUrl}/driver/getPickupOrdersByDriverId?date=${date}&driverId=${driverId}&sortBy=route`);
   }
   getJetroOneReports(date: any, driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getJetroOneByDriverId?date=${date}&driverId=${driverId}`);
+    return this.http.get<any>(`${environment.baseUrl}/driver/getJetroOneByDriverId?date=${date}&driverId=${driverId}&sortBy=userName`);
   }
   getJetroTwoReports(date: any, driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getJetroTwoByDriverId?date=${date}&driverId=${driverId}`);
+    return this.http.get<any>(`${environment.baseUrl}/driver/getJetroTwoByDriverId?date=${date}&driverId=${driverId}&sortBy=userName`);
   }
   getWarehouseReports(date: any, driverId: any): Observable<any> {
     return this.http.get<any>(`${environment.baseUrl}/driver/getWarehouseOrdersByDriverId?date=${date}&driverId=${driverId}&sortBy=route`);

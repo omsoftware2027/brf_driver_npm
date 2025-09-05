@@ -29,7 +29,7 @@
         <div class="text-uppercase small text-muted">ORDER NO</div>
         <div class="fw-bold text-dark">{{orderId}}</div>
       </div>
-      <span class="badge bg-danger rounded-pill px-3 py-2">HIGH</span>
+      <!-- <span class="badge bg-danger rounded-pill px-3 py-2">HIGH</span> -->
     </div>
   </div>
   <!-- Customer Details -->
@@ -47,7 +47,7 @@
           <p class="mb-1"><span class="fw-medium">Name: </span>{{customerDetails?.userName ?? '...'}}</p>
           <p class="mb-1"><span class="fw-medium">Address: </span>{{customerDetails?.shippingAddress ?? '...'}} </p>
           <p class="mb-1"><span class="fw-medium">Phone: </span>{{customerDetails?.contact ?? '...'}}</p>
-          <p class="mb-0"><span class="fw-medium">Delivery Date: </span>{{customerDetails?.deliveryDate ?? '...'}}</p>
+          <p class="mb-0"><span class="fw-medium">Delivery Date: </span>{{ customerDetails?.deliveryDate ? (customerDetails.deliveryDate | date:'MM-dd-yyyy') : '...' }}</p>
         </div>
       </div>
     </div>

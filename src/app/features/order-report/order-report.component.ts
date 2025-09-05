@@ -290,6 +290,7 @@ export class OrderReportComponent {
     console.log('Weights:', weights);
     // Use the limited inventoryIds and weights arrays when calling the service
     this.orderDetailService.changeweight(weights, inventoryIds, this.selectedProduct?.orderItemId).subscribe((res) => {
+      this.setOrderReportType(this.selectedOrderReportType)
       this.modalRef?.hide();
     });
   }
