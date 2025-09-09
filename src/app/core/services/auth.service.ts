@@ -42,6 +42,10 @@ export class AuthService {
     this.userSubject.next(null);
   }
 
+  getUserSnapshot() {
+    return this.userSubject.getValue();
+  }
+
   getTeamById(roleId: any): Observable<any> {
     return this.http.get<any>(`${environment.baseUrl}/masterData/getTeamById?teamId=` + roleId);
   }

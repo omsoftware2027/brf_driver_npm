@@ -8,6 +8,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import { loaderInterceptor } from './core/interceptors/loader.interceptor';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -24,7 +25,9 @@ export const appConfig: ApplicationConfig = {
       }),
       ModalModule.forRoot(),
     ),
-    provideHttpClient(withInterceptors([loaderInterceptor])),
+    provideHttpClient(
+      withInterceptors([authInterceptor, loaderInterceptor])
+    ),
     CommonModule
   ]
 };

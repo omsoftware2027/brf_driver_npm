@@ -27,7 +27,7 @@ export class OrderDetailComponent {
 
   tabs = [
     { key: 'all', label: 'All', count: 0 },
-    { key: 'pickup', label: 'Pickup', count: 0 },
+    { key: 'pick up', label: 'Pickup', count: 0 },
     { key: '1', label: 'Jetro One', count: 0 },
     { key: '2', label: 'Jetro Two', count: 0 }
   ];
@@ -86,7 +86,7 @@ export class OrderDetailComponent {
         this.jetroTwoProductsCount = res?.response?.jetroTwoProductsCount ?? 0;
         this.tabs = [
           { key: 'all', label: 'All', count: this.allProductsCount },
-          { key: 'pickup', label: 'Pickup', count: this.pickupProductsCount },
+          { key: 'pick up', label: 'Pickup', count: this.pickupProductsCount },
           { key: '1', label: 'Jetro One', count: this.jetroOneProdcutsCount },
           { key: '2', label: 'Jetro Two', count: this.jetroTwoProductsCount }
         ];
@@ -100,7 +100,7 @@ export class OrderDetailComponent {
   onSearch() {
     let pickupFilter = '';
     let routeFilter = '';
-    if (this.activeTab === 'pickup') {
+    if (this.activeTab === 'pick up') {
       pickupFilter = this.activeTab
     } else if(this.activeTab === '1' || this.activeTab === '2') {
       routeFilter = this.activeTab
@@ -122,28 +122,7 @@ export class OrderDetailComponent {
     if (tab?.label === 'All' && this.searchText==='') {
       this.getAllProducts();
     }
-
     this.onSearch();
-    // if (tab?.label === 'Jetro One' || tab?.label === 'Jetro Two') {
-    //   this.orderDetailService.getProductsByRoute(this.orderId, this.activeTab).subscribe({
-    //     next: (res) => {
-    //       this.orderDetail = res?.response?.products?.dataSet || [];
-    //     },
-    //     error: (err) => {
-    //       this.orderDetail = [];
-    //     }
-    //   })
-    // }
-    // if (tab?.label === 'Pickup') {
-    //   this.orderDetailService.getProductsByBinNo(this.orderId, this.activeTab).subscribe({
-    //     next: (res) => {
-    //       this.orderDetail = res?.response?.products?.dataSet || [];
-    //     },
-    //     error: (err) => {
-    //       this.orderDetail = [];
-    //     }
-    //   })
-    // }
   }
 
   getAllProductList() {
@@ -394,11 +373,16 @@ export class OrderDetailComponent {
     });
   }
   changeproduct() {
-    this.orderDetailService.changeproduct(this.orderId, this.selectedProduct?.productId, this.productform.value.productId, this.selectedProduct?.orderItemId, this.productform.value.quantity).subscribe((res) => {
-      if (res['status'] == 0) {
-        this.modalRef?.hide();
-        this.onSearch();
-        this.productform.reset();
+    this.orderDetailService.changeproduct(this.orderId, this.selectedProduct?.productId, this.productform.value.productId, this.selectedProduct?.orderItemId, this.productform.value.quantity).subscribe({
+      next: (res) => {
+        if (res['status'] == 0) {
+          this.modalRef?.hide();
+          this.onSearch();
+          this.productform.reset();
+        }
+      },
+      error: (err) => {
+        console.error(err);
       }
     });
   }
