@@ -41,4 +41,8 @@ export class AuthService {
     localStorage.removeItem('userInfo');
     this.userSubject.next(null);
   }
+
+  getTeamById(roleId: any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/masterData/getTeamById?teamId=` + roleId);
+  }
 }

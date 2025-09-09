@@ -20,14 +20,20 @@
         <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
             <i class="bi bi-x" (click)="searchText = ''"></i>
         </span>
-        <div *ngIf="searchResults.length > 0 && searchText"
-            class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
+        <div *ngIf="searchText" class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
             style="max-height: 250px; overflow-y: auto; z-index: 30">
-            <button type="button" class="list-group-item list-group-item-action" *ngFor="let order of searchResults"
-                [routerLink]="['/my-orders/order-detail', order?.orderId]">
-                <div class="fw-bold text-black">{{ order?.trasactionId }}</div>
-                <small class="text-muted">{{ order?.customerName }} • {{ order?.address }}</small>
-            </button>
+            <ng-container *ngIf="searchResults.length > 0; else noData">
+                <button type="button" class="list-group-item list-group-item-action" *ngFor="let order of searchResults"
+                    [routerLink]="['/my-orders/order-detail', order?.orderId]">
+                    <div class="fw-bold text-black">{{ order?.trasactionId }}</div>
+                    <small class="text-muted">{{ order?.customerName }} • {{ order?.address }}</small>
+                </button>
+            </ng-container>
+            <ng-template #noData>
+                <div class="list-group-item text-muted text-center py-2">
+                    No items found <span *ngIf="searchText">matching “{{searchText}}” </span>
+                </div>
+            </ng-template>
         </div>
     </div>
 

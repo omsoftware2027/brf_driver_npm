@@ -15,9 +15,12 @@
   </div>
 
   <!-- User profile -->
-  <div class="header-profile position-relative">
-    <img src="assets/images/profile.image1.jpg" alt="User Profile" class="rounded-circle"
-      style="width: 36px; height: 36px;" (click)="toggleMenu()" />
+  <div class="header-profile position-relative" *ngIf="authService.user$ | async as user">
+    <img *ngIf="user.profilePicture; else defaultAvatar" [src]="user?.profilePicture"
+      class="rounded-circle" style="width: 36px; height: 36px;" (click)="toggleMenu()" />
+    <ng-template #defaultAvatar>
+      <i class="bi bi-person-circle fs-2 text-muted" (click)="toggleMenu()"></i>
+    </ng-template>
     <div *ngIf="menuOpen" class="position-absolute end-0 mt-1 bg-white shadow rounded-2 p-2 border"
       style="min-width: 140px; z-index: 1050;">
       <button class="dropdown-item text-danger fw-medium" (click)="logout()">

@@ -21,6 +21,8 @@ export class LoginComponent {
   otpArray = Array(4).fill(0);  // For 6 boxes
   otpValues: string[] = Array(4).fill('');
 
+  userInfo: any = {};
+
 
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef>;
 
@@ -54,16 +56,23 @@ export class LoginComponent {
           if (data && data.status === 0) {
             if (data.response && data.response.token) {
               if (data?.response?.role?.toLowerCase() === 'driver') {
-                const userInfo = {
-                  name: data.response.name,
-                  id: data.response.teamId,
-                  token: data.response.token,
-                  // role: data.response.role,
-                }
-                this.authService.setUser(userInfo);
+                this.step = 'otp';
+                this.userInfo.name = data?.response?.name;
+                this.userInfo.id = data?.response?.teamId;
+                this.userInfo.token = data?.response?.token;
+
+                this.authService.getTeamById(data.response.teamId).subscribe({
+                  next: (teamData) => {
+                    this.userInfo.profilePicture = teamData?.response?.profilePicture || '';
+                  },
+                  error: () => {
+                    console.log('Failed to fetch profile image');
+                  }
+                })
+
                 this.authService.sendOtp(this.loginForm.value.email).subscribe({
                   next: () => {
-                    this.step = 'otp';
+                    // this.step = 'otp';
                     this.toastr.info('OTP sent to your registered contact', 'Info');
                   },
                   error: () => {
@@ -103,6 +112,7 @@ export class LoginComponent {
     this.authService.verifyOtp(this.otp, this.loginForm.value.email).subscribe({
       next: (res) => {
         if (res?.status === 0) {
+          this.authService.setUser(this.userInfo);
           this.toastr.success('Login successful!', 'Success');
           this.router.navigate(['/dashboard']);
         } else {

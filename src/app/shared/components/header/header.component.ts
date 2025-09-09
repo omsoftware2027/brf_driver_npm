@@ -14,7 +14,7 @@ export class HeaderComponent {
   @Input() showBack: boolean = false;
   menuOpen = false;
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(public authService: AuthService, private router: Router) { }
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
