@@ -1,10 +1,6 @@
-<footer class="footer-nav d-flex justify-content-around align-items-center py-2">
-  <a class="nav-item" 
-     routerLink="/dashboard" 
-     routerLinkActive="active"
-     #rla="routerLinkActive">
+<footer class="footer-nav d-flex justify-content-around align-items-center py-2 px-1">
+  <a class="nav-item" routerLink="/dashboard" routerLinkActive="active" #rla="routerLinkActive">
     <div class="nav-icon">
-      <!-- <i class="bi bi-grid-fill"></i> -->
       <div>
         <img *ngIf="!rla.isActive" src="assets/icons/dashboard-inactive.png" alt="icon" width="20" height="20">
       </div>
@@ -14,26 +10,21 @@
     </div>
     <div class="nav-label">Dashboard</div>
   </a>
-<a class="nav-item" routerLink="/my-orders" routerLinkActive="active" #drla="routerLinkActive">
-  <div class="nav-icon">
-    <!-- <i class="bi bi-box-seam"></i> -->
-    <div>
-      <img *ngIf="!drla.isActive" src="assets/icons/parcel-inactive.png" alt="icon" width="20" height="20">
-    </div>
-    <div>
-      <img *ngIf="drla.isActive" src="assets/icons/parcel-active.png" alt="icon" width="20" height="20">
-    </div>
-  </div>
-  <div class="nav-label">My Orders</div>
-</a>
 
-  <a class="nav-item" 
-     routerLink="/order-report" 
-     routerLinkActive="active"
-     #orla="routerLinkActive"
-     >
+  <a class="nav-item" routerLink="/my-orders" routerLinkActive="active" #drla="routerLinkActive">
     <div class="nav-icon">
-      <!-- <i class="bi bi-file-text"></i> -->
+      <div>
+        <img *ngIf="!drla.isActive" src="assets/icons/parcel-inactive.png" alt="icon" width="20" height="20">
+      </div>
+      <div>
+        <img *ngIf="drla.isActive" src="assets/icons/parcel-active.png" alt="icon" width="20" height="20">
+      </div>
+    </div>
+    <div class="nav-label">My Orders</div>
+  </a>
+
+  <a class="nav-item" routerLink="/order-report" routerLinkActive="active" #orla="routerLinkActive">
+    <div class="nav-icon">
       <div>
         <img *ngIf="!orla.isActive" src="assets/icons/report-inactive.png" alt="icon" width="20" height="20">
       </div>
@@ -42,5 +33,17 @@
       </div>
     </div>
     <div class="nav-label">Order Report</div>
+  </a>
+
+  <a class="nav-item" routerLink="/delivery" routerLinkActive="active" #delvrla="routerLinkActive">
+    <div class="nav-icon">
+      <div>
+        <i *ngIf="!delvrla.isActive" class="bi bi-truck text-black"></i>
+      </div>
+      <div>
+        <i *ngIf="delvrla.isActive" class="bi bi-truck text-success"></i>
+      </div>
+    </div>
+    <div class="nav-label">Delivery</div>
   </a>
 </footer>

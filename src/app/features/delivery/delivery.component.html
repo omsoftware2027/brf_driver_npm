@@ -1,0 +1,17 @@
+<div class="container-fluid p-0">
+  <!-- Trip Summary -->
+  <div *ngIf="totalDistance && totalDuration" class="mb-3 fs-7 fw-semibold">
+    Trip: {{ totalDistance }} • {{ totalDuration }}
+  </div>
+  <div class="delivery-map-container">
+    <div #mapContainer class="map-container"></div>
+
+    <!-- <div class="map-overlay">
+    <h4 class="fw-semibold mb-1">Your Delivery</h4>
+    <p class="mb-1 small text-muted">Live route from your location to the delivery address</p>
+    <button class="btn btn-success btn-sm w-100 mt-2">Start Navigation</button>
+  </div> -->
+  </div>
+
+
+</div>

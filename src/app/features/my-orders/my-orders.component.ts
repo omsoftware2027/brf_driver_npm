@@ -27,7 +27,7 @@ export class MyOrdersComponent {
     public router: Router
   ) {
     const today = new Date();
-    today.setDate(today.getDate() - 7);
+    today.setDate(today.getDate() - 6);
     this.lastSevenDayDate = today.toISOString().split('T')[0];
   }
 
@@ -39,7 +39,7 @@ export class MyOrdersComponent {
           this.orderService.getAllOrders(this.user?.id, this.lastSevenDayDate).subscribe({
             next: (res) => {
               this.orders = res?.response?.dataSet || [];
-              this.orders.sort((a, b) => new Date(b.deliveryDate).getTime() - new Date(a.deliveryDate).getTime());
+              this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
               if (this.orders.length === 0) {
                 // this.toastr.info('No orders found in the last 7 days', 'Info');
               }

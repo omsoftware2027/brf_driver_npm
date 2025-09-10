@@ -1,0 +1,22 @@
+.delivery-map-container {
+  position: relative;
+  height: 75vh;
+  width: 100%;
+}
+
+.map-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* Overlay for mobile view */
+.map-overlay {
+  position: absolute;
+  bottom: 15px;
+  left: 10px;
+  right: 10px;
+  background: #fff;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
+}

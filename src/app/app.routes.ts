@@ -26,5 +26,11 @@ export const routes: Routes = [
         loadChildren: () =>
             import('./features/order-report/order-report.module').then(m => m.OrderReportModule)
     },
+    {
+        path: 'delivery',
+        canActivate: [authGuard],
+        loadChildren: () =>
+            import('./features/delivery/delivery.module').then(m => m.DeliveryModule)
+    },
     { path: '**', redirectTo: 'auth/login' }
 ];

@@ -40,6 +40,7 @@ export class OrderReportComponent {
     public modalService: BsModalService,
   ) {
     const today = new Date();
+    today.setDate(today.getDate() - 6);
     this.lastSevenDayDate = today.toISOString().split('T')[0];
   };
 
