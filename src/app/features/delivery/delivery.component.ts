@@ -80,8 +80,11 @@ export class DeliveryComponent {
     this.map = new google.maps.Map(this.mapContainer.nativeElement, {
       center: this.center,
       zoom: 20,
-      mapId: 'ea16df23bdf1068b82987400'
-
+      mapId: 'ea16df23bdf1068b82987400',
+      gestureHandling: 'cooperative',
+      zoomControl: true,
+      fullscreenControl: false,
+      streetViewControl: false
     });
     new google.maps.marker.AdvancedMarkerElement({
       position: this.deliveryLocation,
@@ -125,65 +128,15 @@ export class DeliveryComponent {
   }
 
   // Draw optimized map with all delivery stops
-  loadMapAndRoute1(userLoc: google.maps.LatLngLiteral, deliveryStops: google.maps.LatLngLiteral[]) {
-    this.map = new google.maps.Map(this.mapContainer.nativeElement, {
-      center: userLoc,
-      zoom: 14,
-      mapId: 'ea16df23bdf1068b82987400'
-    });
-
-    // driver marker (green circle)
-    new google.maps.marker.AdvancedMarkerElement({
-      position: userLoc,
-      map: this.map,
-      title: 'You are here',
-      content: this.createCustomMarker('#28a745')
-    });
-    const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true });
-    directionsRenderer.setMap(this.map);
-    const waypoints = deliveryStops.map((loc) => ({ location: loc, stopover: true }));
-    directionsService.route(
-      {
-        origin: userLoc,
-        destination: userLoc,
-        waypoints,
-        optimizeWaypoints: true,
-        travelMode: google.maps.TravelMode.DRIVING
-      },
-      (response: any, status: any) => {
-        if (status === 'OK') {
-          const order = response.routes[0].waypoint_order;
-          console.log('Optimized order:', order);
-          const route = response.routes[0];
-          const legs = route.legs;
-          if (legs.length > 0) {
-            legs.pop();
-          }
-          directionsRenderer.setDirections(response);
-          // Place numbered delivery markers in optimized order
-          order.forEach((stopIndex: number, i: number) => {
-            const loc = deliveryStops[stopIndex];
-            new google.maps.marker.AdvancedMarkerElement({
-              position: loc,
-              map: this.map,
-              title: `Delivery Stop ${i + 1}`,
-              content: this.createNumberedMarker('#dc3545', i + 1)
-            });
-          });
-        } else {
-          console.error('Directions request failed: ' + status);
-        }
-      }
-    );
-  }
-
-
   loadMapAndRoute(userLoc: google.maps.LatLngLiteral, deliveryStops: google.maps.LatLngLiteral[]) {
     this.map = new google.maps.Map(this.mapContainer.nativeElement, {
       center: userLoc,
       zoom: 14,
-      mapId: 'ea16df23bdf1068b82987400'
+      mapId: 'ea16df23bdf1068b82987400',
+      gestureHandling: 'cooperative',
+      zoomControl: true,
+      fullscreenControl: false,
+      streetViewControl: false
     });
 
     const directionsService = new google.maps.DirectionsService();
@@ -233,9 +186,15 @@ export class DeliveryComponent {
             totalDuration += leg.duration?.value || 0; // in seconds
           });
 
-          // Convert to readable
           this.totalDistance = (totalDistance / 1000).toFixed(1) + ' km';
-          this.totalDuration = Math.round(totalDuration / 60) + ' mins';
+          const totalMinutes = Math.round(totalDuration / 60);
+          if (totalMinutes >= 60) {
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            this.totalDuration = minutes > 0 ? `${hours} hr ${minutes} mins` : `${hours} hr`;
+          } else {
+            this.totalDuration = `${totalMinutes} mins`;
+          }
 
         } else {
           console.error('Directions request failed: ' + status);
