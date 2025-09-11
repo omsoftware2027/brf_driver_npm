@@ -10,22 +10,22 @@ export class OrderReportService {
 
   constructor(public http: HttpClient) { }
 
-  getPickupReports(date: any, driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getPickupOrdersByDriverId?date=${date}&driverId=${driverId}&sortBy=route`);
+  getPickupReports(driverId: any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/getPickupOrdersByDriverId?driverId=${driverId}&sortBy=route`);
   }
-  getJetroOneReports(date: any, driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getJetroOneByDriverId?date=${date}&driverId=${driverId}&sortBy=userName`);
+  getJetroOneReports(driverId: any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/getJetroOneByDriverId?driverId=${driverId}&sortBy=userName`);
   }
-  getJetroTwoReports(date: any, driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getJetroTwoByDriverId?date=${date}&driverId=${driverId}&sortBy=userName`);
+  getJetroTwoReports(driverId: any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/getJetroTwoByDriverId?driverId=${driverId}&sortBy=userName`);
   }
-  getWarehouseReports(date: any, driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getWarehouseOrdersByDriverId?date=${date}&driverId=${driverId}&sortBy=route`);
+  getWarehouseReports(driverId: any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/getWarehouseOrdersByDriverId?driverId=${driverId}&sortBy=route`);
   }
-  getFreezerOneReports(date: any, driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getFreezerOneByDriverId?date=${date}&driverId=${driverId}&sortBy=route`);
+  getFreezerOneReports(driverId: any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/getFreezerOneByDriverId?driverId=${driverId}&sortBy=route`);
   }
-  getFreezerTwoReports(date: any, driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getFreezerTwoByDriverId?date=${date}&driverId=${driverId}&sortBy=route`);
+  getFreezerTwoReports(driverId: any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/getFreezerTwoByDriverId?driverId=${driverId}&sortBy=route`);
   }
 }

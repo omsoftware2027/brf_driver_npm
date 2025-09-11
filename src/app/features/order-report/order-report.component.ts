@@ -16,7 +16,6 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 })
 export class OrderReportComponent {
   selectedOrderReportType: string = 'Pickup';
-  lastSevenDayDate: string = '';
   user: any;
   reports: any = {};
 
@@ -38,17 +37,13 @@ export class OrderReportComponent {
     public orderDetailService: OrderDetailService,
     public datePipe: DatePipe,
     public modalService: BsModalService,
-  ) {
-    const today = new Date();
-    today.setDate(today.getDate() - 6);
-    this.lastSevenDayDate = today.toISOString().split('T')[0];
-  };
+  ) { };
 
   ngOnInit() {
     this.authService.user$.subscribe(
       user => {
         this.user = user;
-        this.getPickupReport(this.lastSevenDayDate, this.user?.id);
+        this.getPickupReport(this.user?.id);
       })
   }
 
@@ -56,27 +51,27 @@ export class OrderReportComponent {
     const driverId = this.user?.id;
     this.selectedOrderReportType = type;
     if (this.selectedOrderReportType === 'Pickup') {
-      this.getPickupReport(this.lastSevenDayDate, driverId);
+      this.getPickupReport(driverId);
     }
     if (this.selectedOrderReportType === 'Jetro One') {
-      this.getJetroOneReport(this.lastSevenDayDate, driverId);
+      this.getJetroOneReport(driverId);
     }
     if (this.selectedOrderReportType === 'Jetro Two') {
-      this.getJetroTwoReport(this.lastSevenDayDate, driverId);
+      this.getJetroTwoReport(driverId);
     }
     if (this.selectedOrderReportType === 'Warehouse') {
-      this.getWarehouseReport(this.lastSevenDayDate, driverId);
+      this.getWarehouseReport(driverId);
     }
     if (this.selectedOrderReportType === 'Freezer One') {
-      this.getFreezerOneReport(this.lastSevenDayDate, driverId);
+      this.getFreezerOneReport(driverId);
     }
     if (this.selectedOrderReportType === 'Freezer Two') {
-      this.getFreezerTwoReport(this.lastSevenDayDate, driverId);
+      this.getFreezerTwoReport(driverId);
     }
   }
 
-  getPickupReport(date: any, driverId: any) {
-    this.orderReportService.getPickupReports(date, driverId).subscribe({
+  getPickupReport(driverId: any) {
+    this.orderReportService.getPickupReports(driverId).subscribe({
       next: (res) => {
         this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
           vendor,
@@ -88,8 +83,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getJetroOneReport(date: any, driverId: any) {
-    this.orderReportService.getJetroOneReports(date, driverId).subscribe({
+  getJetroOneReport(driverId: any) {
+    this.orderReportService.getJetroOneReports(driverId).subscribe({
       next: (res) => {
         this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
           vendor,
@@ -101,8 +96,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getJetroTwoReport(date: any, driverId: any) {
-    this.orderReportService.getJetroTwoReports(date, driverId).subscribe({
+  getJetroTwoReport(driverId: any) {
+    this.orderReportService.getJetroTwoReports(driverId).subscribe({
       next: (res) => {
         this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
           vendor,
@@ -114,8 +109,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getWarehouseReport(date: any, driverId: any) {
-    this.orderReportService.getWarehouseReports(date, driverId).subscribe({
+  getWarehouseReport(driverId: any) {
+    this.orderReportService.getWarehouseReports(driverId).subscribe({
       next: (res) => {
         this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
           vendor,
@@ -127,8 +122,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getFreezerOneReport(date: any, driverId: any) {
-    this.orderReportService.getFreezerOneReports(date, driverId).subscribe({
+  getFreezerOneReport(driverId: any) {
+    this.orderReportService.getFreezerOneReports(driverId).subscribe({
       next: (res) => {
         this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
           vendor,
@@ -140,8 +135,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getFreezerTwoReport(date: any, driverId: any) {
-    this.orderReportService.getFreezerTwoReports(date, driverId).subscribe({
+  getFreezerTwoReport(driverId: any) {
+    this.orderReportService.getFreezerTwoReports(driverId).subscribe({
       next: (res) => {
         this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
           vendor,
