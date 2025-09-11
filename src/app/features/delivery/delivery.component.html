@@ -1,8 +1,13 @@
 <div class="container-fluid p-0">
   <!-- Trip Summary -->
-  <div *ngIf="totalDistance && totalDuration" class="mb-3 fs-7 fw-semibold">
-    Trip: <span class="text-muted">{{ totalDistance }} • {{ totalDuration }}</span>
+  <div *ngIf="orders.length; else noOrders">
+    <div *ngIf="totalDistance && totalDuration" class="mb-3 fs-7 fw-semibold">
+      Trip: <span class="text-muted">{{ totalDistance }} • {{ totalDuration }}</span>
+    </div>
   </div>
+  <ng-template #noOrders>
+    <p class="mb-3 fs-6 fw-medium text-center text-muted">No Order Available</p>
+  </ng-template>
   <div class="delivery-map-container">
     <div #mapContainer class="map-container"></div>
 

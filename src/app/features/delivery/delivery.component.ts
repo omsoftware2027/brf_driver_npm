@@ -4,7 +4,6 @@ import { AuthService } from '../../core/services/auth.service';
 import { OrderService } from '../../core/services/order.service';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
-declare const google: any;
 
 @Component({
   selector: 'app-delivery',
@@ -13,7 +12,7 @@ declare const google: any;
   styleUrl: './delivery.component.scss'
 })
 export class DeliveryComponent {
-
+  google: any;
   user: any;
   orders: any[] = [];
   lastSevenDayDate: string = '';
@@ -52,9 +51,7 @@ export class DeliveryComponent {
             if (this.orders.length > 0) {
               const deliveryStops: google.maps.LatLngLiteral[] = [];
               this.orders.forEach(order => {
-                if (order.latitude && order.longitude) {
-                  deliveryStops.push({ lat: +order.latitude, lng: +order.longitude });
-                } else if (order?.address) {
+                if (order?.address) {
                   this.geocodeAddress(order?.address).then(coords => {
                     if (coords) deliveryStops.push(coords);
                     if (deliveryStops.length === this.orders.length) {
@@ -66,6 +63,8 @@ export class DeliveryComponent {
               if (deliveryStops.length > 0 && deliveryStops.length === this.orders.length) {
                 this.getUserLocationAndLoadMap(deliveryStops);
               }
+            } else {
+                this.getUserLocationAndLoadMap([]);
             }
           },
           error: () => {
@@ -79,17 +78,12 @@ export class DeliveryComponent {
   loadFallbackMap() {
     this.map = new google.maps.Map(this.mapContainer.nativeElement, {
       center: this.center,
-      zoom: 20,
+      zoom: 14,
       mapId: 'ea16df23bdf1068b82987400',
       gestureHandling: 'cooperative',
       zoomControl: true,
       fullscreenControl: false,
       streetViewControl: false
-    });
-    new google.maps.marker.AdvancedMarkerElement({
-      position: this.deliveryLocation,
-      map: this.map,
-      title: 'Delivery Location'
     });
   }
 
@@ -148,7 +142,7 @@ export class DeliveryComponent {
     directionsService.route(
       {
         origin: userLoc,
-        destination: userLoc, // trick to allow optimization
+        destination: waypoints.length > 0 ? waypoints[waypoints.length - 1].location : userLoc,
         waypoints,
         optimizeWaypoints: true,
         travelMode: google.maps.TravelMode.DRIVING
@@ -158,14 +152,14 @@ export class DeliveryComponent {
           const route = response.routes[0];
           directionsRenderer.setDirections(response);
 
-          // 🟢 User marker
+          // User marker
           new google.maps.marker.AdvancedMarkerElement({
             position: userLoc,
             map: this.map,
             content: this.createCustomMarker('#28a745')
           });
 
-          // 🔴 Numbered delivery stops
+          // Numbered delivery stops
           const order = route.waypoint_order;
           order.forEach((stopIndex: number, i: number) => {
             const loc = deliveryStops[stopIndex];
@@ -177,7 +171,7 @@ export class DeliveryComponent {
             });
           });
 
-          // ✅ Calculate total distance & duration (calculated, not per-leg text)
+          // Calculate total distance & duration (calculated, not per-leg text)
           let totalDistance = 0;
           let totalDuration = 0;
 
