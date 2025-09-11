@@ -4,6 +4,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { OrderService } from '../../core/services/order.service';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
+import { LoaderService } from '../../core/services/loader.service';
 
 @Component({
   selector: 'app-delivery',
@@ -33,7 +34,8 @@ export class DeliveryComponent {
   constructor(
     public authService: AuthService,
     public orderService: OrderService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private loaderService: LoaderService
   ) {
     const today = new Date();
     today.setDate(today.getDate() - 6);
@@ -64,7 +66,7 @@ export class DeliveryComponent {
                 this.getUserLocationAndLoadMap(deliveryStops);
               }
             } else {
-                this.getUserLocationAndLoadMap([]);
+              this.getUserLocationAndLoadMap([]);
             }
           },
           error: () => {
@@ -80,28 +82,38 @@ export class DeliveryComponent {
       center: this.center,
       zoom: 14,
       mapId: 'ea16df23bdf1068b82987400',
-      gestureHandling: 'cooperative',
+      gestureHandling: 'grid',
       zoomControl: true,
       fullscreenControl: false,
       streetViewControl: false
     });
+    this.loaderService.hide();
   }
 
   // get user location first, then draw map
   getUserLocationAndLoadMap(deliveryStops: google.maps.LatLngLiteral[]) {
+    this.loaderService.show();
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        this.loadMapAndRoute(this.userLocation, deliveryStops);
-      }, () => {
-        this.userLocation = { lat: 34.01629713107095, lng: -118.21773892171963 };
-        this.loadMapAndRoute(this.userLocation, deliveryStops);
-      });
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          this.userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          this.loadMapAndRoute(this.userLocation, deliveryStops);
+        },
+        () => {
+          this.userLocation = { lat: 34.01629713107095, lng: -118.21773892171963 };
+          this.loadMapAndRoute(this.userLocation, deliveryStops);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        });
     } else {
       console.error('Geolocation not supported by this browser.');
       this.userLocation = { lat: 34.01629713107095, lng: -118.21773892171963 };
       this.center = this.userLocation;
       this.loadFallbackMap();
+      this.loaderService.hide()
     }
   }
 
@@ -127,7 +139,7 @@ export class DeliveryComponent {
       center: userLoc,
       zoom: 14,
       mapId: 'ea16df23bdf1068b82987400',
-      gestureHandling: 'cooperative',
+      gestureHandling: 'grid',
       zoomControl: true,
       fullscreenControl: false,
       streetViewControl: false
@@ -138,7 +150,6 @@ export class DeliveryComponent {
     directionsRenderer.setMap(this.map);
 
     const waypoints = deliveryStops.map((loc) => ({ location: loc, stopover: true }));
-
     directionsService.route(
       {
         origin: userLoc,
@@ -189,9 +200,11 @@ export class DeliveryComponent {
           } else {
             this.totalDuration = `${totalMinutes} mins`;
           }
+          this.loaderService.hide();
 
         } else {
           console.error('Directions request failed: ' + status);
+          this.loaderService.hide();
         }
       }
     );
