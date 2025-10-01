@@ -1,21 +1,28 @@
-#  Template NodeJS build
-
-#  This template allows you to validate your NodeJS code.
-#  The workflow allows running tests and code linting on the default branch.
-
 image: node:20.11.1
+
 pipelines:
   default:
-  - step:
-     name: Build
-     size: 2x
-     caches:
-       - node
-     script: # Modify the commands below to build your repository.
-       - echo "$(ls -la)"
-       - npm install
-       - npm install -g @angular/cli@~16.2.0 -g
-       - ng config -g cli.warnings.versionMismatch false
-       - ng build --configuration production
-       - echo "$(ls -la dist/)"
-       - scp -P 33221 -r dist/ ubuntu@103.27.234.244:/var/www/driver-brfood
+    - step:
+        name: Build
+        size: 2x
+        caches:
+          - node
+        script:
+          # Check project files
+          - echo "$(ls -la)"
+
+          # Install dependencies
+          - npm install
+
+          # Install Angular CLI (v16.x)
+          - npm install -g @angular/cli@~16.2.0
+          - ng config -g cli.warnings.versionMismatch false
+
+          # Build Angular project in production mode
+          - ng build --configuration production
+
+          # Verify dist folder
+          - echo "$(ls -la dist/)"
+
+          # Copy build files to your server via SCP (default SSH port 22)
+          - scp -r dist/* brfserver@72.167.45.111:/var/www/driver-brfood
