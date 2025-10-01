@@ -25,4 +25,5 @@ pipelines:
           - echo "$(ls -la dist/)"
 
           # Copy build files to your server via SCP (default SSH port 22)
-          - scp -r dist/* brfserver@72.167.45.111:/var/www/driver-brfood
+          - scp -r dist/driver-brfood/* brfserver@72.167.45.111:/var/www/driver-brfood/
+
