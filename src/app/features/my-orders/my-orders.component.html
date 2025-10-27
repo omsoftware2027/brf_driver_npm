@@ -37,6 +37,11 @@
         </div>
     </div>
 
+    <div class="d-flex justify-content-end">
+        <button class="btn btn-outline-success btn-sm" (click)="openDriverModal(driverFilterModal)">
+            Drivers <i class="bi bi-funnel"></i>
+        </button>
+    </div>
 
     <div class="pt-3">
         <div *ngIf="orders && orders.length > 0; else noOrders">
@@ -82,3 +87,30 @@
     </div>
 
 </div>
+
+<!-- Driver Filter Modal -->
+<ng-template #driverFilterModal>
+    <div class="modal-body p-3 position-relative">
+        <i class="bi bi-x position-absolute" style="top: 6px; right: 6px" aria-label="Close"
+            (click)="modalRef?.hide()"></i>
+        <p class="modal-title fs-5 mb-3 fw-semibold">Filter by Driver</p>
+        <div class="d-flex flex-column gap-2">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="driverFilter" value="" [(ngModel)]="selectedDriver"
+                    id="driver_all" />
+                <label class="form-check-label" for="driver_all">All</label>
+            </div>
+            <div class="form-check" *ngFor="let driver of drivers">
+                <input class="form-check-input" type="radio" name="driverFilter" [value]="driver?.driverId"
+                    [(ngModel)]="selectedDriver" id="driver_{{driver?.driverId}}" />
+                <label class="form-check-label" for="driver_{{driver?.driverId}}">
+                    {{driver?.driverName}}
+                </label>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <button class="btn btn-outline-secondary btn-sm" (click)="modalRef?.hide()">Cancel</button>
+            <button class="btn btn-success btn-sm" (click)="applyDriverFilter()">Apply</button>
+        </div>
+    </div>
+</ng-template>

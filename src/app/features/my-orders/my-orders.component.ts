@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, TemplateRef } from '@angular/core';
 import { OrderService } from '../../core/services/order.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-my-orders',
@@ -20,11 +21,16 @@ export class MyOrdersComponent {
   searchText: string = '';
   searchResults: any[] = [];
 
+  modalRef?: BsModalRef;
+  selectedDriver: number | null = null;
+  drivers: any[] = [];
+
   constructor(
     public orderService: OrderService,
     public authService: AuthService,
     private toastr: ToastrService,
-    public router: Router
+    public router: Router,
+    private modalService: BsModalService
   ) {
     const today = new Date();
     today.setDate(today.getDate() - 6);
@@ -32,6 +38,7 @@ export class MyOrdersComponent {
   }
 
   ngOnInit() {
+    this.getAllDrivers();
     this.authService.user$.subscribe(
       user => {
         this.user = user;
@@ -53,6 +60,14 @@ export class MyOrdersComponent {
         }
       }
     );
+  }
+
+  getAllDrivers() {
+    this.orderService.getAllDrivers().subscribe({
+      next: (res) => {
+        this.drivers = res.response || [];
+      }
+    })
   }
 
 
@@ -78,5 +93,26 @@ export class MyOrdersComponent {
     // this.router.navigate([])
   }
 
+
+  openDriverModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-sm modal-dialog-centered',
+    });
+  }
+
+  applyDriverFilter() {
+    console.log('Selected driver:', this.selectedDriver);
+    this.modalRef?.hide();
+    this.orderService.filterOrdersByDriver(this.lastSevenDayDate, this.searchText, this.selectedDriver).subscribe({
+      next: (res) => {
+        this.orders = res?.response?.dataSet || [];
+        console.log('searched', this.orders)
+      },
+      error: (err) => {
+        this.toastr.error('Search failed. Please try again.', 'Error');
+        this.orders = [];
+      }
+    });
+  }
 
 }

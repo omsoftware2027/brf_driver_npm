@@ -39,8 +39,9 @@ export class OrderDetailService {
   }
 
   saveRemark(orderItemId: number, remark: string) {
-    return this.http.post<any>(`${environment.baseUrl}/order/updateRemarkByOrderItemsId?orderItemId=${orderItemId}&remark=${remark}`, {});
-  }
+  const url = `${environment.baseUrl}/order/updateRemarkByOrderItemsId?orderItemId=${orderItemId}`;
+  return this.http.post<any>(url, remark);
+}
   
   setProductExpiryDate(data: any){
     return this.http.post(`${environment.baseUrl}/order/saveOrUpdateOrderItemDate`, data);
