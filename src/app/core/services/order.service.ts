@@ -20,4 +20,14 @@ export class OrderService {
     );
   }
 
+  getAllDrivers() {
+    return this.http.get<any>(`${environment.baseUrl}/order/getAllDriverName`);
+  }
+
+  filterOrdersByDriver(startDate: string, search: string, driverId?: any): Observable<any> {
+    return this.http.get<any>(
+      `${environment.baseUrl}/driver/getAllOrdersByDriverId?search=${search}&startDate=${startDate}&driverId=${driverId}`
+    );
+  }
+
 }

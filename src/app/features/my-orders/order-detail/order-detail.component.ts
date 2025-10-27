@@ -25,12 +25,7 @@ export class OrderDetailComponent {
   jetroTwoProductsCount: number = 0;
   customerDetails: any = {};
 
-  tabs = [
-    { key: 'all', label: 'All', count: 0 },
-    { key: 'pick up', label: 'Pickup', count: 0 },
-    { key: '1', label: 'Jetro One', count: 0 },
-    { key: '2', label: 'Jetro Two', count: 0 }
-  ];
+  tabs: any[] = [];
 
   activeTab: string = 'all';
 
@@ -71,55 +66,53 @@ export class OrderDetailComponent {
   ngOnInit() {
     this.orderId = this.route.snapshot.paramMap.get('id')!;
     if (this.orderId) {
-      this.getProductsCountsForTabs(this.orderId);
       this.getAllProducts();
       this.getAllProductList()
     }
   }
 
-  getProductsCountsForTabs(orderId: any) {
-    this.orderDetailService.getProductsCounts(orderId).subscribe({
-      next: (res: any) => {
-        this.allProductsCount = res?.response?.allProductsCount ?? 0;
-        this.pickupProductsCount = res?.response?.pickupProductsCount ?? 0;
-        this.jetroOneProdcutsCount = res?.response?.jetroOneProdcutsCount ?? 0;
-        this.jetroTwoProductsCount = res?.response?.jetroTwoProductsCount ?? 0;
-        this.tabs = [
-          { key: 'all', label: 'All', count: this.allProductsCount },
-          { key: 'pick up', label: 'Pickup', count: this.pickupProductsCount },
-          { key: '1', label: 'Jetro One', count: this.jetroOneProdcutsCount },
-          { key: '2', label: 'Jetro Two', count: this.jetroTwoProductsCount }
-        ];
-      },
-      error: (err)=>{
-        console.log('Something is wrong', err)
-      }
-    })
-  }
+  onSearch(): void {
+  let binNumberFilter = '';
+  let routeFilter: number | null = null;
 
-  onSearch() {
-    let pickupFilter = '';
-    let routeFilter = '';
-    if (this.activeTab === 'pick up') {
-      pickupFilter = this.activeTab
-    } else if(this.activeTab === '1' || this.activeTab === '2') {
-      routeFilter = this.activeTab
-    }
-    this.orderDetailService.searchProduct(this.orderId, this.searchText, routeFilter, pickupFilter).subscribe({
+  const binTabs = ['PICK UP', 'FREEZER', 'DRY', 'COOLER'];
+  if (binTabs.includes(this.activeTab)) {
+    binNumberFilter = this.activeTab;
+  }
+  // Determine filters for JETRO tabs
+  switch (this.activeTab) {
+    case 'JETRO':
+      binNumberFilter = '^[0-9]+$';
+      break;
+
+    case 'JETRO ONE':
+      routeFilter = 1;
+      break;
+
+    case 'JETRO TWO':
+      routeFilter = 2;
+      break;
+  }
+  // API call for filter 
+  this.orderDetailService
+    .searchProduct(this.orderId, this.searchText, routeFilter, binNumberFilter)
+    .subscribe({
       next: (res) => {
         this.orderDetail = res?.response?.products?.dataSet ?? [];
-        console.log('searched', this.orderDetail)
+        console.log('Searched:', this.orderDetail);
       },
       error: (err) => {
+        console.error('Search failed:', err);
         this.orderDetail = [];
       }
     });
-  }
+}
+
 
   setActiveTab(tab: any) {
     this.orderDetail = [];
-    this.activeTab = tab.key;
-    if (tab?.label === 'All' && this.searchText==='') {
+    this.activeTab = tab;
+    if (tab === 'All' && this.searchText==='') {
       this.getAllProducts();
     }
     this.onSearch();
@@ -147,6 +140,8 @@ export class OrderDetailComponent {
       this.orderDetailService.getAllproducts(this.orderId).subscribe({
         next: (res) => {
           this.orderDetail = res?.response?.products?.dataSet || [];
+          this.tabs = ['All', ...new Set(res?.response?.products?.dataSet.map((item: any) => item.binNumber))];          
+          this.activeTab = 'All';
           this.customerDetails = res?.response?.customer ?? {};
         },
         error: (err) => {
