@@ -1,4 +1,4 @@
-import { Component, TemplateRef } from '@angular/core';
+import { Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
 import { OrderReportService } from '../../core/services/order-report.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -18,6 +18,7 @@ export class OrderReportComponent {
   selectedOrderReportType: string = 'Pickup';
   user: any;
   reports: any = {};
+  allReportsBackup: any[] = []; 
 
   expiryDateInput: any;
   selectedProduct: any;
@@ -30,6 +31,22 @@ export class OrderReportComponent {
   inventorylist: any;
   inventoryIds: any;
   selectedInventoryIds: number[] = [];
+
+  vendors: any[] = [];
+  selectedVendor: string = '';
+  selectedDate: string = '';
+
+  selectedBinFilter: string = '';
+  binSortAscending: boolean = true;
+  routeSortAscending: boolean = true;
+  selectedCustomerFilter: string = '';
+
+  customers: any[] = [];
+
+
+@ViewChild('pickupDateFilterInput') pickupDateFilterInput!: ElementRef<HTMLInputElement>;
+@ViewChild('wareHouseDateFilterInput') wareHouseDateFilterInput!: ElementRef<HTMLInputElement>;
+
 
   constructor(
     public orderReportService: OrderReportService,
@@ -48,6 +65,12 @@ export class OrderReportComponent {
   }
 
   setOrderReportType(type: string) {
+    this.selectedBinFilter = '';
+    this.selectedVendor = '';
+    this.selectedCustomerFilter = '';
+    this.binSortAscending = true;
+    this.routeSortAscending = true;
+
     const driverId = this.user?.id;
     this.selectedOrderReportType = type;
     if (this.selectedOrderReportType === 'Pickup') {
@@ -70,81 +93,138 @@ export class OrderReportComponent {
     }
   }
 
-  getPickupReport(driverId: any) {
-    this.orderReportService.getPickupReports(driverId).subscribe({
+  getPickupReport(driverId: any, date?: string) {
+    this.orderReportService.getPickupReports(driverId, date).subscribe({
       next: (res) => {
-        this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
+        const dataSet = res?.response?.dataSet || {};
+        const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
           vendor,
           items
         }));
+        this.reports = formattedReports;
+        this.allReportsBackup = [...formattedReports];
+        this.vendors = Object.keys(res?.response?.dataSet);
       },
       error: (err) => {
-        console.error('something is wrong...', err)
+        console.error('something is wrong...', err);
+        this.reports = [];
+        this.allReportsBackup = [];
+        this.vendors = [];
       }
     })
   }
   getJetroOneReport(driverId: any) {
+    this.customers = [];
     this.orderReportService.getJetroOneReports(driverId).subscribe({
       next: (res) => {
-        this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
+        const dataSet = res?.response?.dataSet || {};
+        const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
           vendor,
           items
         }));
+        this.reports = formattedReports;
+        this.allReportsBackup = [...formattedReports];
+        // Collect unique userName from all items
+        const userNameSet = new Set<string>();
+        formattedReports.forEach(report => {
+          report?.items.forEach((item: any) => {
+            if (item?.userName) {
+              userNameSet.add(item.userName.trim());
+            }
+          });
+        });
+        this.customers = Array.from(userNameSet);
       },
       error: (err) => {
-        console.error('something is wrong...', err)
+        console.error('something is wrong...', err);
+        this.reports = [];
+        this.allReportsBackup = [];
+        this.customers = [];
       }
     })
   }
   getJetroTwoReport(driverId: any) {
+    this.customers = [];
     this.orderReportService.getJetroTwoReports(driverId).subscribe({
       next: (res) => {
-        this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
+        const dataSet = res?.response?.dataSet || {};
+        const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
           vendor,
           items
         }));
+        this.reports = formattedReports;
+        this.allReportsBackup = [...formattedReports];
+        // Collect unique userName from all items
+        const userNameSet = new Set<string>();
+        formattedReports.forEach(report => {
+          report?.items.forEach((item: any) => {
+            if (item?.userName) {
+              userNameSet.add(item?.userName.trim());
+            }
+          });
+        });
+        this.customers = Array.from(userNameSet);
       },
       error: (err) => {
-        console.error('something is wrong...', err)
+        console.error('something is wrong...', err);
+        this.reports = [];
+        this.allReportsBackup = [];
+        this.customers = [];
       }
     })
   }
-  getWarehouseReport(driverId: any) {
-    this.orderReportService.getWarehouseReports(driverId).subscribe({
+  getWarehouseReport(driverId: any, date?: string) {
+    this.orderReportService.getWarehouseReports(driverId, date).subscribe({
       next: (res) => {
-        this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
+        const dataSet = res?.response?.dataSet || {};
+        const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
           vendor,
           items
         }));
+        this.reports = formattedReports;
+        this.allReportsBackup = [...formattedReports];
+
       },
       error: (err) => {
-        console.error('something is wrong...', err)
+        console.error('something is wrong...', err);
+        this.reports = [];
+        this.allReportsBackup = [];
       }
     })
   }
   getFreezerOneReport(driverId: any) {
     this.orderReportService.getFreezerOneReports(driverId).subscribe({
       next: (res) => {
-        this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
+        const dataSet = res?.response?.dataSet || {};
+        const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
           vendor,
           items
         }));
+        this.reports = formattedReports;
+        this.allReportsBackup = [...formattedReports];
       },
       error: (err) => {
-        console.error('something is wrong...', err)
+        console.error('something is wrong...', err);
+        this.reports = [];
+        this.allReportsBackup = [];
       }
     })
   }
   getFreezerTwoReport(driverId: any) {
     this.orderReportService.getFreezerTwoReports(driverId).subscribe({
       next: (res) => {
-        this.reports = Object.entries(res.response.dataSet).map(([vendor, items]: any) => ({
+        const dataSet = res?.response?.dataSet || {};
+        const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
           vendor,
           items
         }));
+        this.reports = formattedReports;
+        this.allReportsBackup = [...formattedReports];
       },
       error: (err) => {
-        console.error('something is wrong...', err)
+        console.error('something is wrong...', err);
+        this.reports = [];
+        this.allReportsBackup = [];
       }
     })
   }
@@ -227,7 +307,15 @@ export class OrderReportComponent {
         }
         console.log('Patched Weight:', weight);
       } else {
-        console.log('Inventory item not found:', inventoryItem);
+
+        // if inventoryCodeAndWeightProjections is [] set weight from the selectedProduct.inventoryItems[];
+        if (this.selectedProduct?.inventoryItems?.length > 0) {
+          this.selectedProduct?.inventoryItems.forEach((item: any, index: number) => {
+            if (index < this.inputValues.length) {
+              this.inputValues[index] = String(item.weight ?? '');
+            }
+          });
+        }
       }
     }
     console.log('Finished patchInventoryWeights');
@@ -291,4 +379,127 @@ export class OrderReportComponent {
     });
   }
 
+  // pickup filter works
+  openVendorModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-sm modal-dialog-centered',
+    });
+  }
+  applyVendorFilter() {
+    if (this.selectedVendor && this.selectedVendor !== '') {
+      // Filter from backup, not from main reports
+      this.reports = this.allReportsBackup.filter(
+        report => report.vendor.trim() === this.selectedVendor.trim()
+      );
+    } else {
+      // Restore original unfiltered data
+      this.reports = [...this.allReportsBackup];
+    }
+  }
+  triggerDatePicker() {
+    this.pickupDateFilterInput.nativeElement.showPicker();
+  }
+  onDateChange(event: Event, reportType: string) {
+    const selectedDate = (event.target as HTMLInputElement).value;
+    this.selectedDate = selectedDate || '';
+    if (reportType === 'warehouse') {
+      this.getWarehouseReport(this.user?.id, selectedDate );
+    }
+    if (reportType === 'pickup') {
+      this.getPickupReport(this.user?.id, selectedDate);
+    }
+  }
+
+
+
+  // warehouse filter works
+  applyBinFilter() {
+    if (!this.selectedBinFilter) {
+      this.reports = [...this.allReportsBackup];
+      return;
+    }
+    this.reports = this.allReportsBackup
+      .map(report => ({
+        ...report,
+        items: report.items.filter((item: any) => item.binNumber.trim() === this.selectedBinFilter.trim())
+      }))
+      .filter(report => report.items.length > 0);
+  }
+    triggerWarehouseDatePicker() {
+    this.wareHouseDateFilterInput.nativeElement.showPicker();
+  }
+
+// jetro filters works
+  applyCustomerFilter() {
+    if (!this.selectedCustomerFilter) {
+      this.reports = [...this.allReportsBackup];
+      return;
+    }
+    this.reports = this.allReportsBackup
+      .map(report => ({
+        ...report,
+        items: report.items.filter((item: any) => item?.userName?.trim() === this.selectedCustomerFilter.trim())
+      }))
+      .filter(report => report.items.length > 0);
+  }
+
+sortByBinNumber() {
+  this.reports.forEach((report: any) => {
+    report.items.sort((a: any, b: any) => {
+      const binA = a.binNumber?.trim().toUpperCase() || '';
+      const binB = b.binNumber?.trim().toUpperCase() || '';
+
+      const numA = parseFloat(binA);
+      const numB = parseFloat(binB);
+
+      let comparison = 0;
+
+      if (!isNaN(numA) && !isNaN(numB)) {
+        comparison = numA - numB;
+      } 
+      else {
+        comparison = binA.localeCompare(binB, undefined, { numeric: true, sensitivity: 'base' });
+      }
+
+      return this.binSortAscending ? comparison : -comparison;
+    });
+  });
+
+  this.binSortAscending = !this.binSortAscending;
+}
+
+sortByRoute() {
+    this.reports.forEach((report: any) => {
+    report.items.sort((a: any, b: any) => {
+      const routeA = a.route?.trim().toUpperCase() || '';
+      const routeB = b.route?.trim().toUpperCase() || '';
+
+      const numA = parseFloat(routeA);
+      const numB = parseFloat(routeB);
+
+      let comparison = 0;
+
+      if (!isNaN(numA) && !isNaN(numB)) {
+        comparison = numA - numB;
+      } 
+      else {
+        comparison = routeA.localeCompare(routeB, undefined, { numeric: true, sensitivity: 'base' });
+      }
+      return this.routeSortAscending ? comparison : -comparison;
+    });
+  });
+
+  this.routeSortAscending = !this.routeSortAscending;
+}
+
+  clearDateFilter() {
+    this.selectedDate = '';
+    if (this.selectedOrderReportType === 'Warehouse') {
+      this.getWarehouseReport(this.user?.id);
+    }
+    if (this.selectedOrderReportType === 'Pickup') {
+      this.getPickupReport(this.user?.id);
+    }
+  }
+  
 }

@@ -7,7 +7,7 @@ const routes: Routes = [
   {
     path: '',
     component: MyOrdersComponent,
-     data: { title: 'My Orders' }
+     data: { title: 'All Orders' }
   },
   {
     path: 'order-detail/:id',

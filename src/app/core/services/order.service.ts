@@ -30,4 +30,10 @@ export class OrderService {
     );
   }
 
+  getCombinedOrders() {
+    return this.http.get<any>(
+      `${environment.baseUrl}/order/getGroupByOrder?pageNo=0&pageSize=1000`
+    );
+  }
+
 }
