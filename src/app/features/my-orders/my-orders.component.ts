@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, TemplateRef } from '@angular/core';
+import { Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
 import { OrderService } from '../../core/services/order.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
@@ -16,7 +16,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 export class MyOrdersComponent {
 
   orders: any[] = [];
-  lastSevenDayDate: string = '';
+  todayDate: string = '';
   user: any;
   searchText: string = '';
   searchResults: any[] = [];
@@ -24,6 +24,10 @@ export class MyOrdersComponent {
   modalRef?: BsModalRef;
   selectedDriver: number | null = null;
   drivers: any[] = [];
+
+  selectedDate: string = '';
+  @ViewChild('dateFilterInput') dateFilterInput!: ElementRef<HTMLInputElement>;
+
 
   constructor(
     public orderService: OrderService,
@@ -33,8 +37,8 @@ export class MyOrdersComponent {
     private modalService: BsModalService
   ) {
     const today = new Date();
-    today.setDate(today.getDate() - 6);
-    this.lastSevenDayDate = today.toISOString().split('T')[0];
+    // today.setDate(today.getDate() - 6);
+    this.todayDate = today.toISOString().split('T')[0];
   }
 
   ngOnInit() {
@@ -43,7 +47,7 @@ export class MyOrdersComponent {
       user => {
         this.user = user;
         if (this.user && this.user.id) {
-          this.orderService.getAllOrders(this.user?.id, this.lastSevenDayDate).subscribe({
+          this.orderService.getAllOrders(this.user?.id, this.todayDate).subscribe({
             next: (res) => {
               this.orders = res?.response?.dataSet || [];
               this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
@@ -77,7 +81,7 @@ export class MyOrdersComponent {
       return;
     }
 
-    this.orderService.searchOrders(this.user.id, this.lastSevenDayDate, this.searchText).subscribe({
+    this.orderService.searchOrders(this.user.id, this.todayDate, this.searchText).subscribe({
       next: (res) => {
         this.searchResults = res?.response?.dataSet || [];
         console.log('searched', this.searchResults)
@@ -103,7 +107,7 @@ export class MyOrdersComponent {
   applyDriverFilter() {
     console.log('Selected driver:', this.selectedDriver);
     this.modalRef?.hide();
-    this.orderService.filterOrdersByDriver(this.lastSevenDayDate, this.searchText, this.selectedDriver).subscribe({
+    this.orderService.filterOrdersByDriver(this.todayDate, this.searchText, this.selectedDriver).subscribe({
       next: (res) => {
         this.orders = res?.response?.dataSet || [];
         console.log('searched', this.orders)
@@ -115,4 +119,36 @@ export class MyOrdersComponent {
     });
   }
 
+  triggerDatePicker() {
+    this.dateFilterInput.nativeElement.showPicker();
+  }
+  onDateChange(event: Event) {
+    const selectedDate = (event.target as HTMLInputElement).value;
+    this.selectedDate = selectedDate || '';
+
+    this.orderService.searchOrders(this.user?.id, this.todayDate, selectedDate).subscribe({
+      next: (res) => {
+        this.orders = res?.response?.dataSet || [];
+        this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
+      },
+      error: (err) => {
+        this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
+      }
+    })
+
+  }
+
+  clearDateFilter() {
+    this.selectedDate = '';
+
+    this.orderService.getAllOrders(this.user?.id, this.todayDate).subscribe({
+      next: (res) => {
+        this.orders = res?.response?.dataSet || [];
+        this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
+      },
+      error: (err) => {
+        this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
+      }
+    })
+  }
 }

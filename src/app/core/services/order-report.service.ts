@@ -10,8 +10,12 @@ export class OrderReportService {
 
   constructor(public http: HttpClient) { }
 
-  getPickupReports(driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getPickupOrdersByDriverId?driverId=${driverId}&sortBy=route`);
+  getPickupReports(driverId: any, date?: string): Observable<any> {
+    let url = `${environment.baseUrl}/driver/getPickupOrdersByDriverId?driverId=${driverId}&sortBy=route`;
+    if (date) {
+      url += `&date=${encodeURIComponent(date)}`;
+    }
+    return this.http.get<any>(url);
   }
   getJetroOneReports(driverId: any): Observable<any> {
     return this.http.get<any>(`${environment.baseUrl}/driver/getJetroOneByDriverId?driverId=${driverId}&sortBy=userName`);
@@ -19,8 +23,12 @@ export class OrderReportService {
   getJetroTwoReports(driverId: any): Observable<any> {
     return this.http.get<any>(`${environment.baseUrl}/driver/getJetroTwoByDriverId?driverId=${driverId}&sortBy=userName`);
   }
-  getWarehouseReports(driverId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getWarehouseOrdersByDriverId?driverId=${driverId}&sortBy=route`);
+  getWarehouseReports(driverId: any, date?: string): Observable<any> {
+    let url = `${environment.baseUrl}/driver/getWarehouseOrdersByDriverId?driverId=${driverId}&sortBy=route`;
+    if (date) {
+      url += `&date=${encodeURIComponent(date)}`;
+    }
+    return this.http.get<any>(url);
   }
   getFreezerOneReports(driverId: any): Observable<any> {
     return this.http.get<any>(`${environment.baseUrl}/driver/getFreezerOneByDriverId?driverId=${driverId}&sortBy=route`);

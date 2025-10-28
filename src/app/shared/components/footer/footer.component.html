@@ -20,7 +20,7 @@
         <img *ngIf="drla.isActive" src="assets/icons/parcel-active.png" alt="icon" width="20" height="20">
       </div>
     </div>
-    <div class="nav-label">My Orders</div>
+    <div class="nav-label">All Orders</div>
   </a>
 
   <a class="nav-item" routerLink="/order-report" routerLinkActive="active" #orla="routerLinkActive">
@@ -35,7 +35,7 @@
     <div class="nav-label">Order Report</div>
   </a>
 
-  <a class="nav-item" routerLink="/delivery" routerLinkActive="active" #delvrla="routerLinkActive">
+  <!-- <a class="nav-item" routerLink="/delivery" routerLinkActive="active" #delvrla="routerLinkActive">
     <div class="nav-icon">
       <div>
         <i *ngIf="!delvrla.isActive" class="bi bi-truck text-black"></i>
@@ -45,5 +45,5 @@
       </div>
     </div>
     <div class="nav-label">Delivery</div>
-  </a>
+  </a> -->
 </footer>
