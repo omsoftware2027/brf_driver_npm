@@ -36,17 +36,19 @@ export class DeliveryComponent {
     public orderService: OrderService,
     private toastr: ToastrService,
     private loaderService: LoaderService
-  ) {
-    const today = new Date();
-    today.setDate(today.getDate() - 6);
-    this.lastSevenDayDate = today.toISOString().split('T')[0];
-  }
+  ) { }
 
   ngOnInit() {
     this.authService.user$.subscribe(user => {
       this.user = user;
       if (this.user && this.user.id) {
-        this.orderService.getAllOrders(this.user?.id, this.lastSevenDayDate).subscribe({
+        const today = new Date();
+        const todayDate = today.toISOString().split('T')[0];
+
+        const nextDay = new Date(today);
+        nextDay.setDate(today.getDate() + 1);
+        const endDate = nextDay.toISOString().split('T')[0];
+        this.orderService.getAllOrders(this.user?.id, todayDate, endDate).subscribe({
           next: (res) => {
             this.orders = res?.response?.dataSet || [];
             this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());

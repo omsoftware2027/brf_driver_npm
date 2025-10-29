@@ -10,8 +10,8 @@ export class OrderService {
 
   constructor(private http: HttpClient) { }
 
-  getAllOrders(dId: number, startDate: string): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getAllOrdersByDriverId?startDate=${startDate}`);
+  getAllOrders(dId: number, startDate: string, endDate: string): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/getAllOrdersByDriverId?startDate=${startDate}&endDate=${endDate}`);
   }
 
   searchOrders(dId: number, startDate: string, search: string): Observable<any> {
