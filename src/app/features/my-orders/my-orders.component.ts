@@ -17,6 +17,7 @@ export class MyOrdersComponent {
 
   orders: any[] = [];
   todayDate: string = '';
+  endDate: string = '';
   user: any;
   searchText: string = '';
   searchResults: any[] = [];
@@ -35,35 +36,42 @@ export class MyOrdersComponent {
     private toastr: ToastrService,
     public router: Router,
     private modalService: BsModalService
-  ) {
-    const today = new Date();
-    // today.setDate(today.getDate() - 6);
-    this.todayDate = today.toISOString().split('T')[0];
-  }
+  ) {}
 
   ngOnInit() {
     this.getAllDrivers();
     this.authService.user$.subscribe(
       user => {
         this.user = user;
-        if (this.user && this.user.id) {
-          this.orderService.getAllOrders(this.user?.id, this.todayDate).subscribe({
-            next: (res) => {
-              this.orders = res?.response?.dataSet || [];
-              this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
-              if (this.orders.length === 0) {
-                // this.toastr.info('No orders found in the last 7 days', 'Info');
-              }
-            },
-            error: (err) => {
-              this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
-            }
-          })
-        } else {
-          // this.toastr.warning('You need to login', 'Warning');
-        }
+        this.getTodaysOrders();
       }
     );
+  }
+
+  getTodaysOrders() {
+    if (this.user && this.user.id) {
+      const today = new Date();
+      this.todayDate = today.toISOString().split('T')[0];
+
+      const nextDay = new Date(today);
+      nextDay.setDate(today.getDate() + 1);
+      const endDate = nextDay.toISOString().split('T')[0];
+
+      this.orderService.getAllOrders(this.user?.id, this.todayDate, endDate).subscribe({
+        next: (res) => {
+          this.orders = res?.response?.dataSet || [];
+          this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
+          if (this.orders.length === 0) {
+            // this.toastr.info('No orders found in the last 7 days', 'Info');
+          }
+        },
+        error: (err) => {
+          this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
+        }
+      })
+    } else {
+      // this.toastr.warning('You need to login', 'Warning');
+    }
   }
 
   getAllDrivers() {
@@ -126,7 +134,14 @@ export class MyOrdersComponent {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
 
-    this.orderService.searchOrders(this.user?.id, this.todayDate, selectedDate).subscribe({
+    const startDate = new Date(this.selectedDate);
+    const nextDay = new Date(startDate);
+    nextDay.setDate(startDate.getDate() + 1);
+
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = nextDay.toISOString().split('T')[0];
+
+    this.orderService.getAllOrders(this.user?.id, formattedStartDate, formattedEndDate).subscribe({
       next: (res) => {
         this.orders = res?.response?.dataSet || [];
         this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
@@ -140,15 +155,6 @@ export class MyOrdersComponent {
 
   clearDateFilter() {
     this.selectedDate = '';
-
-    this.orderService.getAllOrders(this.user?.id, this.todayDate).subscribe({
-      next: (res) => {
-        this.orders = res?.response?.dataSet || [];
-        this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
-      },
-      error: (err) => {
-        this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
-      }
-    })
+    this.getTodaysOrders();
   }
 }
