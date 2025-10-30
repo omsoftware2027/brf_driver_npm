@@ -145,7 +145,7 @@
         </div>
         <!-- Action buttons -->
         <div class="d-flex justify-content-between mt-3">
-          <button class="btn btn-success btn-responsive" *ngIf="product?.unit == 'LBS' && product?.qty > 0"
+          <button class="btn btn-success btn-responsive" *ngIf="product?.unit == 'LBS' && product?.quantity > 0"
             (click)="openWeightModal(weightModal, product)">
             <img src="assets/icons/outline_scale.png" alt="icon" width="15" height="15">
             weight
@@ -188,10 +188,7 @@
       </p>
     <p class="fs-7 text-muted">{{selectedProduct?.productCode}}</p>
     <div class="text-muted fw-medium m-0 p-0">Enter weight for each item (Quantity: {{selectedProductQuantity}})</div>
-    <p *ngIf="selectedProduct?.weight" class="fs-8 text-muted mb-3 fw-medium">Previous weight: {{selectedProduct?.weight}}</p>
-    <!-- <label for="wight" class="fw-semibold pb-1">Weight(lbs)</label>
-    <input type="number" [(ngModel)]="weightInput" class="form-control" placeholder="Enter weight"
-      (keypress)="($event.charCode === 45) ? $event.preventDefault() : null"> -->
+    <!-- <p *ngIf="selectedProduct?.weight" class="fs-8 text-muted mb-3 fw-medium">Previous weight: {{selectedProduct?.weight}}</p> -->
       <div class="row">
         <div class="col-12 px-0 pb-2" *ngFor="let _ of generateArray(selectedProductQuantity); let i = index">
           <label for="wight" class="fw-semibold pb-0 fs-7">Item{{i+1}}/Weight(lbs)</label>
