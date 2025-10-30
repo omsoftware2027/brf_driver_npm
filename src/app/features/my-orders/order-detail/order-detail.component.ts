@@ -245,6 +245,14 @@ export class OrderDetailComponent {
         console.log('Patched Weight:', weight);
       } else {
         console.log('Inventory item not found:', inventoryItem);
+        // if inventoryCodeAndWeightProjections is [] set weight from the selectedProduct.inventoryItems[];
+        if (this.selectedProduct?.inventoryItems?.length > 0) {
+          this.selectedProduct?.inventoryItems.forEach((item: any, index: number) => {
+            if (index < this.inputValues.length) {
+              this.inputValues[index] = String(item.weight ?? '');
+            }
+          });
+        }
       }
     }
     console.log('Finished patchInventoryWeights');

@@ -150,8 +150,8 @@ export class GroupedOrderDetailsComponent {
 
   openWeightModal(template: TemplateRef<any>, product: any) {
     this.selectedProduct = product;
-    this.selectedProductQuantity = parseInt(product?.qty, 10);
-    this.inputValues = new Array(parseInt(product?.qty, 10)).fill('');
+    this.selectedProductQuantity = parseInt(product?.quantity, 10);
+    this.inputValues = new Array(parseInt(product?.quantity, 10)).fill('');
     this.checkInventoryStatus = new Array(this.inputValues.length).fill(true);
     this.orderDetailService.getOrderProductInventoryedit(product?.productId, product?.orderItemId).subscribe(
       (res) => {
@@ -213,6 +213,14 @@ export class GroupedOrderDetailsComponent {
         }
         console.log('Patched Weight:', weight);
       } else {
+        // if inventoryCodeAndWeightProjections is [] set weight from the selectedProduct.inventoryItems[];
+        if (this.selectedProduct?.inventoryItems?.length > 0) {
+          this.selectedProduct?.inventoryItems.forEach((item: any, index: number) => {
+            if (index < this.inputValues.length) {
+              this.inputValues[index] = String(item.weight ?? '');
+            }
+          });
+        }
         console.log('Inventory item not found:', inventoryItem);
       }
     }
