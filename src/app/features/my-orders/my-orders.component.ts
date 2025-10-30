@@ -115,16 +115,37 @@ export class MyOrdersComponent {
   applyDriverFilter() {
     console.log('Selected driver:', this.selectedDriver);
     this.modalRef?.hide();
-    this.orderService.filterOrdersByDriver(this.todayDate, this.searchText, this.selectedDriver).subscribe({
-      next: (res) => {
-        this.orders = res?.response?.dataSet || [];
-        console.log('searched', this.orders)
-      },
-      error: (err) => {
-        this.toastr.error('Search failed. Please try again.', 'Error');
-        this.orders = [];
-      }
-    });
+
+    if (this.selectedDate) {
+      const startDate = new Date(this.selectedDate);
+      const nextDay = new Date(startDate);
+      nextDay.setDate(startDate.getDate() + 1);
+
+      const formattedStartDate = startDate.toISOString().split('T')[0] ?? '';
+      const formattedEndDate = nextDay.toISOString().split('T')[0] || '';
+
+      this.orderService.filterOrdersByDriver(formattedStartDate, formattedEndDate, this.searchText, this.selectedDriver).subscribe({
+        next: (res) => {
+          this.orders = res?.response?.dataSet || [];
+          console.log('searched', this.orders)
+        },
+        error: (err) => {
+          this.toastr.error('Search failed. Please try again.', 'Error');
+          this.orders = [];
+        }
+      });
+    } else {
+      this.orderService.filterOrdersByDriver('', '', this.searchText, this.selectedDriver).subscribe({
+        next: (res) => {
+          this.orders = res?.response?.dataSet || [];
+          console.log('searched', this.orders)
+        },
+        error: (err) => {
+          this.toastr.error('Search failed. Please try again.', 'Error');
+          this.orders = [];
+        }
+      });
+    }
   }
 
   triggerDatePicker() {

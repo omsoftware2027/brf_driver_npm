@@ -1,0 +1,116 @@
+<div class="mt-3">
+    <div class="d-flex justify-content-start">
+        <i class="bi bi-arrow-left fw-bolder fs-3" (click)="goBack()"></i>
+    </div>
+    <div class="row align-content-between">
+        <div class="col-auto p-0">
+            <b class="fw-bold fs-3">All Grouped Orders</b>
+            <p class="text-muted fs-7" *ngIf="orders.length">{{orders.length}} Grouped Orders sorted by delivery time</p>
+        </div>
+    </div>
+
+    <div class="input-group my-2 border rounded position-relative">
+        <span class="input-group-text bg-white border-0 pe-0">
+            <i class="bi bi-search"></i>
+        </span>
+        <input type="text" [(ngModel)]="searchText" (input)="onSearch()" class="form-control border-0"
+            placeholder="Search orders by number, customer" />
+        <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
+            <i class="bi bi-x" (click)="searchText = ''"></i>
+        </span>
+        <div *ngIf="searchText" class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
+            style="max-height: 250px; overflow-y: auto; z-index: 30">
+            <ng-container *ngIf="searchResults.length > 0; else noData">
+                <button type="button" class="list-group-item list-group-item-action" *ngFor="let order of searchResults"
+                    (click)="goToGroupedOrderDetail(order)">
+                    <div class="fw-bold text-black">{{ order?.transactionId }}</div>
+                    <small class="text-muted">{{ order?.customerName }} • {{ order?.shippingAddress }}</small>
+                </button>
+            </ng-container>
+            <ng-template #noData>
+                <div class="list-group-item text-muted text-center py-2">
+                    No items found <span *ngIf="searchText">matching “{{searchText}}” </span>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+    <!-- date N driver filters -->
+    <div class="d-flex justify-content-end gap-2">
+        <input type="date" #dateFilterInput class="" style="visibility: hidden; width: 2px;" (change)="onDateChange($event)" />
+        <div *ngIf="selectedDate" class="d-flex align-items-center" (click)="clearDateFilter()">
+           <span class="fs-8 badge badge-red">{{selectedDate}} <i class="bi bi-x ms-1"></i></span>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" (click)="triggerDatePicker()">
+            Date <i class="bi bi-calendar-date ms-1"></i>
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="openDriverModal(driverFilterModal)">
+            Drivers <i class="bi bi-funnel"></i>
+        </button>
+    </div>
+
+    <div class="pt-3">
+        <div *ngIf="orders && orders.length > 0; else noOrders">
+            <div *ngFor="let order of orders"
+                class="order-card px-3 py-4 mb-3 border rounded bg-white position-relative">
+                <span class="orderid-case">{{order?.idorders}}</span>
+                <div class="row" (click)="goToGroupedOrderDetail(order)">
+                    <div class="col-2 p-0">
+                        <span class="badge-green rounded-3 d-flex justify-content-center \" style="padding: 0.7rem;">
+                            <img src="assets/icons/parcel-active.png" width="24" height="24" />
+                        </span>
+                    </div>
+                    <div class="col-10 p-0 ps-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fs-8 text-muted"><i class="bi bi-person pe-1"></i>{{ order?.customerName }}
+                            </div>
+                            <span class="fs-8"> | </span>
+                            <small class="fs-8 text-muted">
+                                <i class="bi bi-clock pe-1"></i> {{ order?.shippingDate | date: 'MM-dd-yyyy' }}
+                            </small>
+                        </div>
+                        <div class="fw-bold text-uppercase py-1">{{ order?.transactionId }}</div>
+                    </div>
+                </div>
+                <button class="btn btn-success w-100 mt-4 rounded-2 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-geo-alt-fill me-2"></i>
+                    <span class="fs-7">{{ order?.shippingAddress }}</span>
+                </button>
+            </div>
+        </div>
+        <ng-template #noOrders>
+            <div class="text-center text-muted py-5">
+                No Orders
+            </div>
+        </ng-template>
+    </div>
+
+</div>
+
+
+<!-- Driver Filter Modal -->
+<ng-template #driverFilterModal>
+    <div class="modal-body p-3 position-relative">
+        <i class="bi bi-x position-absolute" style="top: 6px; right: 6px" aria-label="Close"
+            (click)="modalRef?.hide()"></i>
+        <p class="modal-title fs-5 mb-3 fw-semibold">Filter by Driver</p>
+        <div class="d-flex flex-column gap-2">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="driverFilter" value="" [(ngModel)]="selectedDriver"
+                    id="driver_all" />
+                <label class="form-check-label" for="driver_all">All</label>
+            </div>
+            <div class="form-check" *ngFor="let driver of drivers">
+                <input class="form-check-input" type="radio" name="driverFilter" [value]="driver?.driverId"
+                    [(ngModel)]="selectedDriver" id="driver_{{driver?.driverId}}" />
+                <label class="form-check-label" for="driver_{{driver?.driverId}}">
+                    {{driver?.driverName}}
+                </label>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <button class="btn btn-outline-secondary btn-sm" (click)="modalRef?.hide()">Cancel</button>
+            <button class="btn btn-success btn-sm" (click)="applyDriverFilter()">Apply</button>
+        </div>
+    </div>
+</ng-template>
+

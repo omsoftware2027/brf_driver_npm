@@ -1,0 +1,19 @@
+.form-control:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.orderid-case {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 20px;
+  height: 20px;
+  background-color: #29a329;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  color: #fff;
+}

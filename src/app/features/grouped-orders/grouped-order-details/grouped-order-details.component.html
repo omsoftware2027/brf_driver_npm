@@ -1,0 +1,276 @@
+<div class="container-fluid p-0">
+
+  <!-- Order Info -->
+  <div class="card border-0 mb-3 rounded-4">
+    <div class="card-body p-3 d-flex justify-content-between align-items-center rounded-4"
+      style="background-color: #FF383C24;">
+      <div>
+        <div class="text-uppercase small text-muted">ORDER NO</div>
+        <div class="fw-bold text-dark">{{orderId}}</div>
+      </div>
+    </div>
+  </div>
+  <!-- Customer Details -->
+  <div class="accordion mb-3" id="customerDetails">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed fw-medium  small" type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
+          <i class="bi bi-person-lines-fill pe-2"></i>
+          Customer Details
+        </button>
+      </h2>
+      <div id="collapseDetails" class="accordion-collapse collapse" data-bs-parent="#customerDetails">
+        <div class="accordion-body small">
+          <p class="mb-1"><span class="fw-medium">Name: </span>{{customerDetails?.customerName ?? '...'}}</p>
+          <p class="mb-1"><span class="fw-medium">Address: </span>{{shippingAddress ?? '...'}} </p>
+          <p class="mb-1"><span class="fw-medium">Phone: </span>{{customerDetails?.contact ?? '...'}}</p>
+          <p class="mb-0"><span class="fw-medium">Delivery Date: </span>{{ deliveryDate ? (deliveryDate | date:'MM-dd-yyyy') : '...' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- Search -->
+  <div class="search-container">
+    <div class="input-group mt-2 mb-3 border rounded">
+      <span class="input-group-text bg-white border-0 pe-0">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" [(ngModel)]="searchText" (input)="onSearch()" class="form-control border-0"
+        placeholder="Search items by name, SKU, or BIN..." />
+      <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
+        <i class="bi bi-x" (click)="searchText = ''; activeTab === 'all'? getAllProducts() : onSearch()"></i>
+      </span>
+    </div>
+  </div>
+  <!-- Tabs -->
+
+  <!-- backend pending -->
+  <!-- <div *ngIf="tabs.length > 2" class="segments-container">
+    <div class="segment-tab" *ngFor="let tab of tabs" [class.active]="activeTab === tab"
+      (click)="setActiveTab(tab)">
+      <span class="fs-7">{{tab}}</span>
+    </div>
+  </div> -->
+  <!-- Product Card --> 
+
+  <div class="pt-3">
+    <div *ngIf="orderDetail?.length; else noProducts">
+      <div *ngFor="let product of orderDetail" class="order-card px-3 py-4 mb-3 border rounded bg-white">
+        <div class="row">
+          <div class="text-warning fs-7 text-center fw-medium pb-2" *ngIf="product?.replaceProductCode">Replaced By {{ product?.replaceProductCode }} </div>
+          <div class="col-2 p-0">
+            <span class="badge-green rounded-3 d-flex justify-content-center \" style="padding: 0.7rem;">
+              <img src="assets/icons/parcel-active.png" width="24" height="24" />
+            </span>
+          </div>
+          <div class="col-10 p-0 ps-2">
+            <div *ngIf="!product?.isProductReplaced" class="fs-8 text-muted"><span class="text-success">{{product?.code}}</span> - <span
+                class="text-black fw-medium">{{product?.productName}}</span></div>
+            <s *ngIf="product?.isProductReplaced"  class="fs-8 text-muted">
+              <span class="text-success">{{product?.code}}</span> - 
+              <span class="text-black fw-medium">{{product?.productName}}</span>
+            </s>
+            <!-- qty and price -->
+            <div class="d-flex align-items-center fs-7 pb-0 gap-2">
+              <span class="text-muted">Qty: {{product?.quantity}}</span>
+              <span class="text-muted fs-6">•</span>
+              <span class="text-muted">$ {{product?.price}}</span>
+            </div>
+            <!-- badges -->
+            <div class="d-flex gap-2 w-100 overflow-auto hiden-scrollbar">
+              <span *ngIf="product?.confirmStatus === 'Pending'" class="badge badge-red fs-8">PENDING</span>
+              <span *ngIf="product?.confirmStatus === 'Confirm'" class="badge badge-green fs-8">CONFIRMED</span>
+              <span *ngIf="product?.confirmStatus === 'Missing'" class="badge badge-orange fs-8">MISSING</span>
+              <span *ngIf="product?.remark" class="badge badge-outlined fs-8">Remark: {{product?.remark}}</span>
+              <span *ngIf="product?.weight" class="badge badge-outlined fs-8">⚖️ {{product?.weight}}LBS</span>
+              <span *ngIf="product?.dateType" class="badge badge-red fs-8">Expiry</span>
+            </div>
+            <!-- radio checks -->
+            <div *ngIf="!product?.isProductReplaced" class="d-flex gap-3 align-items-center pt-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="driverOption{{ product.productId }}"
+                        id="warehouse{{ product.productId }}" [checked]="product?.driverWarehouse"
+                        (change)="onDriverSelectionChange(product)" />
+                    <label class="form-check-label" for="warehouse{{ product.productId }}">Warehouse</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="driverOption{{ product.productId }}"
+                        id="jetro{{ product.productId }}" [checked]="product?.driverJetro"
+                        (change)="onDriverSelectionChange(product)" />
+                    <label class="form-check-label" for="jetro{{ product.productId }}">Jetro</label>
+                </div>
+            </div>
+          </div>
+        </div>
+        <!-- status change sec -->
+        <div class="row my-3">
+          <div class="col-12 p-0">
+            <div class="d-flex w-100">
+              <label [class.disabled]="product?.isProductReplaced" class="status-option flex-fill" [class.active]="product.confirmStatus === 'Pending'"
+                style="border-radius: 10px 0 0 10px;">
+                <input [disabled]="product?.isProductReplaced" type="radio" [(ngModel)]="product.confirmStatus" [value]="'Pending'" name="status{{product.id}}"
+                  (change)="onStatusChange(product)" />
+                <i class="bi bi-clock me-1"></i>
+                <span>Pending</span>
+                <i class="bi ms-auto"
+                  [ngClass]="product.confirmStatus === 'Pending' ? 'bi-record-circle' : 'bi-circle'"></i>
+              </label>
+              <label [class.disabled]="product?.isProductReplaced" class="status-option flex-fill" [class.active]="product.confirmStatus === 'Confirm'"
+                style="border-radius: 0 10px 10px 0;">
+                <input [disabled]="product?.isProductReplaced" type="radio" [(ngModel)]="product.confirmStatus" [value]="'Confirm'" name="status{{product.id}}"
+                  (change)="onStatusChange(product)" />
+                <i class="bi bi-check-circle me-1"></i>
+                <span>Confirm</span>
+                <i class="bi ms-auto"
+                  [ngClass]="product.confirmStatus === 'Confirm' ? 'bi-record-circle' : 'bi-circle'"></i>
+              </label>
+            </div>
+            <div class="mt-2 d-flex flex-fill">
+              <label [class.disabled]="product?.isProductReplaced" class="status-option w-100" [class.active]="product.confirmStatus === 'Missing'"
+                style="border-radius: 10px;">
+                <input [disabled]="product?.isProductReplaced" type="radio" [(ngModel)]="product.confirmStatus" [value]="'Missing'" name="status{{product.id}}"
+                  (change)="onStatusChange(product)" />
+                <i class="bi bi-x-circle me-1"></i>
+                <span>Missing</span>
+                <i class="bi ms-auto"
+                  [ngClass]="product.confirmStatus === 'Missing' ? 'bi-record-circle' : 'bi-circle'"></i>
+              </label>
+              <button [disabled]="product?.isProductReplaced" *ngIf="product.confirmStatus === 'Missing' && !product?.isProductReplaced" class="replace-button d-flex justify-content-center align-items-center gap-2 fs-7 fw-medium ms-2" (click)="showProductReplaceModal(RecordModal, product)">
+                <i class="bi bi-arrow-clockwise fs-6 fw-bold"></i>
+                Replace
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Action buttons -->
+        <div class="d-flex justify-content-between mt-3">
+          <button class="btn btn-success btn-responsive" *ngIf="product?.unit == 'LBS' && product?.qty > 0"
+            (click)="openWeightModal(weightModal, product)">
+            <img src="assets/icons/outline_scale.png" alt="icon" width="15" height="15">
+            weight
+          </button>
+          <button class="btn btn-success btn-responsive" *ngIf="product?.dateType" (click)="openExpiryDateModal(expiryDateModal, product)"> 
+            <img src="assets/icons/pajamas_time-out.png" alt="icon" width="15" height="15">
+            Expiry
+          </button>
+          <button class="btn btn-success btn-responsive" (click)="openRemarkModal(remarkModal, product)">
+            <i class="bi bi-pencil"></i>
+            Remark
+          </button>
+        </div>
+      </div>
+    </div>
+    <ng-template #noProducts>
+      <div class="py-5">
+        <div class="d-flex justify-content-center">
+          <img src="assets/images/no_matched_img.png" alt="No matched" style="height: 32px;" />
+        </div>
+        <div class="text-center text-muted">
+          No items found <span *ngIf="searchText">matching “{{searchText}}” </span>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+
+<!-- modals -->
+
+<ng-template #weightModal>
+  <div class="modal-body p-4 position-relative">
+    <i class="bi bi-x position-absolute fs-3" style="top: 6px; right: 6px" aria-label="Close"
+      (click)="modalRef?.hide()"></i>
+    <p class="modal-title fs-6 fw-semibold">Update Weight
+       <!-- - <span
+        class="text-light-emphasis fs-7">{{selectedProduct?.title}}
+      </span> -->
+      </p>
+    <p class="fs-7 text-muted">{{selectedProduct?.productCode}}</p>
+    <div class="text-muted fw-medium m-0 p-0">Enter weight for each item (Quantity: {{selectedProductQuantity}})</div>
+    <p *ngIf="selectedProduct?.weight" class="fs-8 text-muted mb-3 fw-medium">Previous weight: {{selectedProduct?.weight}}</p>
+    <!-- <label for="wight" class="fw-semibold pb-1">Weight(lbs)</label>
+    <input type="number" [(ngModel)]="weightInput" class="form-control" placeholder="Enter weight"
+      (keypress)="($event.charCode === 45) ? $event.preventDefault() : null"> -->
+      <div class="row">
+        <div class="col-12 px-0 pb-2" *ngFor="let _ of generateArray(selectedProductQuantity); let i = index">
+          <label for="wight" class="fw-semibold pb-0 fs-7">Item{{i+1}}/Weight(lbs)</label>
+          <input type="text" id="Property-title-input" class="form-control" placeholder="Enter weight"
+            [(ngModel)]="inputValues[i]" (keyup)="checkInventory(inputValues[i], i)">
+          <span *ngIf="!checkInventoryStatus[i]" class="text-danger fs-8 fw-medium">
+            Weight is not matching with the inventory in hand - Do you still want to proceed?
+          </span>
+        </div>
+        <div class="mt-2 fw-medium p-2 fs-7" style="background-color: #29A3291A; border-radius: 6px;">
+          Total Weight: {{ totalWeight }} lbs
+        </div>
+      </div>
+
+    <div class="d-flex pt-3 gap-2">
+      <button class="btn btn-success flex-fill" (click)="sumbitInventory()">Update Weight</button>
+      <button class="btn btn-outline-danger flex-fill" (click)="modalRef?.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #expiryDateModal>
+  <div class="modal-body p-4 position-relative">
+    <i class="bi bi-x position-absolute fs-3" style="top: 6px; right: 6px" aria-label="Close"
+      (click)="modalRef?.hide()"></i>
+    <p class="modal-title fs-6 fw-semibold">Expiry Date - <span
+        class="text-light-emphasis fs-7">{{selectedProduct?.title}}</span></p>
+    <p class="fs-7 text-muted">{{selectedProduct?.productCode}}</p>
+    <label for="expiryDate" class="fw-semibold pb-1">Expiry Date</label>
+    <!-- <input type="date" [(ngModel)]="expiryDateInput" class="form-control" placeholder="Expiry Date"> -->
+    <input type="text"
+       class="form-control"
+       bsDatepicker
+       [container]="'body'"
+       [bsConfig]="{ dateInputFormat: 'MM/DD/YYYY' }"
+       [(ngModel)]="expiryDateInput"
+       placeholder="MM/DD/YYYY" />
+    <div class="d-flex pt-3 gap-2">
+      <button class="btn btn-success flex-fill" [disabled]="!expiryDateInput" (click)="saveExpiryDate()">Add Expiry
+        Date</button>
+      <button class="btn btn-outline-danger flex-fill" (click)="modalRef?.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #remarkModal>
+  <div class="modal-body p-4 position-relative">
+    <i class="bi bi-x position-absolute" style="top: 6px; right: 6px" aria-label="Close" (click)="modalRef?.hide()"></i>
+    <p class="modal-title fs-6 fw-semibold">Add Remark</p>
+    <p class="fs-7 text-muted">{{selectedProduct?.productCode}}</p>
+    <label for="remark" class="fw-semibold pb-1">Remark</label>
+    <textarea [(ngModel)]="remarkInput" class="form-control" rows="4" placeholder="Enter your remark here"></textarea>
+    <div class="d-flex pt-3">
+      <button class="btn btn-success flex-fill me-1" (click)="saveRemark()">Add Remark</button>
+      <button class="btn btn-outline-danger flex-fill ms-1" (click)="modalRef?.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #RecordModal>
+  <div class="modal-body p-4 position-relative">
+    <i class="bi bi-x position-absolute" style="top: 6px; right: 6px" aria-label="Close" (click)="modalRef?.hide()"></i>
+    <div class="p-0">
+      <form [formGroup]="productform">
+        <div class="mb-3">
+          <label for="product-category-input" class="form-label">Product category</label>
+          <ng-select [items]="itemsList" bindLabel="name" bindValue="productId" formControlName="productId"
+            placeholder="Select Product" [searchFn]="customSearchFn">
+          </ng-select>
+        </div>
+        <div class="mb-3">
+          <label for="product-quantity-input" class="form-label">Quantity</label>
+          <input type="text" id="quantity" class="form-control m-1" placeholder="Enter Quantity"
+            formControlName="quantity" (keypress)="allowOnlyNumbers($event)">
+        </div>
+      </form>
+      <button type="submit" class="btn btn-danger" id="add-btn" (click)="changeproduct()">Change
+        product
+      </button>
+    </div>
+  </div>
+</ng-template>

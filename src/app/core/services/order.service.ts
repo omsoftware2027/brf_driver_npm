@@ -24,16 +24,25 @@ export class OrderService {
     return this.http.get<any>(`${environment.baseUrl}/order/getAllDriverName`);
   }
 
-  filterOrdersByDriver(startDate: string, search: string, driverId?: any): Observable<any> {
+  filterOrdersByDriver(startDate: string, endDate: string, search: string, driverId?: any): Observable<any> {
     return this.http.get<any>(
-      `${environment.baseUrl}/driver/getAllOrdersByDriverId?search=${search}&startDate=${startDate}&driverId=${driverId}`
+      `${environment.baseUrl}/driver/getAllOrdersByDriverId?search=${search}&startDate=${startDate}&endDate=${endDate}&driverId=${driverId}`
     );
   }
 
-  getCombinedOrders() {
-    return this.http.get<any>(
-      `${environment.baseUrl}/order/getGroupByOrder?pageNo=0&pageSize=1000`
-    );
+  getCombinedOrders(search?: string, date?: string) {
+    let url = `${environment.baseUrl}/order/getGroupByOrder?pageNo=0&pageSize=1000`;
+    const params: string[] = [];
+    if (search) {
+      params.push(`search=${encodeURIComponent(search)}`);
+    }
+    if (date) {
+      params.push(`date=${encodeURIComponent(date)}`);
+    }
+    if (params.length > 0) {
+      url += `&${params.join('&')}`;
+    }
+    return this.http.get<any>(url);
   }
 
 }

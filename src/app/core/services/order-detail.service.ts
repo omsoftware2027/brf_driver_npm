@@ -74,4 +74,18 @@ export class OrderDetailService {
     return this.http.get<any>(`${environment.baseUrl}/order/changeProduct?orderId=${orderId}&originalProductId=${originalProductId}&replaceProductId=${replaceProductId}&orderItemId=${orderItemId}&quantity=${quantity}`);
   }
 
+  // get grouped order products
+  getAllGroupedOrdersProducts(userId: any, shippingAddress: string, shippingDate: string, orderId: any, search?: string): Observable<any> {
+    let url = `${environment.baseUrl}/order/getGroupByOrderByOrderId?userId=${userId}&shippingAddress=${encodeURIComponent(shippingAddress)}&shippingDate=${shippingDate}&orderId=${orderId}`;
+    if (search) {
+      url += `&search=${encodeURIComponent(search)}`;
+    }
+    return this.http.get<any>(url);
+  }
+// set warehouse/jetro
+  updateDriverType(orderItemId: any) {
+     return this.http.get<any>(`${environment.baseUrl}/driver/setWarehouseOrJetro?orderItemId=${orderItemId}`)
+  }
+
+
 }
