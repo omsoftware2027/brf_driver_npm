@@ -1,7 +1,7 @@
 import { Component, HostListener, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 
 @Component({
   selector: 'app-header',
@@ -14,7 +14,7 @@ export class HeaderComponent {
   @Input() showBack: boolean = false;
   menuOpen = false;
 
-  constructor(public authService: AuthService, private router: Router) { }
+  constructor(public authService: AuthService, private router: Router, public location: Location) { }
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
@@ -35,6 +35,7 @@ export class HeaderComponent {
   }
 
   goBack() {
-    this.router.navigate(['/my-orders'])
+    // this.router.navigate(['/my-orders'])
+    this.location.back();
   }
 }

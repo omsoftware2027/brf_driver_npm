@@ -381,4 +381,17 @@ export class OrderDetailComponent {
       }
     });
   }
+
+  onDriverSelectionChange(product: any) {
+    this.orderDetailService.updateDriverType(product?.orderItemId).subscribe({
+      next: (res) => {
+        console.log('Driver type updated successfully', res);
+      },
+      error: (err) => {
+        product.driverWarehouse = !product.driverWarehouse;
+        product.driverJetro = !product.driverJetro;
+      }
+    });
+  }
+
 }
