@@ -36,146 +36,83 @@ export class MyOrdersComponent {
     private toastr: ToastrService,
     public router: Router,
     private modalService: BsModalService
-  ) {}
+  ) { }
 
   ngOnInit() {
-    this.getAllDrivers();
     this.authService.user$.subscribe(
       user => {
         this.user = user;
-        this.getTodaysOrders();
+        this.loadOrders();
       }
     );
   }
 
-  getTodaysOrders() {
-    if (this.user && this.user.id) {
-      const today = new Date();
-      this.todayDate = today.toISOString().split('T')[0];
+  loadOrders() {
+    if (!this.user?.id) return;
+    const today = new Date();
+    const startDate = this.selectedDate || today.toISOString().split('T')[0];
+    const nextDay = new Date(startDate);
+    nextDay.setDate(new Date(startDate).getDate() + 1);
+    const endDate = nextDay.toISOString().split('T')[0];
 
-      const nextDay = new Date(today);
-      nextDay.setDate(today.getDate() + 1);
-      const endDate = nextDay.toISOString().split('T')[0];
-
-      this.orderService.getAllOrders(this.user?.id, this.todayDate, endDate).subscribe({
-        next: (res) => {
-          this.orders = res?.response?.dataSet || [];
-          this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
-          if (this.orders.length === 0) {
-            // this.toastr.info('No orders found in the last 7 days', 'Info');
-          }
-        },
-        error: (err) => {
-          this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
-        }
-      })
-    } else {
-      // this.toastr.warning('You need to login', 'Warning');
-    }
-  }
-
-  getAllDrivers() {
-    this.orderService.getAllDrivers().subscribe({
+    this.orderService.getOrders({
+      driverId: this.user.id,
+      startDate,
+      endDate,
+      search: this.searchText,
+      assignedDriverId: this.selectedDriver || undefined
+    }).subscribe({
       next: (res) => {
-        this.drivers = res.response || [];
-      }
-    })
-  }
+        this.orders = res?.response?.dataSet || [];
+        this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
 
-
-  onSearch() {
-    if (!this.user?.id || !this.searchText) {
-      this.searchResults = [];
-      return;
-    }
-
-    this.orderService.searchOrders(this.user.id, this.todayDate, this.searchText).subscribe({
-      next: (res) => {
-        this.searchResults = res?.response?.dataSet || [];
-        console.log('searched', this.searchResults)
+        // Update drivers only on date change or initial load
+        this.drivers = [
+          ...new Map(
+            this.orders
+              .filter(o => o.driverId && o.driverName)
+              .map(o => [o.driverId, { driverId: o.driverId, driverName: o.driverName }])
+          ).values()
+        ];
       },
-      error: (err) => {
-        this.toastr.error('Search failed. Please try again.', 'Error');
-        this.searchResults = [];
-      }
+      error: () => this.toastr.error('Failed to fetch orders. Please try again later.', 'Error')
     });
   }
 
-  viewOrderDetails(transactionId: string) {
-    // this.router.navigate([])
+  onSearch() {
+    this.loadOrders();
   }
-
 
   openDriverModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template, {
       class: 'modal-sm modal-dialog-centered',
     });
   }
-
   applyDriverFilter() {
-    console.log('Selected driver:', this.selectedDriver);
     this.modalRef?.hide();
-
-    if (this.selectedDate) {
-      const startDate = new Date(this.selectedDate);
-      const nextDay = new Date(startDate);
-      nextDay.setDate(startDate.getDate() + 1);
-
-      const formattedStartDate = startDate.toISOString().split('T')[0] ?? '';
-      const formattedEndDate = nextDay.toISOString().split('T')[0] || '';
-
-      this.orderService.filterOrdersByDriver(formattedStartDate, formattedEndDate, this.searchText, this.selectedDriver).subscribe({
-        next: (res) => {
-          this.orders = res?.response?.dataSet || [];
-          console.log('searched', this.orders)
-        },
-        error: (err) => {
-          this.toastr.error('Search failed. Please try again.', 'Error');
-          this.orders = [];
-        }
-      });
-    } else {
-      this.orderService.filterOrdersByDriver('', '', this.searchText, this.selectedDriver).subscribe({
-        next: (res) => {
-          this.orders = res?.response?.dataSet || [];
-          console.log('searched', this.orders)
-        },
-        error: (err) => {
-          this.toastr.error('Search failed. Please try again.', 'Error');
-          this.orders = [];
-        }
-      });
-    }
+    this.loadOrders();
+  }
+  clearDriverFilter() {
+    this.selectedDriver = null;
+    this.loadOrders();
   }
 
   triggerDatePicker() {
+    this.dateFilterInput.nativeElement.value = '';
     this.dateFilterInput.nativeElement.showPicker();
   }
   onDateChange(event: Event) {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
-
-    const startDate = new Date(this.selectedDate);
-    const nextDay = new Date(startDate);
-    nextDay.setDate(startDate.getDate() + 1);
-
-    const formattedStartDate = startDate.toISOString().split('T')[0];
-    const formattedEndDate = nextDay.toISOString().split('T')[0];
-
-    this.orderService.getAllOrders(this.user?.id, formattedStartDate, formattedEndDate).subscribe({
-      next: (res) => {
-        this.orders = res?.response?.dataSet || [];
-        this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
-      },
-      error: (err) => {
-        this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
-      }
-    })
-
+    this.loadOrders();
   }
-
   clearDateFilter() {
     this.selectedDate = '';
-    this.getTodaysOrders();
+    this.loadOrders();
+  }
+
+  get selectedDriverName(): string | null {
+    const order = this.orders.find(o => o.driverId === this.selectedDriver);
+    return order ? order.driverName : null;
   }
 }

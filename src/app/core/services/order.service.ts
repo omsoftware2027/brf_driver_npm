@@ -10,24 +10,25 @@ export class OrderService {
 
   constructor(private http: HttpClient) { }
 
-  getAllOrders(dId: number, startDate: string, endDate: string): Observable<any> {
+  getOrders(options: {
+    driverId?: number;
+    startDate?: string;
+    endDate?: string;
+    search?: string;
+    assignedDriverId?: number;
+  }): Observable<any> {
+    let url = `${environment.baseUrl}/driver/getAllOrdersByDriverId?`;
+    const params: string[] = [];
+    if (options.startDate) params.push(`startDate=${encodeURIComponent(options.startDate)}`);
+    if (options.endDate) params.push(`endDate=${encodeURIComponent(options.endDate)}`);
+    if (options.search) params.push(`search=${encodeURIComponent(options.search)}`);
+    if (options.assignedDriverId) params.push(`driverId=${encodeURIComponent(options.assignedDriverId)}`);
+    url += params.join('&');
+    return this.http.get<any>(url);
+  }
+
+    getAllOrders(dId: number, startDate: string, endDate: string): Observable<any> {
     return this.http.get<any>(`${environment.baseUrl}/driver/getAllOrdersByDriverId?startDate=${startDate}&endDate=${endDate}`);
-  }
-
-  searchOrders(dId: number, startDate: string, search: string): Observable<any> {
-    return this.http.get<any>(
-      `${environment.baseUrl}/driver/getAllOrdersByDriverId?search=${search}&startDate=${startDate}`
-    );
-  }
-
-  getAllDrivers() {
-    return this.http.get<any>(`${environment.baseUrl}/order/getAllDriverName`);
-  }
-
-  filterOrdersByDriver(startDate: string, endDate: string, search: string, driverId?: any): Observable<any> {
-    return this.http.get<any>(
-      `${environment.baseUrl}/driver/getAllOrdersByDriverId?search=${search}&startDate=${startDate}&endDate=${endDate}&driverId=${driverId}`
-    );
   }
 
   getCombinedOrders(search?: string, date?: string) {
