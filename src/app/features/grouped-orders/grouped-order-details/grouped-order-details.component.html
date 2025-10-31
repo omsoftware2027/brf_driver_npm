@@ -256,7 +256,7 @@
         <div class="mb-3">
           <label for="product-category-input" class="form-label">Product category</label>
           <ng-select [items]="itemsList" bindLabel="name" bindValue="productId" formControlName="productId"
-            placeholder="Select Product" [searchFn]="customSearchFn">
+            placeholder="Select Product" [typeahead]="searchInput$">
           </ng-select>
         </div>
         <div class="mb-3">

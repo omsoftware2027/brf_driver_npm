@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { OrderDetailService } from '../../../core/services/order-detail.service';
 import { DatePipe } from '@angular/common';
+import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-grouped-order-details',
@@ -43,6 +44,7 @@ export class GroupedOrderDetailsComponent {
   productList: any[] = [];
 
   productform!: FormGroup
+  searchInput$ = new Subject<string>();
 
 
   constructor(
@@ -74,7 +76,8 @@ export class GroupedOrderDetailsComponent {
 
     if (this.orderId) {
       this.getAllProducts();
-      this.getAllProductList()
+      this.setupSearch();
+      this.getallsampletype();
     }
   }
 
@@ -82,16 +85,27 @@ export class GroupedOrderDetailsComponent {
     this.getAllProducts();
   }
 
-  setActiveTab(tab: any) {
-    this.orderDetail = [];
-    this.activeTab = tab;
-    if (tab === 'All' && this.searchText === '') {
-      this.getAllProducts();
-    }
-    this.onSearch();
+  setupSearch() {
+    this.searchInput$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(term => this.orderDetailService.getallproductlist(0, 600, term))
+      )
+      .subscribe(res => {
+        if (res.status === 0) {
+          this.itemsList = res.response.dataSet.map((product: any) => ({
+            name: product.productName,
+            productId: product.productId,
+            description: product.description,
+            shortDescription: product.shortDescription,
+            code: product.code,
+          }));
+        }
+      });
   }
 
-  getAllProductList() {
+  getallsampletype() {
     this.orderDetailService.getallproductlist(0, 600).subscribe((res) => {
       if (res['status'] === 0) {
         this.productList = res['response']['dataSet'];
@@ -101,11 +115,21 @@ export class GroupedOrderDetailsComponent {
             productId: product.productId,
             description: product.description,
             shortDescription: product.shortDescription,
-            code: product.code
+            code: product.code,
           };
         });
+        console.log("items", this.itemsList);
       }
     });
+  }
+
+  setActiveTab(tab: any) {
+    this.orderDetail = [];
+    this.activeTab = tab;
+    if (tab === 'All' && this.searchText === '') {
+      this.getAllProducts();
+    }
+    this.onSearch();
   }
 
   getAllProducts() {
