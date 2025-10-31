@@ -36,22 +36,32 @@
             </ng-template>
         </div>
     </div>
-    
+
     <div class="mb-2 d-flex justify-content-end">
         <button class="btn btn-success btn-sm" [routerLink]="['/my-orders/grouped-orders']">Grouped Orders <i class="bi bi-arrow-right"></i></button>
     </div>
 
-    <div class="d-flex justify-content-end gap-2">
-        <input type="date" #dateFilterInput class="" style="visibility: hidden; width: 2px;" (change)="onDateChange($event)" />
-        <div *ngIf="selectedDate" class="d-flex align-items-center" (click)="clearDateFilter()">
-           <span class="fs-8 badge badge-red">{{selectedDate}} <i class="bi bi-x ms-1"></i></span>
+    <div class="d-flex justify-content-end align-items-center gap-1 flex-wrap-reverse">
+        <input type="date" #dateFilterInput class="" style="visibility: hidden; width: 1px;"
+            (input)="onDateChange($event)" />
+        <div class="d-flex align-items-center flex-wrap gap-1 me-2">
+            <span *ngIf="selectedDate" class="fs-8 badge badge-red d-flex align-items-center" (click)="clearDateFilter()">{{
+                selectedDate }}<i class="bi bi-x ms-1"></i>
+            </span>
+            <span *ngIf="selectedDriver" class="fs-8 badge badge-red d-flex align-items-center"
+                (click)="clearDriverFilter()"> {{
+                selectedDriverName || selectedDriver }} <i class="bi bi-x ms-1"></i>
+            </span>
         </div>
-        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" (click)="triggerDatePicker()">
-            Date <i class="bi bi-calendar-date ms-1"></i>
-        </button>
-        <button class="btn btn-outline-secondary btn-sm" (click)="openDriverModal(driverFilterModal)">
-            Drivers <i class="bi bi-funnel"></i>
-        </button>
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" (click)="triggerDatePicker()">
+                Date <i class="bi bi-calendar-date ms-1"></i>
+            </button>
+            <button class="btn btn-outline-secondary btn-sm d-flex align-items-center"
+                (click)="openDriverModal(driverFilterModal)">
+                Drivers <i class="bi bi-funnel"></i>
+            </button>
+        </div>
     </div>
 
     <div class="pt-3">

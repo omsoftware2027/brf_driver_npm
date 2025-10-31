@@ -40,21 +40,12 @@ export class OrdersListComponent {
   ) { }
 
   ngOnInit() {
-    this.getAllDrivers();
     this.authService.user$.subscribe(
       user => {
         this.user = user;
         this.getAllOrders();
       }
     );
-  }
-
-  getAllDrivers() {
-    this.orderService.getAllDrivers().subscribe({
-      next: (res) => {
-        this.drivers = res.response || [];
-      }
-    })
   }
 
   goBack() {
@@ -78,6 +69,15 @@ export class OrdersListComponent {
     this.orderService.getCombinedOrders().subscribe({
       next: (res) => {
         this.orders = res?.response?.dataSet || [];
+        // collect drivers
+        this.drivers = [
+          ...new Map(
+            this.orders
+              .filter(order => order.driverId && order.driverName)
+              .map(order => [order.driverId, { driverId: order.driverId, driverName: order.driverName }])
+          ).values()
+        ];
+        console.log('Unique Valid Drivers:', this.drivers);
         this.orders.sort((a, b) => new Date(a.shippingDate).getTime() - new Date(b.shippingDate).getTime());
         // Keep backup copy of original orders
         this.ordersBackup = [...this.orders];
@@ -108,66 +108,58 @@ export class OrdersListComponent {
 
 
   triggerDatePicker() {
+    this.dateFilterInput.nativeElement.value = '';
     this.dateFilterInput.nativeElement.showPicker();
   }
   onDateChange(event: Event) {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
-    if (selectedDate) {
-      this.orders = this.ordersBackup.filter(order => {
-        const shortShippingDate = order.shippingDate?.substring(0, 10);;
-        return shortShippingDate === this.selectedDate;
-      });
-    } else {
-      this.orders = [...this.ordersBackup];
-    }
-
-
-    // const startDate = new Date(this.selectedDate);
-    // const nextDay = new Date(startDate);
-    // nextDay.setDate(startDate.getDate() + 1);
-
-    // const formattedStartDate = startDate.toISOString().split('T')[0];
-    // const formattedEndDate = nextDay.toISOString().split('T')[0];
-
-    // this.orderService.getCombinedOrders(undefined, undefined).subscribe({
-    //   next: (res) => {
-    //     this.orders = res?.response?.dataSet || [];
-    //     this.orders.sort((a, b) => new Date(a.shippingDate).getTime() - new Date(b.shippingDate).getTime());
-    //   },
-    //   error: (err) => {
-    //     this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
-    //   }
-    // })
-
+    this.applyCombinedFilters(true);
   }
   clearDateFilter() {
     this.selectedDate = '';
-    this.orders = [...this.ordersBackup];
-    // this.getAllOrders();
+    this.dateFilterInput.nativeElement.value = '';
+    this.applyCombinedFilters(true);
   }
 
+  applyCombinedFilters(updateDrivers = false) {
+    this.orders = this.ordersBackup.filter(order => {
+      const shortShippingDate = order.shippingDate?.substring(0, 10);
+      const matchesDate = this.selectedDate ? shortShippingDate === this.selectedDate : true;
+      const matchesDriver = this.selectedDriver ? order.driverId === this.selectedDriver : true;
+      return matchesDate && matchesDriver;
+    });
+    console.log('filtered orders', this.orders)
+    // Update drivers list based on filtered orders ...only on datefilter 
+    if (updateDrivers) {
+      this.drivers = [
+        ...new Map(
+          this.orders
+            .filter(order => order.driverId && order.driverName)
+            .map(order => [order.driverId, { driverId: order.driverId, driverName: order.driverName }])
+        ).values()
+      ];
+    }
+  }
 
   openDriverModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template, {
       class: 'modal-sm modal-dialog-centered',
     });
   }
-
   applyDriverFilter() {
     console.log('Selected driver:', this.selectedDriver);
     this.modalRef?.hide();
-    if (this.selectedDriver) {
-      this.orders = this.ordersBackup.filter(order => order.driverId === this.selectedDriver);
-      console.log('filter by driver-->', this.orders)
-    } else {
-      this.orders = [...this.ordersBackup];
-    }
+    this.applyCombinedFilters(false);
   }
-
   clearDriverFilter() {
     this.selectedDriver = null;
-    this.orders = [...this.ordersBackup];
+    this.applyCombinedFilters(false);
+  }
+
+  get selectedDriverName(): string | null {
+    const order = this.ordersBackup.find(o => o.driverId === this.selectedDriver);
+    return order ? order.driverName : null;
   }
 
 }
