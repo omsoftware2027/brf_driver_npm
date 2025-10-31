@@ -3,9 +3,14 @@
         <i class="bi bi-arrow-left fw-bolder fs-3" (click)="goBack()"></i>
     </div>
     <div class="row align-content-between">
-        <div class="col-auto p-0">
+        <div class="col-8 p-0">
             <b class="fw-bold fs-3">All Grouped Orders</b>
             <p class="text-muted fs-7" *ngIf="orders.length">{{orders.length}} Grouped Orders sorted by delivery time</p>
+        </div>
+        <div class="col-4 p-0">
+            <div class="d-flex justify-content-end mt-2">
+                <span class="badge badge-green">{{selectedDate == todayDate ? 'Today' : selectedDate}}</span>
+            </div>
         </div>
     </div>
 
@@ -38,11 +43,8 @@
     <div class="d-flex justify-content-end align-items-center gap-1 flex-wrap-reverse">
         <input type="date" #dateFilterInput class="" style="visibility: hidden; width: 2px;" (input)="onDateChange($event)" />
         <div class="d-flex align-items-center flex-wrap gap-1 me-2">
-            <span *ngIf="selectedDate" class="fs-8 badge badge-red d-flex align-items-center"
+            <span *ngIf="selectedDate && (selectedDate != todayDate)" class="fs-8 badge badge-red d-flex align-items-center"
                 (click)="clearDateFilter()">{{selectedDate }}<i class="bi bi-x ms-1"></i>
-            </span>
-            <span *ngIf="selectedDriver" class="fs-8 badge badge-red d-flex align-items-center"
-                (click)="clearDriverFilter()">{{selectedDriverName || selectedDriver }} <i class="bi bi-x ms-1"></i>
             </span>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -50,7 +52,7 @@
                 Date <i class="bi bi-calendar-date ms-1"></i>
             </button>
             <button class="btn btn-outline-secondary btn-sm" (click)="openDriverModal(driverFilterModal)">
-                Drivers <i class="bi bi-funnel"></i>
+                {{selectedDriverName ? selectedDriverName :  'Drivers'}} <i class="bi bi-funnel"></i>
             </button>
         </div>
     </div>
@@ -78,7 +80,22 @@
                         <div class="fw-bold text-uppercase py-1">{{ order?.transactionId }}</div>
                     </div>
                 </div>
-                <button class="btn btn-success w-100 mt-4 rounded-2 d-flex align-items-center justify-content-center">
+                <!-- radio checks -->
+                <div class="d-flex gap-3 align-items-center pt-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="warehouseOption{{ order?.idorders }}"
+                            id="warehouse{{ order?.idorders }}" [checked]="order?.driverWarehouse"
+                            (change)="setDriverWarehouse(order?.idorders)" />
+                        <label class="form-check-label" for="warehouse{{ order?.idorders }}">Warehouse</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="jetroOption{{ order?.idorders }}"
+                            id="jetro{{ order?.idorders }}" [checked]="order?.driverJetro"
+                            (change)="setDriverJetro(order?.idorders)" />
+                        <label class="form-check-label" for="jetro{{ order?.idorders }}">Jetro</label>
+                    </div>
+                </div>
+                <button (click)="goToGroupedOrderDetail(order)" class="btn btn-success w-100 mt-4 rounded-2 d-flex align-items-center justify-content-center">
                     <i class="bi bi-geo-alt-fill me-2"></i>
                     <span class="fs-7">{{ order?.shippingAddress }}</span>
                 </button>

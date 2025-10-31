@@ -46,4 +46,11 @@ export class OrderService {
     return this.http.get<any>(url);
   }
 
+  setDriverWarehouse(orderId: any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/setDriverWarehouse?orderId=${orderId}`);
+  }
+  setDriverJetro(orderId: any): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/setDriverJetro?orderId=${orderId}`);
+  }
+
 }

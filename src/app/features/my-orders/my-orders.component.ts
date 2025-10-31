@@ -97,9 +97,14 @@ export class MyOrdersComponent {
     this.loadOrders();
   }
 
+  // triggerDatePicker() {
+  //   this.dateFilterInput.nativeElement.value = '';
+  //   this.dateFilterInput.nativeElement.showPicker();
+  // }
   triggerDatePicker() {
-    this.dateFilterInput.nativeElement.value = '';
-    this.dateFilterInput.nativeElement.showPicker();
+    const input = this.dateFilterInput.nativeElement;
+    input.value = '';
+    (input as any).showPicker ? input.showPicker() : input.click();
   }
   onDateChange(event: Event) {
     const selectedDate = (event.target as HTMLInputElement).value;
@@ -115,4 +120,25 @@ export class MyOrdersComponent {
     const order = this.orders.find(o => o.driverId === this.selectedDriver);
     return order ? order.driverName : null;
   }
+
+setDriverJetro(orderId: any) {
+    this.orderService.setDriverJetro(orderId).subscribe({
+    next: (res)=>{
+      console.log(res)
+    },
+    error: (err)=>{
+      console.log('error setting warehouse', err)
+    }
+  })
+}
+setDriverWarehouse(orderId: any) {
+  this.orderService.setDriverWarehouse(orderId).subscribe({
+    next: (res)=>{
+      console.log(res)
+    },
+    error: (err)=>{
+      console.log('error setting warehouse', err)
+    }
+  })
+}
 }
