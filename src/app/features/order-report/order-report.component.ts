@@ -4,12 +4,14 @@ import { AuthService } from '../../core/services/auth.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { OrderDetailService } from '../../core/services/order-detail.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-order-report',
-  imports: [CommonModule, FormsModule, BsDatepickerModule],
+  imports: [CommonModule, FormsModule, BsDatepickerModule, ReactiveFormsModule, NgSelectModule],
   templateUrl: './order-report.component.html',
   styleUrl: './order-report.component.scss',
   providers: [DatePipe]
@@ -18,7 +20,7 @@ export class OrderReportComponent {
   selectedOrderReportType: string = 'Pickup';
   user: any;
   reports: any = {};
-  allReportsBackup: any[] = []; 
+  allReportsBackup: any[] = [];
 
   expiryDateInput: any;
   selectedProduct: any;
@@ -43,9 +45,16 @@ export class OrderReportComponent {
 
   customers: any[] = [];
 
+  itemsList: any[] = [];
+  productList: any[] = [];
+  productform!: FormGroup;
+  searchInput$ = new Subject<string>();
 
-@ViewChild('pickupDateFilterInput') pickupDateFilterInput!: ElementRef<HTMLInputElement>;
-@ViewChild('wareHouseDateFilterInput') wareHouseDateFilterInput!: ElementRef<HTMLInputElement>;
+  remarkInput: any
+
+
+  @ViewChild('pickupDateFilterInput') pickupDateFilterInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('wareHouseDateFilterInput') wareHouseDateFilterInput!: ElementRef<HTMLInputElement>;
 
 
   constructor(
@@ -54,14 +63,61 @@ export class OrderReportComponent {
     public orderDetailService: OrderDetailService,
     public datePipe: DatePipe,
     public modalService: BsModalService,
-  ) { };
+    private formBuilder: FormBuilder
+  ) { 
+    this.productform = this.formBuilder.group({
+      productId: [''],
+      quantity: [''],
+    });
+  };
 
   ngOnInit() {
     this.authService.user$.subscribe(
       user => {
         this.user = user;
         this.getPickupReport(this.user?.id);
-      })
+        this.setupSearch();
+        this.getallsampletype();
+      }
+    )
+  }
+
+  setupSearch() {
+    this.searchInput$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(term => this.orderDetailService.getallproductlist(0, 600, term))
+      )
+      .subscribe(res => {
+        if (res.status === 0) {
+          this.itemsList = res.response.dataSet.map((product: any) => ({
+            name: product.productName,
+            productId: product.productId,
+            description: product.description,
+            shortDescription: product.shortDescription,
+            code: product.code,
+          }));
+        }
+      });
+  }
+
+  getallsampletype() {
+    this.orderDetailService.getallproductlist(0, 600).subscribe((res) => {
+      if (res['status'] === 0) {
+        this.productList = res['response']['dataSet'];
+        this.itemsList = this.productList.map((product) => {
+          return {
+            name: product.productName,
+            productId: product.productId,
+            description: product.description,
+            shortDescription: product.shortDescription,
+            code: product.code,
+          };
+        });
+        console.log("items", this.itemsList);
+      }
+    });
   }
 
   setOrderReportType(type: string) {
@@ -344,7 +400,7 @@ export class OrderReportComponent {
     } else {
       // Perform inventory check when weightValue is not empty
       this.inputValues[index] = weightValue;
-      this.orderDetailService.checkWeightExists(weight, this.selectedProduct?.productCode, this.selectedProduct?.orderItemId).subscribe((res) => {
+      this.orderDetailService.checkWeightExists(weight, this.selectedProduct?.sku, this.selectedProduct?.orderItemId).subscribe((res) => {
         this.checkInventoryStatus[index] = !!res.response; // Convert to boolean
         const inventoryId = res.response !== undefined ? res.response : 0;
         console.log('Received inventoryId:', inventoryId);
@@ -396,14 +452,23 @@ export class OrderReportComponent {
       this.reports = [...this.allReportsBackup];
     }
   }
+  // triggerDatePicker() {
+  //   this.pickupDateFilterInput.nativeElement.showPicker();
+  // }
   triggerDatePicker() {
-    this.pickupDateFilterInput.nativeElement.showPicker();
+    const input = this.pickupDateFilterInput.nativeElement;
+    input.value = '';
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+    } else {
+      input.click();
+    }
   }
   onDateChange(event: Event, reportType: string) {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
     if (reportType === 'warehouse') {
-      this.getWarehouseReport(this.user?.id, selectedDate );
+      this.getWarehouseReport(this.user?.id, selectedDate);
     }
     if (reportType === 'pickup') {
       this.getPickupReport(this.user?.id, selectedDate);
@@ -425,11 +490,17 @@ export class OrderReportComponent {
       }))
       .filter(report => report.items.length > 0);
   }
-    triggerWarehouseDatePicker() {
-    this.wareHouseDateFilterInput.nativeElement.showPicker();
+triggerWarehouseDatePicker() {
+  const input = this.wareHouseDateFilterInput.nativeElement;
+  input.value = '';
+  if (typeof input.showPicker === 'function') {
+    input.showPicker();
+  } else {
+    input.click();
   }
+}
 
-// jetro filters works
+  // jetro filters works
   applyCustomerFilter() {
     if (!this.selectedCustomerFilter) {
       this.reports = [...this.allReportsBackup];
@@ -443,54 +514,54 @@ export class OrderReportComponent {
       .filter(report => report.items.length > 0);
   }
 
-sortByBinNumber() {
-  this.reports.forEach((report: any) => {
-    report.items.sort((a: any, b: any) => {
-      const binA = a.binNumber?.trim().toUpperCase() || '';
-      const binB = b.binNumber?.trim().toUpperCase() || '';
-
-      const numA = parseFloat(binA);
-      const numB = parseFloat(binB);
-
-      let comparison = 0;
-
-      if (!isNaN(numA) && !isNaN(numB)) {
-        comparison = numA - numB;
-      } 
-      else {
-        comparison = binA.localeCompare(binB, undefined, { numeric: true, sensitivity: 'base' });
-      }
-
-      return this.binSortAscending ? comparison : -comparison;
-    });
-  });
-
-  this.binSortAscending = !this.binSortAscending;
-}
-
-sortByRoute() {
+  sortByBinNumber() {
     this.reports.forEach((report: any) => {
-    report.items.sort((a: any, b: any) => {
-      const routeA = a.route?.trim().toUpperCase() || '';
-      const routeB = b.route?.trim().toUpperCase() || '';
+      report.items.sort((a: any, b: any) => {
+        const binA = a.binNumber?.trim().toUpperCase() || '';
+        const binB = b.binNumber?.trim().toUpperCase() || '';
 
-      const numA = parseFloat(routeA);
-      const numB = parseFloat(routeB);
+        const numA = parseFloat(binA);
+        const numB = parseFloat(binB);
 
-      let comparison = 0;
+        let comparison = 0;
 
-      if (!isNaN(numA) && !isNaN(numB)) {
-        comparison = numA - numB;
-      } 
-      else {
-        comparison = routeA.localeCompare(routeB, undefined, { numeric: true, sensitivity: 'base' });
-      }
-      return this.routeSortAscending ? comparison : -comparison;
+        if (!isNaN(numA) && !isNaN(numB)) {
+          comparison = numA - numB;
+        }
+        else {
+          comparison = binA.localeCompare(binB, undefined, { numeric: true, sensitivity: 'base' });
+        }
+
+        return this.binSortAscending ? comparison : -comparison;
+      });
     });
-  });
 
-  this.routeSortAscending = !this.routeSortAscending;
-}
+    this.binSortAscending = !this.binSortAscending;
+  }
+
+  sortByRoute() {
+    this.reports.forEach((report: any) => {
+      report.items.sort((a: any, b: any) => {
+        const routeA = a.route?.trim().toUpperCase() || '';
+        const routeB = b.route?.trim().toUpperCase() || '';
+
+        const numA = parseFloat(routeA);
+        const numB = parseFloat(routeB);
+
+        let comparison = 0;
+
+        if (!isNaN(numA) && !isNaN(numB)) {
+          comparison = numA - numB;
+        }
+        else {
+          comparison = routeA.localeCompare(routeB, undefined, { numeric: true, sensitivity: 'base' });
+        }
+        return this.routeSortAscending ? comparison : -comparison;
+      });
+    });
+
+    this.routeSortAscending = !this.routeSortAscending;
+  }
 
   clearDateFilter() {
     this.selectedDate = '';
@@ -501,5 +572,69 @@ sortByRoute() {
       this.getPickupReport(this.user?.id);
     }
   }
-  
+
+
+
+  onStatusChange(product: any) {
+    const remark = product.remark || '';
+    this.orderDetailService.changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
+      .subscribe({
+        next: (res) => {
+          console.log('Product status updated successfully', res);
+          this.setOrderReportType(this.selectedOrderReportType);
+        },
+        error: (err) => {
+          console.error('Error updating product status', err);
+        }
+      });
+  }
+
+  showProductReplaceModal(template: TemplateRef<any>, product: any) {
+    this.selectedProduct = product;
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-dialog-centered modal-sm'
+    });
+  }
+  allowOnlyNumbers(event: KeyboardEvent) {
+    const charCode = event.key.charCodeAt(0);
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
+  }
+  changeproduct() {
+    this.orderDetailService.changeproduct(this.selectedProduct?.orderId, this.selectedProduct?.productId, this.productform.value.productId, this.selectedProduct?.orderItemId, this.productform.value.quantity).subscribe({
+      next: (res) => {
+        if (res['status'] == 0) {
+          this.modalRef?.hide();
+          this.setOrderReportType(this.selectedOrderReportType);
+          this.productform.reset();
+        }
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
+
+  openRemarkModal(template: TemplateRef<any>, product: any) {
+    this.selectedProduct = product;
+    this.remarkInput = product?.remark ?? ''
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-dialog-centered modal-sm'
+    });
+  }
+    saveRemark() {
+    this.orderDetailService.saveRemark(this.selectedProduct.orderItemId, this.remarkInput)
+      .subscribe({
+        next: (res) => {
+          this.modalRef?.hide();
+          this.setOrderReportType(this.selectedOrderReportType);
+        },
+        error: (err) => {
+          console.error('Error saving weight', err);
+        }
+      });
+  }
+
 }

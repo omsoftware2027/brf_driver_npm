@@ -43,6 +43,9 @@ export class OrdersListComponent {
     this.authService.user$.subscribe(
       user => {
         this.user = user;
+        const today = new Date();
+        this.todayDate = today.toISOString().split('T')[0]
+        this.selectedDate = this.todayDate;
         this.getAllOrders();
       }
     );
@@ -82,6 +85,7 @@ export class OrdersListComponent {
         // Keep backup copy of original orders
         this.ordersBackup = [...this.orders];
 
+        this.applyCombinedFilters(true);
       },
       error: (err) => {
         this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
@@ -107,17 +111,23 @@ export class OrdersListComponent {
   }
 
 
+  // triggerDatePicker() {
+  //   this.dateFilterInput.nativeElement.value = '';
+  //   this.dateFilterInput.nativeElement.showPicker();
+  // }
   triggerDatePicker() {
-    this.dateFilterInput.nativeElement.value = '';
-    this.dateFilterInput.nativeElement.showPicker();
+    const input = this.dateFilterInput.nativeElement;
+    input.value = '';
+    (input as any).showPicker ? input.showPicker() : input.click();
   }
+
   onDateChange(event: Event) {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
     this.applyCombinedFilters(true);
   }
   clearDateFilter() {
-    this.selectedDate = '';
+    this.selectedDate = this.todayDate;
     this.dateFilterInput.nativeElement.value = '';
     this.applyCombinedFilters(true);
   }
@@ -161,5 +171,26 @@ export class OrdersListComponent {
     const order = this.ordersBackup.find(o => o.driverId === this.selectedDriver);
     return order ? order.driverName : null;
   }
+
+setDriverJetro(orderId: any) {
+    this.orderService.setDriverJetro(orderId).subscribe({
+    next: (res)=>{
+      console.log(res)
+    },
+    error: (err)=>{
+      console.log('error setting warehouse', err)
+    }
+  })
+}
+setDriverWarehouse(orderId: any) {
+  this.orderService.setDriverWarehouse(orderId).subscribe({
+    next: (res)=>{
+      console.log(res)
+    },
+    error: (err)=>{
+      console.log('error setting warehouse', err)
+    }
+  })
+}
 
 }

@@ -18,9 +18,9 @@
         <input type="text" [(ngModel)]="searchText" (input)="onSearch()" class="form-control border-0"
             placeholder="Search orders by number, customer & ..." />
         <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
-            <i class="bi bi-x" (click)="searchText = ''"></i>
+            <!-- <i class="bi bi-x" (click)="searchText = ''"></i> -->
         </span>
-        <div *ngIf="searchText" class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
+        <!-- <div *ngIf="searchText" class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
             style="max-height: 250px; overflow-y: auto; z-index: 30">
             <ng-container *ngIf="searchResults.length > 0; else noData">
                 <button type="button" class="list-group-item list-group-item-action" *ngFor="let order of searchResults"
@@ -34,7 +34,7 @@
                     No items found <span *ngIf="searchText">matching “{{searchText}}” </span>
                 </div>
             </ng-template>
-        </div>
+        </div> -->
     </div>
 
     <div class="mb-2 d-flex justify-content-end">
@@ -48,10 +48,10 @@
             <span *ngIf="selectedDate" class="fs-8 badge badge-red d-flex align-items-center" (click)="clearDateFilter()">{{
                 selectedDate }}<i class="bi bi-x ms-1"></i>
             </span>
-            <span *ngIf="selectedDriver" class="fs-8 badge badge-red d-flex align-items-center"
+            <!-- <span *ngIf="selectedDriver" class="fs-8 badge badge-red d-flex align-items-center"
                 (click)="clearDriverFilter()"> {{
                 selectedDriverName || selectedDriver }} <i class="bi bi-x ms-1"></i>
-            </span>
+            </span> -->
         </div>
         <div class="d-flex align-items-center gap-2">
             <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" (click)="triggerDatePicker()">
@@ -59,7 +59,7 @@
             </button>
             <button class="btn btn-outline-secondary btn-sm d-flex align-items-center"
                 (click)="openDriverModal(driverFilterModal)">
-                Drivers <i class="bi bi-funnel"></i>
+                {{selectedDriverName || 'Drivers'}} <i class="bi bi-funnel"></i>
             </button>
         </div>
     </div>
@@ -86,18 +86,26 @@
                         </div>
                         <div class="fw-bold text-uppercase py-1">{{ order?.trasactionId }}</div>
                         <div class="text-muted"><b>{{ order?.confirmCount }}</b>/{{ order?.pendingCount }} Items</div>
-                        <!-- <div class="text-muted">{{ order?.deliveryDate | date:'MM/dd/yyyy' }}</div> -->
                     </div>
                 </div>
-                <button class="btn btn-success w-100 mt-2 rounded-2 d-flex align-items-center justify-content-center">
+                <!-- radio checks -->
+                <div class="d-flex gap-3 align-items-center pt-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="warehouseOpt{{ order?.orderId }}"
+                            id="warehouse{{ order?.orderId }}" [checked]="order?.driverWarehouse"
+                            (change)="setDriverWarehouse(order?.orderId)" />
+                        <label class="form-check-label" for="warehouse{{ order?.orderId }}">Warehouse</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="jetroOpt{{ order?.orderId }}"
+                            id="jetro{{ order?.orderId }}" [checked]="order?.driverJetro" (change)="setDriverJetro(order?.orderId)" />
+                        <label class="form-check-label" for="jetro{{ order?.orderId }}">Jetro</label>
+                    </div>
+                </div>
+                <button [routerLink]="['/my-orders/order-detail', order?.orderId]" class="btn btn-success w-100 mt-2 rounded-2 d-flex align-items-center justify-content-center">
                     <i class="bi bi-geo-alt-fill me-2"></i>
                     <span class="fs-7">{{ order.address }}</span>
                 </button>
-                <!-- <button class="btn btn-success w-100 mt-2 rounded-2 d-flex align-items-center justify-content-center text-truncate"
-                    [title]="order.address">
-                    <i class="bi bi-geo-alt-fill me-2"></i>
-                    <span class="fs-7 text-truncate">{{ order.address }}</span>
-                </button> -->
             </div>
         </div>
         <ng-template #noOrders>

@@ -94,19 +94,6 @@
               <span *ngIf="product?.weight" class="badge badge-outlined fs-8">⚖️ {{product?.weight}}LBS</span>
               <span *ngIf="product?.expOrProdDate" class="badge badge-red fs-8">Expiry</span>
             </div>
-            <!-- radio checks -->
-            <div *ngIf="!product?.isProductReplaced" class="d-flex gap-3 align-items-center pt-2">
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="driverOption{{ product.productId }}"
-                  id="warehouse{{ product.productId }}" [checked]="product?.driverWarehouse" (change)="onDriverSelectionChange(product)"/>
-                <label class="form-check-label" for="warehouse{{ product.productId }}">Warehouse</label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="driverOption{{ product.productId }}"
-                  id="jetro{{ product.productId }}" [checked]="product?.driverJetro" (change)="onDriverSelectionChange(product)"/>
-                <label class="form-check-label" for="jetro{{ product.productId }}">Jetro</label>
-              </div>
-            </div>
           </div>
         </div>
         <!-- status change sec -->
