@@ -66,8 +66,9 @@ export class OrderDetailService {
     return this.http.post(url, {});
   }
 
-  getallproductlist(page: any, size: any) {
-    return this.http.get<any>(`${environment.baseUrl}/order/getAllProduct?pageNo=${page}&pageSize=${size}`);
+  getallproductlist(page: any, size: any, search?: string) {
+    const searchParam = search || '';
+    return this.http.get<any>(`${environment.baseUrl}/order/getAllProduct?pageNo=${page}&pageSize=${size}&search=${searchParam}`);
   }
 
   changeproduct(orderId: any, originalProductId: any, replaceProductId: any, orderItemId: any, quantity: any) {

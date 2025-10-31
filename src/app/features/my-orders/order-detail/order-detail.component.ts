@@ -6,6 +6,7 @@ import { OrderDetailService } from '../../../core/services/order-detail.service'
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 
 
 @Component({
@@ -48,6 +49,7 @@ export class OrderDetailComponent {
   productList: any[] = [];
 
   productform!:FormGroup
+  searchInput$ = new Subject<string>();
 
 
   constructor(
@@ -67,7 +69,8 @@ export class OrderDetailComponent {
     this.orderId = this.route.snapshot.paramMap.get('id')!;
     if (this.orderId) {
       this.getAllProducts();
-      this.getAllProductList()
+      this.setupSearch();
+      this.getallsampletype();
     }
   }
 
@@ -118,22 +121,43 @@ export class OrderDetailComponent {
     this.onSearch();
   }
 
-  getAllProductList() {
-    this.orderDetailService.getallproductlist(0, 600).subscribe((res) => {
-      if (res['status'] === 0) {
-        this.productList = res['response']['dataSet'];
-        this.itemsList = this.productList.map((product) => {
-          return {
+  setupSearch() {
+    this.searchInput$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(term => this.orderDetailService.getallproductlist(0, 600, term))
+      )
+      .subscribe(res => {
+        if (res.status === 0) {
+          this.itemsList = res.response.dataSet.map((product: any) => ({
             name: product.productName,
             productId: product.productId,
             description: product.description,
             shortDescription: product.shortDescription,
-            code: product.code
-          };
-        });
-      }
-    });
+            code: product.code,
+          }));
+        }
+      });
   }
+
+   getallsampletype() {
+  this.orderDetailService.getallproductlist(0, 600).subscribe((res) => {
+    if (res['status'] === 0) {
+      this.productList = res['response']['dataSet'];
+      this.itemsList = this.productList.map((product) => {
+        return {
+          name: product.productName,
+          productId: product.productId,
+          description: product.description,
+          shortDescription: product.shortDescription,
+          code: product.code,
+        };
+      });
+      console.log("items", this.itemsList);
+    }
+  });
+}
 
   getAllProducts() {
     if (this.orderId) {
