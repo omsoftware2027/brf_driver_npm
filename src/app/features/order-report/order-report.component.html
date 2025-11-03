@@ -64,15 +64,8 @@
         </div>
     </div>
 
-    <div *ngIf="selectedOrderReportType === 'Pickup'" class="d-flex justify-content-end gap-2">
-        <input type="date" #pickupDateFilterInput class="" style="visibility: hidden; width: 2px;" (change)="onDateChange($event, 'pickup')" />
-        
-        <div *ngIf="selectedDate" class="d-flex align-items-center" (click)="clearDateFilter()">
-           <span class="fs-8 badge badge-red">{{selectedDate}} <i class="bi bi-x ms-1"></i></span>
-        </div>
-        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" (click)="triggerDatePicker()">
-            Date <i class="bi bi-calendar-date ms-1"></i>
-        </button>
+    <div *ngIf="selectedOrderReportType === 'Pickup'" class="d-flex justify-content-end gap-2 flex-wrap">
+        <input type="date" lang="en-US" style="width: fit-content;" class="form-control form-control-sm" (input)="onDateChange($event, 'pickup')" [value]="selectedDate" />
         <div class="d-flex align-items-center">
             <select class="form-select form-select-sm" style="width: 140px;" [(ngModel)]="selectedVendor"
                 (change)="applyVendorFilter()">
@@ -84,16 +77,8 @@
     </div>
 
     <div *ngIf="selectedOrderReportType === 'Warehouse'">
-        <div class="d-flex justify-content-end gap-2">
-            <input type="date" #wareHouseDateFilterInput class="" style="visibility: hidden; width: 2px;"
-                (change)="onDateChange($event, 'warehouse')" />
-            <div *ngIf="selectedDate" class="d-flex align-items-center" (click)="clearDateFilter()">
-                <span class="fs-8 badge badge-red">{{selectedDate}} <i class="bi bi-x ms-1"></i></span>
-            </div>
-            <button class="btn btn-outline-secondary btn-sm d-flex align-items-center"
-                (click)="triggerWarehouseDatePicker()">
-                Date <i class="bi bi-calendar-date ms-1"></i>
-            </button>
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+            <input type="date" lang="en-US" style="width: fit-content;" class="form-control form-control-sm" (input)="onDateChange($event, 'warehouse')" [value]="selectedDate" />
             <div class="d-flex align-items-center">
                 <select class="form-select form-select-sm" style="width: 140px;" [(ngModel)]="selectedBinFilter"
                     (change)="applyBinFilter()">

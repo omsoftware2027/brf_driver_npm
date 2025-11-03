@@ -50,11 +50,18 @@ export class MyOrdersComponent {
 
   loadOrders() {
     if (!this.user?.id) return;
-    const today = new Date();
-    const startDate = this.selectedDate || today.toISOString().split('T')[0];
-    const nextDay = new Date(startDate);
-    nextDay.setDate(new Date(startDate).getDate() + 1);
-    const endDate = nextDay.toISOString().split('T')[0];
+    let startDate = '';
+    let endDate = ''; 
+
+    startDate = this.selectedDate || '';
+
+    if (startDate) {
+      const nextDay = new Date(startDate); 
+      nextDay.setDate(new Date(startDate).getDate() + 1);
+      endDate = nextDay.toISOString().split('T')[0];
+    } else {
+      endDate = '';
+    }
 
     this.orderService.getOrders({
       driverId: this.user.id,

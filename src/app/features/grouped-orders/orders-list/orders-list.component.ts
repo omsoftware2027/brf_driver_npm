@@ -27,7 +27,6 @@ export class OrdersListComponent {
   ordersBackup: any[] = [];
 
   selectedDate: string = '';
-  @ViewChild('dateFilterInput') dateFilterInput!: ElementRef<HTMLInputElement>;
 
 
   constructor(
@@ -110,17 +109,6 @@ export class OrdersListComponent {
     });
   }
 
-
-  // triggerDatePicker() {
-  //   this.dateFilterInput.nativeElement.value = '';
-  //   this.dateFilterInput.nativeElement.showPicker();
-  // }
-  triggerDatePicker() {
-    const input = this.dateFilterInput.nativeElement;
-    input.value = '';
-    (input as any).showPicker ? input.showPicker() : input.click();
-  }
-
   onDateChange(event: Event) {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
@@ -128,7 +116,6 @@ export class OrdersListComponent {
   }
   clearDateFilter() {
     this.selectedDate = this.todayDate;
-    this.dateFilterInput.nativeElement.value = '';
     this.applyCombinedFilters(true);
   }
 
