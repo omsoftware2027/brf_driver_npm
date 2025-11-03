@@ -27,7 +27,6 @@ export class MyOrdersComponent {
   drivers: any[] = [];
 
   selectedDate: string = '';
-  @ViewChild('dateFilterInput') dateFilterInput!: ElementRef<HTMLInputElement>;
 
 
   constructor(
@@ -42,6 +41,8 @@ export class MyOrdersComponent {
     this.authService.user$.subscribe(
       user => {
         this.user = user;
+        const today = new Date();
+        this.selectedDate = today.toISOString().split('T')[0] || '';
         this.loadOrders();
       }
     );
@@ -97,15 +98,6 @@ export class MyOrdersComponent {
     this.loadOrders();
   }
 
-  // triggerDatePicker() {
-  //   this.dateFilterInput.nativeElement.value = '';
-  //   this.dateFilterInput.nativeElement.showPicker();
-  // }
-  triggerDatePicker() {
-    const input = this.dateFilterInput.nativeElement;
-    input.value = '';
-    (input as any).showPicker ? input.showPicker() : input.click();
-  }
   onDateChange(event: Event) {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
