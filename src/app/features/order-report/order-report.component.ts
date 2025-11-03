@@ -53,10 +53,6 @@ export class OrderReportComponent {
   remarkInput: any
 
 
-  @ViewChild('pickupDateFilterInput') pickupDateFilterInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('wareHouseDateFilterInput') wareHouseDateFilterInput!: ElementRef<HTMLInputElement>;
-
-
   constructor(
     public orderReportService: OrderReportService,
     public authService: AuthService,
@@ -453,18 +449,7 @@ export class OrderReportComponent {
       this.reports = [...this.allReportsBackup];
     }
   }
-  // triggerDatePicker() {
-  //   this.pickupDateFilterInput.nativeElement.showPicker();
-  // }
-  triggerDatePicker() {
-    const input = this.pickupDateFilterInput.nativeElement;
-    input.value = '';
-    if (typeof input.showPicker === 'function') {
-      input.showPicker();
-    } else {
-      input.click();
-    }
-  }
+
   onDateChange(event: Event, reportType: string) {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
@@ -491,15 +476,6 @@ export class OrderReportComponent {
       }))
       .filter(report => report.items.length > 0);
   }
-triggerWarehouseDatePicker() {
-  const input = this.wareHouseDateFilterInput.nativeElement;
-  input.value = '';
-  if (typeof input.showPicker === 'function') {
-    input.showPicker();
-  } else {
-    input.click();
-  }
-}
 
   // jetro filters works
   applyCustomerFilter() {
