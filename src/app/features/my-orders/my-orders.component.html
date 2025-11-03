@@ -6,7 +6,7 @@
         </div>
         <div class="col-4 p-0">
             <div class="d-flex justify-content-end mt-2">
-                <span class="badge badge-green">{{selectedDate || 'Today'}}</span>
+                <span class="badge badge-green">{{!selectedDate ? 'Today' : ''}}</span>
             </div>
         </div>
     </div>
@@ -41,27 +41,12 @@
         <button class="btn btn-success btn-sm" [routerLink]="['/my-orders/grouped-orders']">Grouped Orders <i class="bi bi-arrow-right"></i></button>
     </div>
 
-    <div class="d-flex justify-content-end align-items-center gap-1 flex-wrap-reverse">
-        <input type="date" #dateFilterInput class="" style="visibility: hidden; width: 1px;"
-            (input)="onDateChange($event)" />
-        <div class="d-flex align-items-center flex-wrap gap-1 me-2">
-            <span *ngIf="selectedDate" class="fs-8 badge badge-red d-flex align-items-center" (click)="clearDateFilter()">{{
-                selectedDate }}<i class="bi bi-x ms-1"></i>
-            </span>
-            <!-- <span *ngIf="selectedDriver" class="fs-8 badge badge-red d-flex align-items-center"
-                (click)="clearDriverFilter()"> {{
-                selectedDriverName || selectedDriver }} <i class="bi bi-x ms-1"></i>
-            </span> -->
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" (click)="triggerDatePicker()">
-                Date <i class="bi bi-calendar-date ms-1"></i>
-            </button>
-            <button class="btn btn-outline-secondary btn-sm d-flex align-items-center"
-                (click)="openDriverModal(driverFilterModal)">
-                {{selectedDriverName || 'Drivers'}} <i class="bi bi-funnel"></i>
-            </button>
-        </div>
+    <div class="d-flex justify-content-end align-items-center gap-1 flex-wrap">
+        <input type="date" lang="en-US" style="width: 160px;" class="form-control form-control-sm" (input)="onDateChange($event)" [value]="selectedDate" />
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center"
+            (click)="openDriverModal(driverFilterModal)">
+            {{selectedDriverName || 'Drivers'}} <i class="bi bi-funnel"></i>
+        </button>
     </div>
 
     <div class="pt-3">

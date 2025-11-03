@@ -124,6 +124,7 @@ export class OrderReportComponent {
     this.selectedBinFilter = '';
     this.selectedVendor = '';
     this.selectedCustomerFilter = '';
+    this.selectedDate = '';
     this.binSortAscending = true;
     this.routeSortAscending = true;
 
