@@ -27,12 +27,7 @@ export class MyOrdersComponent {
   drivers: any[] = [];
 
   selectedDate: string = '';
-
-  pageNo = 0;
-  pageSize = 30;
-  totalPages = 0;
-  totalElements = 0;
-  Math = Math;
+  
 
   constructor(
     public orderService: OrderService,
@@ -74,12 +69,10 @@ export class MyOrdersComponent {
       endDate,
       search: this.searchText,
       assignedDriverId: this.selectedDriver || undefined,
-      pageNo: this.pageNo,
-      pageSize: this.pageSize
+      sortBy: 'deliveryDate',
+      sortDirection: 'asc'
     }).subscribe({
       next: (res) => {
-        this.totalPages = res?.response?.totalPages || 0;
-        this.totalElements = res?.response?.totalElements || 0;
         this.orders = res?.response?.dataSet || [];
         this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
 
@@ -149,16 +142,4 @@ setDriverWarehouse(orderId: any) {
     }
   })
 }
-
-  onPageChange(newPage: number): void {
-    if (newPage >= 0 && newPage <= this.totalPages) {
-      this.pageNo = newPage;
-      this.loadOrders();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-   get displayPageNo(): number {
-    return this.pageNo + 1;
-  }
-  
 }

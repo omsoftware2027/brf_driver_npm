@@ -17,13 +17,3 @@
   font-size: 10px;
   color: #fff;
 }
-
-@media (max-width: 576px) {
-  .pagination .page-link {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.6rem;
-  }
-  .pagination {
-    gap: 2px;
-  }
-}
