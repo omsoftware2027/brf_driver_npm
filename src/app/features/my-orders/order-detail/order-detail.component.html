@@ -74,11 +74,19 @@
           </div>
           <div class="col-10 p-0 ps-2">
             <div *ngIf="!product?.isProductReplaced" class="fs-8 text-muted"><span class="text-success">{{product?.productCode}}</span> - <span
-                class="text-black fw-medium">{{product?.title}}</span></div>
+                class="text-black fw-medium">{{product?.title}}</span>
+                <div *ngIf="product?.shortDescription" class="text-muted fw-medium fs-8" style="font-size: 9px;">{{product?.shortDescription}}</div>
+              </div>
             <s *ngIf="product?.isProductReplaced"  class="fs-8 text-muted">
               <span class="text-success">{{product?.productCode}}</span> - 
               <span class="text-black fw-medium">{{product?.title}}</span>
+              <div *ngIf="product?.shortDescription" class="text-muted fw-medium fs-8" style="font-size: 9px;">{{product?.shortDescription}}</div>
             </s>
+            <div *ngIf="product?.notes" class="fs-8">
+              <b>Notes:</b> {{product?.notes}}
+            </div>
+              <div *ngIf="product?.vendor" class="text-info fs-8">Vendor: {{product?.vendor}}</div>
+              <div *ngIf="product?.binNumber" class="badge badge-green fs-8">{{product?.binNumber}}</div>
             <!-- qty and price -->
             <div class="d-flex align-items-center fs-7 pb-0 gap-2">
               <span class="text-muted">Qty: {{product?.qty}}</span>
