@@ -16,8 +16,8 @@ export class OrderService {
     endDate?: string;
     search?: string;
     assignedDriverId?: number;
-    pageNo?: number;
-    pageSize?: number;
+    sortBy?: string;
+    sortDirection?: 'asc' | 'desc';
   }): Observable<any> {
     let url = `${environment.baseUrl}/driver/getAllOrdersByDriverId?`;
     const params: string[] = [];
@@ -25,8 +25,9 @@ export class OrderService {
     if (options.endDate) params.push(`endDate=${encodeURIComponent(options.endDate)}`);
     if (options.search) params.push(`search=${encodeURIComponent(options.search)}`);
     if (options.assignedDriverId) params.push(`driverId=${encodeURIComponent(options.assignedDriverId)}`);
-    if (options.pageNo) params.push(`pageNo=${options.pageNo}`);
-    if (options.pageSize) params.push(`pageSize=${options.pageSize}`);
+    if (options.sortBy) params.push(`sortBy=${encodeURIComponent(options.sortBy)}`);
+    if (options.sortDirection) params.push(`sortDirection=${options.sortDirection}`);
+
     url += params.join('&');
     return this.http.get<any>(url);
   }
