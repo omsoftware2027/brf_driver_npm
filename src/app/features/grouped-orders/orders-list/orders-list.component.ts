@@ -16,7 +16,7 @@ export class OrdersListComponent {
 
   Math = Math;
   pageNo = 0;
-  pageSize = 300;
+  pageSize = 30;
   totalPages = 0;
   totalElements = 0;
 
@@ -101,7 +101,8 @@ export class OrdersListComponent {
   }
 
 onSearch() {
-  this.applyCombinedFilters(false);
+  // this.applyCombinedFilters(false);
+  this.getAllOrders();
 }
 
   onDateChange(event: Event) {
