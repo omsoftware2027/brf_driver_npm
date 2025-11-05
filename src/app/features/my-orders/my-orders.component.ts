@@ -15,6 +15,11 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 })
 export class MyOrdersComponent {
 
+  pageNo = 0;
+  pageSize = 30;
+  totalPages = 0;
+  totalElements = 0;
+
   orders: any[] = [];
   todayDate: string = '';
   endDate: string = '';
@@ -27,7 +32,7 @@ export class MyOrdersComponent {
   drivers: any[] = [];
 
   selectedDate: string = '';
-  
+  Math = Math;
 
   constructor(
     public orderService: OrderService,
@@ -69,14 +74,19 @@ export class MyOrdersComponent {
       endDate,
       search: this.searchText,
       assignedDriverId: this.selectedDriver || undefined,
+      pageNo: this.pageNo,
+      pageSize: this.pageSize,
       sortBy: 'deliveryDate',
       sortDirection: 'asc'
     }).subscribe({
       next: (res) => {
         this.orders = res?.response?.dataSet || [];
+        this.totalPages = res?.response?.totalPages || 0;
+        this.totalElements = res?.response?.totalElements || 0;
         this.orders.sort((a, b) => new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime());
 
         // Update drivers only on date change or initial load
+        if (!this.selectedDriver) {
         this.drivers = [
           ...new Map(
             this.orders
@@ -84,6 +94,7 @@ export class MyOrdersComponent {
               .map(o => [o.driverId, { driverId: o.driverId, driverName: o.driverName }])
           ).values()
         ];
+      }
       },
       error: () => this.toastr.error('Failed to fetch orders. Please try again later.', 'Error')
     });
@@ -142,4 +153,14 @@ setDriverWarehouse(orderId: any) {
     }
   })
 }
+onPageChange(newPage: number): void {
+    if (newPage >= 0 && newPage < this.totalPages) {
+      this.pageNo = newPage;
+      this.loadOrders();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+  get displayPageNo(): number {
+    return this.pageNo + 1;
+  }
 }

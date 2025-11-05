@@ -21,9 +21,9 @@
         <input type="text" [(ngModel)]="searchText" (input)="onSearch()" class="form-control border-0"
             placeholder="Search orders by number, customer" />
         <span *ngIf="searchText" class="input-group-text bg-white border-0 ps-0">
-            <i class="bi bi-x" (click)="searchText = ''"></i>
+            <i class="bi bi-x" (click)="searchText = ''; onSearch()"></i>
         </span>
-        <div *ngIf="searchText" class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
+        <!-- <div *ngIf="searchText" class="list-group position-absolute w-100 shadow bg-white mt-5 rounded"
             style="max-height: 250px; overflow-y: auto; z-index: 30">
             <ng-container *ngIf="searchResults.length > 0; else noData">
                 <button type="button" class="list-group-item list-group-item-action" *ngFor="let order of searchResults"
@@ -37,7 +37,7 @@
                     No items found <span *ngIf="searchText">matching “{{searchText}}” </span>
                 </div>
             </ng-template>
-        </div>
+        </div> -->
     </div>
     <!-- date N driver filters -->
     <div class="d-flex justify-content-end align-items-center gap-1 flex-wrap">
@@ -98,6 +98,35 @@
                 No Orders
             </div>
         </ng-template>
+    </div>
+
+    <div *ngIf="totalPages > 1 && !searchText" class="d-flex justify-content-center align-items-center mt-3 mb-4">
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item" [class.disabled]="pageNo === 0">
+                    <button class="page-link px-3 py-2 rounded-start" (click)="onPageChange(pageNo - 1)"
+                        [disabled]="pageNo === 0">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link px-3 py-2 bg-light text-dark border-0">
+                        Page {{ displayPageNo }} / {{ totalPages }}
+                    </span>
+                </li>
+                <li class="page-item" [class.disabled]="pageNo === totalPages - 1">
+                    <button class="page-link px-3 py-2 rounded-end" (click)="onPageChange(pageNo + 1)"
+                        [disabled]="pageNo === totalPages - 1">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <!-- Showing range -->
+    <div class="text-center text-muted small mb-4" *ngIf="totalElements && !searchText && !selectedDriver && !selectedDate">
+        Showing {{ pageNo * pageSize + 1 }} -
+        {{ Math.min((pageNo + 1) * pageSize, totalElements) }} of {{ totalElements }} orders
     </div>
 
 </div>

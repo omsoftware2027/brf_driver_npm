@@ -16,6 +16,8 @@ export class OrderService {
     endDate?: string;
     search?: string;
     assignedDriverId?: number;
+    pageNo?: number;
+    pageSize?: number;
     sortBy?: string;
     sortDirection?: 'asc' | 'desc';
   }): Observable<any> {
@@ -25,6 +27,8 @@ export class OrderService {
     if (options.endDate) params.push(`endDate=${encodeURIComponent(options.endDate)}`);
     if (options.search) params.push(`search=${encodeURIComponent(options.search)}`);
     if (options.assignedDriverId) params.push(`driverId=${encodeURIComponent(options.assignedDriverId)}`);
+    if ((options.pageNo !== undefined && options.pageNo >= 0 ) && (!options.search) && (!options.startDate) && (!options.assignedDriverId)) params.push(`pageNo=${options.pageNo}`);
+    if (options.pageSize && (!options.search) && (!options.startDate) && (!options.assignedDriverId)) params.push(`pageSize=${options.pageSize}`);
     if (options.sortBy) params.push(`sortBy=${encodeURIComponent(options.sortBy)}`);
     if (options.sortDirection) params.push(`sortDirection=${options.sortDirection}`);
 
@@ -36,14 +40,17 @@ export class OrderService {
     return this.http.get<any>(`${environment.baseUrl}/driver/getAllOrdersByDriverId?startDate=${startDate}&endDate=${endDate}`);
   }
 
-  getCombinedOrders(search?: string, date?: string) {
-    let url = `${environment.baseUrl}/order/getGroupByOrder?pageNo=0&pageSize=1000`;
+  getCombinedOrders(search?: string, pageNo?: any, pageSize?: any ) {
+    let url = `${environment.baseUrl}/order/getGroupByOrder?sortBy=shippingDate`;
     const params: string[] = [];
     if (search) {
       params.push(`search=${encodeURIComponent(search)}`);
     }
-    if (date) {
-      params.push(`date=${encodeURIComponent(date)}`);
+    if (pageNo >= 0) {
+      params.push(`pageNo=${pageNo}`);
+    }
+    if (pageSize) {
+      params.push(`pageSize=${pageSize}`);
     }
     if (params.length > 0) {
       url += `&${params.join('&')}`;
