@@ -46,7 +46,7 @@ export class OrderService {
     if (search) {
       params.push(`search=${encodeURIComponent(search)}`);
     }
-    if (pageNo >= 0) {
+    if (pageNo >= 0 && !search) {
       params.push(`pageNo=${pageNo}`);
     }
     if (pageSize) {
