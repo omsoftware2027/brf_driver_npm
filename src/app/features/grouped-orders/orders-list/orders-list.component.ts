@@ -14,6 +14,12 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 })
 export class OrdersListComponent {
 
+  Math = Math;
+  pageNo = 0;
+  pageSize = 300;
+  totalPages = 0;
+  totalElements = 0;
+
   orders: any[] = [];
   todayDate: string = '';
   endDate: string = '';
@@ -68,9 +74,11 @@ export class OrdersListComponent {
   }
 
   getAllOrders() {
-    this.orderService.getCombinedOrders().subscribe({
+    this.orderService.getCombinedOrders(this.searchText, this.pageNo, this.pageSize).subscribe({
       next: (res) => {
         this.orders = res?.response?.dataSet || [];
+        this.totalPages = res?.response?.totalPages || 0;
+        this.totalElements = res?.response?.totalElements || 0;
         // collect drivers
         this.drivers = [
           ...new Map(
@@ -92,22 +100,9 @@ export class OrdersListComponent {
     })
   }
 
-
-  onSearch() {
-    if (!this.user?.id || !this.searchText) {
-      this.searchResults = [];
-      return;
-    }
-    this.orderService.getCombinedOrders(this.searchText).subscribe({
-      next: (res) => {
-        this.searchResults = res?.response?.dataSet || [];
-      },
-      error: (err) => {
-        this.toastr.error('Search failed. Please try again.', 'Error');
-        this.searchResults = [];
-      }
-    });
-  }
+onSearch() {
+  this.applyCombinedFilters(false);
+}
 
   onDateChange(event: Event) {
     const selectedDate = (event.target as HTMLInputElement).value;
@@ -124,7 +119,18 @@ export class OrdersListComponent {
       const shortShippingDate = order.shippingDate?.substring(0, 10);
       const matchesDate = this.selectedDate ? shortShippingDate === this.selectedDate : true;
       const matchesDriver = this.selectedDriver ? order.driverId === this.selectedDriver : true;
-      return matchesDate && matchesDriver;
+      // search filter currenlty for customerName & orderid 
+      const matchesSearch = this.searchText ?
+        (
+          // order.transactionId?.includes(this.searchText) ||
+          order.customerName?.toLowerCase().includes(this.searchText)
+          // || order.shippingAddress?.includes(this.searchText)
+        ) ||
+
+        order.idorders?.toString().toLowerCase().includes(this.searchText)
+        : true;
+
+      return matchesDate && matchesDriver && matchesSearch;
     });
     console.log('filtered orders', this.orders)
     // Update drivers list based on filtered orders ...only on datefilter 
@@ -179,5 +185,16 @@ setDriverWarehouse(orderId: any) {
     }
   })
 }
+
+onPageChange(newPage: number): void {
+    if (newPage >= 0 && newPage < this.totalPages) {
+      this.pageNo = newPage;
+      this.getAllOrders();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+  get displayPageNo(): number {
+    return this.pageNo + 1;
+  }
 
 }
