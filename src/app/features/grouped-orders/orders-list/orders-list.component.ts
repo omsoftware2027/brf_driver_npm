@@ -22,15 +22,12 @@ export class OrdersListComponent {
 
   orders: any[] = [];
   todayDate: string = '';
-  endDate: string = '';
   user: any;
   searchText: string = '';
-  searchResults: any[] = [];
 
   modalRef?: BsModalRef;
   drivers: any[] = [];
   selectedDriver: number | null = null;
-  ordersBackup: any[] = [];
 
   selectedDate: string = '';
 
@@ -74,7 +71,7 @@ export class OrdersListComponent {
   }
 
   getAllOrders() {
-    this.orderService.getCombinedOrders(this.searchText, this.pageNo, this.pageSize).subscribe({
+    this.orderService.getCombinedOrders(this.selectedDate, this.selectedDriver, this.searchText, this.pageNo, this.pageSize).subscribe({
       next: (res) => {
         this.orders = res?.response?.dataSet || [];
         this.totalPages = res?.response?.totalPages || 0;
@@ -88,11 +85,6 @@ export class OrdersListComponent {
           ).values()
         ];
         console.log('Unique Valid Drivers:', this.drivers);
-        this.orders.sort((a, b) => new Date(a.shippingDate).getTime() - new Date(b.shippingDate).getTime());
-        // Keep backup copy of original orders
-        this.ordersBackup = [...this.orders];
-
-        this.applyCombinedFilters(true);
       },
       error: (err) => {
         this.toastr.error('Failed to fetch orders. Please try again later.', 'Error');
@@ -101,49 +93,17 @@ export class OrdersListComponent {
   }
 
 onSearch() {
-  // this.applyCombinedFilters(false);
   this.getAllOrders();
 }
 
   onDateChange(event: Event) {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
-    this.applyCombinedFilters(true);
+    this.getAllOrders();
   }
   clearDateFilter() {
-    this.selectedDate = this.todayDate;
-    this.applyCombinedFilters(true);
-  }
-
-  applyCombinedFilters(updateDrivers = false) {
-    this.orders = this.ordersBackup.filter(order => {
-      const shortShippingDate = order.shippingDate?.substring(0, 10);
-      const matchesDate = this.selectedDate ? shortShippingDate === this.selectedDate : true;
-      const matchesDriver = this.selectedDriver ? order.driverId === this.selectedDriver : true;
-      // search filter currenlty for customerName & orderid 
-      const matchesSearch = this.searchText ?
-        (
-          // order.transactionId?.includes(this.searchText) ||
-          order.customerName?.toLowerCase().includes(this.searchText)
-          // || order.shippingAddress?.includes(this.searchText)
-        ) ||
-
-        order.idorders?.toString().toLowerCase().includes(this.searchText)
-        : true;
-
-      return matchesDate && matchesDriver && matchesSearch;
-    });
-    console.log('filtered orders', this.orders)
-    // Update drivers list based on filtered orders ...only on datefilter 
-    if (updateDrivers) {
-      this.drivers = [
-        ...new Map(
-          this.orders
-            .filter(order => order.driverId && order.driverName)
-            .map(order => [order.driverId, { driverId: order.driverId, driverName: order.driverName }])
-        ).values()
-      ];
-    }
+    this.selectedDate = '';
+    this.getAllOrders();
   }
 
   openDriverModal(template: TemplateRef<any>) {
@@ -154,15 +114,15 @@ onSearch() {
   applyDriverFilter() {
     console.log('Selected driver:', this.selectedDriver);
     this.modalRef?.hide();
-    this.applyCombinedFilters(false);
+    this.getAllOrders();
   }
   clearDriverFilter() {
     this.selectedDriver = null;
-    this.applyCombinedFilters(false);
+    this.getAllOrders();
   }
 
   get selectedDriverName(): string | null {
-    const order = this.ordersBackup.find(o => o.driverId === this.selectedDriver);
+    const order = this.orders.find(o => o.driverId === this.selectedDriver);
     return order ? order.driverName : null;
   }
 
