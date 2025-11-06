@@ -40,16 +40,22 @@ export class OrderService {
     return this.http.get<any>(`${environment.baseUrl}/driver/getAllOrdersByDriverId?startDate=${startDate}&endDate=${endDate}`);
   }
 
-  getCombinedOrders(search?: string, pageNo?: any, pageSize?: any ) {
+  getCombinedOrders(date?: any, driverId?: any, search?: string, pageNo?: any, pageSize?: any ) {
     let url = `${environment.baseUrl}/order/getGroupByOrder?sortBy=shippingDate`;
     const params: string[] = [];
+    if (date) {
+      params.push(`date=${encodeURIComponent(date)}`);
+    }
+    if (driverId) {
+      params.push(`driverId=${driverId}`);
+    }
     if (search) {
       params.push(`search=${encodeURIComponent(search)}`);
     }
-    if (pageNo >= 0 && !search) {
+    if (pageNo >= 0 && !search && !date && !driverId) {
       params.push(`pageNo=${pageNo}`);
     }
-    if (pageSize) {
+    if (pageSize  && !search && !date && !driverId) {
       params.push(`pageSize=${pageSize}`);
     }
     if (params.length > 0) {
