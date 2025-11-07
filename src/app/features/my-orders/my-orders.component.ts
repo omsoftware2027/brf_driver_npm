@@ -133,8 +133,9 @@ export class MyOrdersComponent {
     return order ? order.driverName : null;
   }
 
-setDriverJetro(orderId: any) {
-    this.orderService.setDriverJetro(orderId).subscribe({
+setDriverJetro(order: any) {
+    order.driverJetro = !order.driverJetro;
+    this.orderService.setDriverJetro(order?.orderId).subscribe({
     next: (res)=>{
       console.log(res)
     },
@@ -143,8 +144,9 @@ setDriverJetro(orderId: any) {
     }
   })
 }
-setDriverWarehouse(orderId: any) {
-  this.orderService.setDriverWarehouse(orderId).subscribe({
+setDriverWarehouse(order: any) {
+  order.driverWarehouse = !order.driverWarehouse 
+  this.orderService.setDriverWarehouse(order?.orderId).subscribe({
     next: (res)=>{
       console.log(res)
     },

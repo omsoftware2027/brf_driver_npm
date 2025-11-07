@@ -78,12 +78,12 @@
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="warehouseOpt{{ order?.orderId }}"
                             id="warehouse{{ order?.orderId }}" [checked]="order?.driverWarehouse"
-                            (change)="setDriverWarehouse(order?.orderId)" />
+                            (click)="setDriverWarehouse(order)" />
                         <label class="form-check-label" for="warehouse{{ order?.orderId }}">Warehouse</label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="jetroOpt{{ order?.orderId }}"
-                            id="jetro{{ order?.orderId }}" [checked]="order?.driverJetro" (change)="setDriverJetro(order?.orderId)" />
+                            id="jetro{{ order?.orderId }}" [checked]="order?.driverJetro" (click)="setDriverJetro(order)" />
                         <label class="form-check-label" for="jetro{{ order?.orderId }}">Jetro</label>
                     </div>
                 </div>
