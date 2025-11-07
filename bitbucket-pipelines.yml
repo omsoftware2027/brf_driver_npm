@@ -1,21 +1,33 @@
-#  Template NodeJS build
-
-#  This template allows you to validate your NodeJS code.
-#  The workflow allows running tests and code linting on the default branch.
-
 image: node:20.11.1
+
 pipelines:
   default:
-  - step:
-     name: Build
-     size: 2x
-     caches:
-       - node
-     script: # Modify the commands below to build your repository.
-       - echo "$(ls -la)"
-       - npm install
-       - npm install -g @angular/cli@~16.2.0 -g
-       - ng config -g cli.warnings.versionMismatch false
-       - ng build --configuration production
-       - echo "$(ls -la dist/)"
-       - scp -P 33221 -r dist/ ubuntu@103.27.234.244:/var/www/driver-brfood
+    - step:
+        name: Build & Deploy Driver App
+        size: 2x
+        caches:
+          - node
+        script:
+          # Show repository files
+          - echo ">>> Listing repo files"
+          - ls -la
+
+          # Install project dependencies
+          - npm install
+
+          # Install Angular CLI (compatible version)
+          - npm install -g @angular/cli@~16.2.0
+          - ng config -g cli.warnings.versionMismatch false
+
+          # Build Angular production build
+          - ng build --configuration production
+
+          # Debug build output
+          - echo ">>> Build output inside dist/driver-brfood"
+          - ls -la dist/driver-brfood/
+
+          # Clean remote deployment folder
+          - ssh -p 33221 ubuntu@103.27.234.244 "rm -rf /var/www/driver-brfood/*"
+
+          # Deploy only build output (no whole dist folder)
+          - scp -P 33221 -r dist/driver-brfood/* ubuntu@103.27.234.244:/var/www/driver-brfood/
