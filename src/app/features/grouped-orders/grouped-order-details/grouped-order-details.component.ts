@@ -194,7 +194,7 @@ export class GroupedOrderDetailsComponent {
       })
 
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   sumbitInventory() {
@@ -301,7 +301,7 @@ export class GroupedOrderDetailsComponent {
     })
     this.selectedProduct = product;
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   saveExpiryDate() {
@@ -328,7 +328,7 @@ export class GroupedOrderDetailsComponent {
     this.selectedProduct = product;
     this.remarkInput = product?.remark ?? ''
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   saveRemark() {
@@ -365,7 +365,7 @@ export class GroupedOrderDetailsComponent {
   showProductReplaceModal(template: TemplateRef<any>, product: any) {
     this.selectedProduct = product;
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   changeproduct() {

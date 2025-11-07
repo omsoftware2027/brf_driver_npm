@@ -101,6 +101,14 @@
     border-radius: 10px;
 }
 
+::ng-deep .ng-dropdown-panel .ng-option {
+  font-size: 10px !important;
+}
+::ng-deep .ng-select .ng-value,
+::ng-deep .ng-select .ng-placeholder {
+  font-size: 11px !important;
+}
+
 
 @media (max-width: 360px) {
   .btn-responsive {

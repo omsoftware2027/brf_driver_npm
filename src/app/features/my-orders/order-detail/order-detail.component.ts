@@ -213,7 +213,7 @@ export class OrderDetailComponent {
       })
 
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   saveWeight() {
@@ -332,7 +332,7 @@ export class OrderDetailComponent {
     })
     this.selectedProduct = product;
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   saveExpiryDate() {
@@ -359,7 +359,7 @@ export class OrderDetailComponent {
     this.selectedProduct = product;
     this.remarkInput = product?.remark ?? ''
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   saveRemark() {
@@ -396,7 +396,7 @@ export class OrderDetailComponent {
   showProductReplaceModal(template: TemplateRef<any>, product: any) {
     this.selectedProduct = product;
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   changeproduct() {

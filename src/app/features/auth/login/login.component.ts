@@ -47,7 +47,7 @@ export class LoginComponent {
       const formData = {
         email: this.loginForm.value.email,
         password: this.loginForm.value.password,
-        userType: 'driver'
+        loginType: 'driver'
       }
 
       this.authService.login(formData).subscribe({
