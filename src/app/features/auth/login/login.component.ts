@@ -40,6 +40,13 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit() {
+    const savedUser = this.authService.getUserSnapshot();
+    if (savedUser && savedUser.token && savedUser.id) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
   onSubmit() {
     if (this.loginForm.valid) {
       this.userEmail = this.loginForm.value.email;
