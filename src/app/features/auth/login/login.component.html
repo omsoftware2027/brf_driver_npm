@@ -57,9 +57,9 @@
             </p>
         
             <div class="d-flex justify-content-center gap-2 mb-4">
-                <input *ngFor="let digit of otpArray; let i = index" type="text" maxlength="1" class="form-control text-center"
+                <input *ngFor="let digit of otpArray; let i = index" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="form-control text-center"
                     style="width: 45px; font-size: 20px;" [(ngModel)]="otpValues[i]" (input)="onOtpInput($event, i)"
-                    (keydown)="onOtpKeyDown($event, i)" #otpInput />
+                    (keydown)="onOtpKeyDown($event, i)" autocomplete="one-time-code" #otpInput />
             </div>
             <p class="text-muted small mb-3">
                 OTP will expire in <b>1 min</b>
