@@ -52,6 +52,12 @@ export class OrderReportComponent {
 
   remarkInput: any
 
+  searchText: string = '';
+  pageNo = 0;
+  pageSize = 30;
+  totalPages = 0;
+  totalElements = 0;
+  Math = Math;
 
   constructor(
     public orderReportService: OrderReportService,
@@ -71,7 +77,7 @@ export class OrderReportComponent {
     this.authService.user$.subscribe(
       user => {
         this.user = user;
-        this.getPickupReport(this.user?.id);
+        this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
         this.setupSearch();
         this.getallsampletype();
       }
@@ -123,31 +129,34 @@ export class OrderReportComponent {
     this.selectedDate = '';
     this.binSortAscending = true;
     this.routeSortAscending = true;
+    this.searchText = '';
+    this.pageNo = 0;
+    this.pageSize = 30;
+    this.totalElements = 0;
 
-    const driverId = this.user?.id;
     this.selectedOrderReportType = type;
     if (this.selectedOrderReportType === 'Pickup') {
-      this.getPickupReport(driverId);
+      this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Jetro One') {
-      this.getJetroOneReport(driverId);
+      this.getJetroOneReport(this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Jetro Two') {
-      this.getJetroTwoReport(driverId);
+      this.getJetroTwoReport(this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Warehouse') {
-      this.getWarehouseReport(driverId);
+      this.getWarehouseReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Freezer One') {
-      this.getFreezerOneReport(driverId);
+      this.getFreezerOneReport(this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Freezer Two') {
-      this.getFreezerTwoReport(driverId);
+      this.getFreezerTwoReport(this.searchText, this.pageNo, this.pageSize);
     }
   }
 
-  getPickupReport(driverId: any, date?: string) {
-    this.orderReportService.getPickupReports(driverId, date).subscribe({
+  getPickupReport(date: string, searchText: string, pageNo: any, pageSize: any) {
+    this.orderReportService.getPickupReports(date, searchText, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -157,6 +166,8 @@ export class OrderReportComponent {
         this.reports = formattedReports;
         this.allReportsBackup = [...formattedReports];
         this.vendors = Object.keys(res?.response?.dataSet);
+        this.totalPages = res?.response?.totalPages || 0;
+        this.totalElements = res?.response?.totalElements || 0;
       },
       error: (err) => {
         console.error('something is wrong...', err);
@@ -166,9 +177,9 @@ export class OrderReportComponent {
       }
     })
   }
-  getJetroOneReport(driverId: any) {
+  getJetroOneReport(search?: string, pageNo?: any, pageSize?: any) {
     this.customers = [];
-    this.orderReportService.getJetroOneReports(driverId).subscribe({
+    this.orderReportService.getJetroOneReports(search, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -187,6 +198,8 @@ export class OrderReportComponent {
           });
         });
         this.customers = Array.from(userNameSet);
+        this.totalPages = res?.response?.totalPages || 0;
+        this.totalElements = res?.response?.totalElements || 0;
       },
       error: (err) => {
         console.error('something is wrong...', err);
@@ -196,9 +209,9 @@ export class OrderReportComponent {
       }
     })
   }
-  getJetroTwoReport(driverId: any) {
+  getJetroTwoReport(search?: string, pageNo?: any, pageSize?: any) {
     this.customers = [];
-    this.orderReportService.getJetroTwoReports(driverId).subscribe({
+    this.orderReportService.getJetroTwoReports(search, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -217,6 +230,8 @@ export class OrderReportComponent {
           });
         });
         this.customers = Array.from(userNameSet);
+        this.totalPages = res?.response?.totalPages || 0;
+        this.totalElements = res?.response?.totalElements || 0;
       },
       error: (err) => {
         console.error('something is wrong...', err);
@@ -226,8 +241,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getWarehouseReport(driverId: any, date?: string) {
-    this.orderReportService.getWarehouseReports(driverId, date).subscribe({
+  getWarehouseReport(date: any, search: string, pageNo: any, pageSize: any) {
+    this.orderReportService.getWarehouseReports(date, search, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -236,7 +251,8 @@ export class OrderReportComponent {
         }));
         this.reports = formattedReports;
         this.allReportsBackup = [...formattedReports];
-
+        this.totalPages = res?.response?.totalPages || 0;
+        this.totalElements = res?.response?.totalElements || 0;
       },
       error: (err) => {
         console.error('something is wrong...', err);
@@ -245,8 +261,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getFreezerOneReport(driverId: any) {
-    this.orderReportService.getFreezerOneReports(driverId).subscribe({
+  getFreezerOneReport(search: string, pageNo: any, pageSize: any) {
+    this.orderReportService.getFreezerOneReports(search, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -255,6 +271,8 @@ export class OrderReportComponent {
         }));
         this.reports = formattedReports;
         this.allReportsBackup = [...formattedReports];
+        this.totalPages = res?.response?.totalPages || 0;
+        this.totalElements = res?.response?.totalElements || 0;
       },
       error: (err) => {
         console.error('something is wrong...', err);
@@ -263,8 +281,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getFreezerTwoReport(driverId: any) {
-    this.orderReportService.getFreezerTwoReports(driverId).subscribe({
+  getFreezerTwoReport(search: string, pageNo: any, pageSize: any) {
+    this.orderReportService.getFreezerTwoReports(search, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -273,6 +291,8 @@ export class OrderReportComponent {
         }));
         this.reports = formattedReports;
         this.allReportsBackup = [...formattedReports];
+        this.totalPages = res?.response?.totalPages || 0;
+        this.totalElements = res?.response?.totalElements || 0;        
       },
       error: (err) => {
         console.error('something is wrong...', err);
@@ -295,7 +315,7 @@ export class OrderReportComponent {
     })
     this.selectedProduct = product;
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   saveExpiryDate() {
@@ -340,7 +360,7 @@ export class OrderReportComponent {
       })
 
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   patchInventoryWeights(inventoryItems: any) {
@@ -435,7 +455,7 @@ export class OrderReportComponent {
   // pickup filter works
   openVendorModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-sm modal-dialog-centered',
+      class: 'modal-dialog-centered',
     });
   }
   applyVendorFilter() {
@@ -454,10 +474,10 @@ export class OrderReportComponent {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
     if (reportType === 'warehouse') {
-      this.getWarehouseReport(this.user?.id, selectedDate);
+      this.getWarehouseReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
     if (reportType === 'pickup') {
-      this.getPickupReport(this.user?.id, selectedDate);
+      this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
   }
 
@@ -543,10 +563,10 @@ export class OrderReportComponent {
   clearDateFilter() {
     this.selectedDate = '';
     if (this.selectedOrderReportType === 'Warehouse') {
-      this.getWarehouseReport(this.user?.id);
+      this.getWarehouseReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Pickup') {
-      this.getPickupReport(this.user?.id);
+      this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
   }
 
@@ -569,7 +589,7 @@ export class OrderReportComponent {
   showProductReplaceModal(template: TemplateRef<any>, product: any) {
     this.selectedProduct = product;
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
   allowOnlyNumbers(event: KeyboardEvent) {
@@ -598,7 +618,7 @@ export class OrderReportComponent {
     this.selectedProduct = product;
     this.remarkInput = product?.remark ?? ''
     this.modalRef = this.modalService.show(template, {
-      class: 'modal-dialog-centered modal-sm'
+      class: 'modal-dialog-centered'
     });
   }
     saveRemark() {
@@ -612,6 +632,43 @@ export class OrderReportComponent {
           console.error('Error saving weight', err);
         }
       });
+  }
+
+  onSearch() {
+    this.getOrdersReports(this.selectedOrderReportType);
+  }
+
+  getOrdersReports(type: any) {
+    this.selectedOrderReportType = type;
+    if (this.selectedOrderReportType === 'Pickup') {
+      this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
+    }
+    if (this.selectedOrderReportType === 'Jetro One') {
+      this.getJetroOneReport(this.searchText, this.pageNo, this.pageSize);
+    }
+    if (this.selectedOrderReportType === 'Jetro Two') {
+      this.getJetroTwoReport(this.searchText, this.pageNo, this.pageSize);
+    }
+    if (this.selectedOrderReportType === 'Warehouse') {
+      this.getWarehouseReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
+    }
+    if (this.selectedOrderReportType === 'Freezer One') {
+      this.getFreezerOneReport(this.searchText, this.pageNo, this.pageSize);
+    }
+    if (this.selectedOrderReportType === 'Freezer Two') {
+      this.getFreezerTwoReport(this.searchText, this.pageNo, this.pageSize);
+    }
+  }
+
+  onPageChange(newPage: number): void {
+    if (newPage >= 0 && newPage < this.totalPages) {
+      this.pageNo = newPage;
+      this.getOrdersReports(this.selectedOrderReportType);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+  get displayPageNo(): number {
+    return this.pageNo + 1;
   }
 
 }
