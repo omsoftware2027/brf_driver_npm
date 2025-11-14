@@ -23,7 +23,7 @@ export class OrderReportService {
     if (pageNo >= 0 && !search && !date) {
       params.push(`pageNo=${pageNo}`);
     }
-    if (pageSize  && !search && !date) {
+    if (pageSize && !search && !date) {
       params.push(`pageSize=${pageSize}`);
     }
     if (params.length > 0) {
@@ -32,46 +32,8 @@ export class OrderReportService {
     return this.http.get<any>(url);
   }
 
-  getJetroOneReports(search?: string, pageNo?: any, pageSize?: any): Observable<any> {
+  getJetroOneReports(date?: any, search?: string, customerName?: any, pageNo?: any, pageSize?: any): Observable<any> {
     let url = `${environment.baseUrl}/driver/getJetroOneByDriverId?sortBy=userName`;
-    const params: string[] = [];
-
-    if (search) {
-      params.push(`search=${encodeURIComponent(search)}`);
-    }
-    if (pageNo >= 0 && !search) {
-      params.push(`pageNo=${pageNo}`);
-    }
-    if (pageSize && !search) {
-      params.push(`pageSize=${pageSize}`);
-    }
-    if (params.length > 0) {
-      url += `&${params.join('&')}`;
-    }
-    return this.http.get<any>(url);
-  }
-  
-  getJetroTwoReports(search?: string, pageNo?: any, pageSize?: any): Observable<any> {
-    let url = `${environment.baseUrl}/driver/getJetroTwoByDriverId?sortBy=userName`;
-    const params: string[] = [];
-
-    if (search) {
-      params.push(`search=${encodeURIComponent(search)}`);
-    }
-    if (pageNo >= 0 && !search) {
-      params.push(`pageNo=${pageNo}`);
-    }
-    if (pageSize && !search) {
-      params.push(`pageSize=${pageSize}`);
-    }
-    if (params.length > 0) {
-      url += `&${params.join('&')}`;
-    }
-    return this.http.get<any>(url);
-  }
-
-  getWarehouseReports(date?: any, search?: string, pageNo?: any, pageSize?: any): Observable<any> {
-    let url = `${environment.baseUrl}/driver/getWarehouseOrdersByDriverId?sortBy=route`;
     const params: string[] = [];
 
     if (date) {
@@ -79,6 +41,9 @@ export class OrderReportService {
     }
     if (search) {
       params.push(`search=${encodeURIComponent(search)}`);
+    }
+    if (customerName) {
+      params.push(`customerName=${encodeURIComponent(customerName)}`);
     }
     if (pageNo >= 0 && !search && !date) {
       params.push(`pageNo=${pageNo}`);
@@ -91,10 +56,63 @@ export class OrderReportService {
     }
     return this.http.get<any>(url);
   }
-  getFreezerOneReports(search?: string, pageNo?: any, pageSize?: any): Observable<any> {
+
+  getJetroTwoReports(date?: any, search?: string, customerName?: any, pageNo?: any, pageSize?: any): Observable<any> {
+    let url = `${environment.baseUrl}/driver/getJetroTwoByDriverId?sortBy=userName`;
+    const params: string[] = [];
+
+    if (date) {
+      params.push(`date=${encodeURIComponent(date)}`);
+    }
+    if (search) {
+      params.push(`search=${encodeURIComponent(search)}`);
+    }
+    if (customerName) {
+      params.push(`customerName=${encodeURIComponent(customerName)}`);
+    }
+    if (pageNo >= 0 && !search) {
+      params.push(`pageNo=${pageNo}`);
+    }
+    if (pageSize && !search) {
+      params.push(`pageSize=${pageSize}`);
+    }
+    if (params.length > 0) {
+      url += `&${params.join('&')}`;
+    }
+    return this.http.get<any>(url);
+  }
+
+  getWarehouseReports(date?: any, search?: string, binFilter?: any, pageNo?: any, pageSize?: any): Observable<any> {
+    let url = `${environment.baseUrl}/driver/getWarehouseOrdersByDriverId?sortBy=route`;
+    const params: string[] = [];
+
+    if (date) {
+      params.push(`date=${encodeURIComponent(date)}`);
+    }
+    if (search) {
+      params.push(`search=${encodeURIComponent(search)}`);
+    }
+    if (binFilter) {
+      params.push(`binFilter=${encodeURIComponent(binFilter)}`);
+    }
+    if (pageNo >= 0 && !search && !date && !binFilter) {
+      params.push(`pageNo=${pageNo}`);
+    }
+    if (pageSize && !search && !date && !binFilter) {
+      params.push(`pageSize=${pageSize}`);
+    }
+    if (params.length > 0) {
+      url += `&${params.join('&')}`;
+    }
+    return this.http.get<any>(url);
+  }
+  getFreezerOneReports(date?: any, search?: string, pageNo?: any, pageSize?: any): Observable<any> {
     let url = `${environment.baseUrl}/driver/getFreezerOneByDriverId?sortBy=route`;
     const params: string[] = [];
 
+    if (date) {
+      params.push(`date=${encodeURIComponent(date)}`);
+    }
     if (search) {
       params.push(`search=${encodeURIComponent(search)}`);
     }
@@ -109,10 +127,13 @@ export class OrderReportService {
     }
     return this.http.get<any>(url);
   }
-  getFreezerTwoReports(search?: string, pageNo?: any, pageSize?: any): Observable<any> {
+  getFreezerTwoReports(date?: any, search?: string, pageNo?: any, pageSize?: any): Observable<any> {
     let url = `${environment.baseUrl}/driver/getFreezerTwoByDriverId?sortBy=route`;
     const params: string[] = [];
 
+    if (date) {
+      params.push(`date=${encodeURIComponent(date)}`);
+    }
     if (search) {
       params.push(`search=${encodeURIComponent(search)}`);
     }
@@ -127,4 +148,13 @@ export class OrderReportService {
     }
     return this.http.get<any>(url);
   }
+
+  getCustomers(route: any, date?: string) {
+    let url = `${environment.baseUrl}/driver/getJetroOneOrTwoCustomerNames?route=${route}`;
+    if (date) {
+      url += `&date=${date}`;
+    }
+    return this.http.get(url);
+  }
+
 }

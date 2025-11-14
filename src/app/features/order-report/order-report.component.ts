@@ -43,7 +43,8 @@ export class OrderReportComponent {
   routeSortAscending: boolean = true;
   selectedCustomerFilter: string = '';
 
-  customers: any[] = [];
+  jetroOneCustomers: any[] = [];
+  jetroTwoCustomers: any[] = [];
 
   itemsList: any[] = [];
   productList: any[] = [];
@@ -77,11 +78,26 @@ export class OrderReportComponent {
     this.authService.user$.subscribe(
       user => {
         this.user = user;
+        const today = new Date();
+        this.selectedDate = today.toISOString().split('T')[0] || '';
         this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
         this.setupSearch();
         this.getallsampletype();
       }
     )
+  }
+
+  getCustomers(jetroType: any) {
+    if (jetroType === 1) {
+      this.orderReportService.getCustomers(1, this.selectedDate).subscribe((res: any) => {
+        this.jetroOneCustomers = res?.response || [];
+      })
+    }
+    if (jetroType === 2) {
+      this.orderReportService.getCustomers(2, this.selectedDate).subscribe((res: any) => {
+        this.jetroTwoCustomers = res?.response || [];
+      })
+    }
   }
 
   setupSearch() {
@@ -126,7 +142,6 @@ export class OrderReportComponent {
     this.selectedBinFilter = '';
     this.selectedVendor = '';
     this.selectedCustomerFilter = '';
-    this.selectedDate = '';
     this.binSortAscending = true;
     this.routeSortAscending = true;
     this.searchText = '';
@@ -139,19 +154,19 @@ export class OrderReportComponent {
       this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Jetro One') {
-      this.getJetroOneReport(this.searchText, this.pageNo, this.pageSize);
+      this.getJetroOneReport(this.selectedDate, this.searchText, this.selectedCustomerFilter, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Jetro Two') {
-      this.getJetroTwoReport(this.searchText, this.pageNo, this.pageSize);
+      this.getJetroTwoReport(this.selectedDate, this.searchText, this.selectedCustomerFilter, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Warehouse') {
-      this.getWarehouseReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
+      this.getWarehouseReport(this.selectedDate, this.searchText, this.selectedBinFilter, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Freezer One') {
-      this.getFreezerOneReport(this.searchText, this.pageNo, this.pageSize);
+      this.getFreezerOneReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Freezer Two') {
-      this.getFreezerTwoReport(this.searchText, this.pageNo, this.pageSize);
+      this.getFreezerTwoReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
   }
 
@@ -168,6 +183,9 @@ export class OrderReportComponent {
         this.vendors = Object.keys(res?.response?.dataSet);
         this.totalPages = res?.response?.totalPages || 0;
         this.totalElements = res?.response?.totalElements || 0;
+        if(this.selectedVendor){
+          this.applyVendorFilter()
+        }
       },
       error: (err) => {
         console.error('something is wrong...', err);
@@ -177,9 +195,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getJetroOneReport(search?: string, pageNo?: any, pageSize?: any) {
-    this.customers = [];
-    this.orderReportService.getJetroOneReports(search, pageNo, pageSize).subscribe({
+  getJetroOneReport(date: string, search?: string, customerName?: string, pageNo?: any, pageSize?: any) {
+    this.orderReportService.getJetroOneReports(date, search, customerName, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -188,16 +205,6 @@ export class OrderReportComponent {
         }));
         this.reports = formattedReports;
         this.allReportsBackup = [...formattedReports];
-        // Collect unique userName from all items
-        const userNameSet = new Set<string>();
-        formattedReports.forEach(report => {
-          report?.items.forEach((item: any) => {
-            if (item?.userName) {
-              userNameSet.add(item.userName.trim());
-            }
-          });
-        });
-        this.customers = Array.from(userNameSet);
         this.totalPages = res?.response?.totalPages || 0;
         this.totalElements = res?.response?.totalElements || 0;
       },
@@ -205,13 +212,12 @@ export class OrderReportComponent {
         console.error('something is wrong...', err);
         this.reports = [];
         this.allReportsBackup = [];
-        this.customers = [];
       }
     })
+    this.getCustomers(1);
   }
-  getJetroTwoReport(search?: string, pageNo?: any, pageSize?: any) {
-    this.customers = [];
-    this.orderReportService.getJetroTwoReports(search, pageNo, pageSize).subscribe({
+  getJetroTwoReport(date: string, search?: string, customerName?: string, pageNo?: any, pageSize?: any) {
+    this.orderReportService.getJetroTwoReports(date, search, customerName, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -220,16 +226,6 @@ export class OrderReportComponent {
         }));
         this.reports = formattedReports;
         this.allReportsBackup = [...formattedReports];
-        // Collect unique userName from all items
-        const userNameSet = new Set<string>();
-        formattedReports.forEach(report => {
-          report?.items.forEach((item: any) => {
-            if (item?.userName) {
-              userNameSet.add(item?.userName.trim());
-            }
-          });
-        });
-        this.customers = Array.from(userNameSet);
         this.totalPages = res?.response?.totalPages || 0;
         this.totalElements = res?.response?.totalElements || 0;
       },
@@ -237,12 +233,12 @@ export class OrderReportComponent {
         console.error('something is wrong...', err);
         this.reports = [];
         this.allReportsBackup = [];
-        this.customers = [];
       }
     })
+    this.getCustomers(2);
   }
-  getWarehouseReport(date: any, search: string, pageNo: any, pageSize: any) {
-    this.orderReportService.getWarehouseReports(date, search, pageNo, pageSize).subscribe({
+  getWarehouseReport(date: any, search: string, binFilter: any, pageNo: any, pageSize: any) {
+    this.orderReportService.getWarehouseReports(date, search, binFilter, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -261,8 +257,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getFreezerOneReport(search: string, pageNo: any, pageSize: any) {
-    this.orderReportService.getFreezerOneReports(search, pageNo, pageSize).subscribe({
+  getFreezerOneReport(date: any, search: string, pageNo: any, pageSize: any) {
+    this.orderReportService.getFreezerOneReports(date, search, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -281,8 +277,8 @@ export class OrderReportComponent {
       }
     })
   }
-  getFreezerTwoReport(search: string, pageNo: any, pageSize: any) {
-    this.orderReportService.getFreezerTwoReports(search, pageNo, pageSize).subscribe({
+  getFreezerTwoReport(date: any, search: string, pageNo: any, pageSize: any) {
+    this.orderReportService.getFreezerTwoReports(date, search, pageNo, pageSize).subscribe({
       next: (res) => {
         const dataSet = res?.response?.dataSet || {};
         const formattedReports = Object.entries(dataSet).map(([vendor, items]: any) => ({
@@ -447,7 +443,7 @@ export class OrderReportComponent {
     console.log('Weights:', weights);
     // Use the limited inventoryIds and weights arrays when calling the service
     this.orderDetailService.changeweight(weights, inventoryIds, this.selectedProduct?.orderItemId).subscribe((res) => {
-      this.setOrderReportType(this.selectedOrderReportType)
+      this.getOrdersReports(this.selectedOrderReportType);
       this.modalRef?.hide();
     });
   }
@@ -470,45 +466,22 @@ export class OrderReportComponent {
     }
   }
 
-  onDateChange(event: Event, reportType: string) {
+  onDateChange(event: Event) {
     const selectedDate = (event.target as HTMLInputElement).value;
     this.selectedDate = selectedDate || '';
-    if (reportType === 'warehouse') {
-      this.getWarehouseReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
-    }
-    if (reportType === 'pickup') {
-      this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
-    }
+    this.getOrdersReports(this.selectedOrderReportType);
   }
 
 
 
   // warehouse filter works
   applyBinFilter() {
-    if (!this.selectedBinFilter) {
-      this.reports = [...this.allReportsBackup];
-      return;
-    }
-    this.reports = this.allReportsBackup
-      .map(report => ({
-        ...report,
-        items: report.items.filter((item: any) => item.binNumber.trim() === this.selectedBinFilter.trim())
-      }))
-      .filter(report => report.items.length > 0);
+    this.getOrdersReports(this.selectedOrderReportType)
   }
 
   // jetro filters works
   applyCustomerFilter() {
-    if (!this.selectedCustomerFilter) {
-      this.reports = [...this.allReportsBackup];
-      return;
-    }
-    this.reports = this.allReportsBackup
-      .map(report => ({
-        ...report,
-        items: report.items.filter((item: any) => item?.userName?.trim() === this.selectedCustomerFilter.trim())
-      }))
-      .filter(report => report.items.length > 0);
+    this.getOrdersReports(this.selectedOrderReportType)
   }
 
   sortByBinNumber() {
@@ -562,12 +535,7 @@ export class OrderReportComponent {
 
   clearDateFilter() {
     this.selectedDate = '';
-    if (this.selectedOrderReportType === 'Warehouse') {
-      this.getWarehouseReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
-    }
-    if (this.selectedOrderReportType === 'Pickup') {
-      this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
-    }
+    this.getOrdersReports(this.selectedOrderReportType);
   }
 
 
@@ -577,8 +545,7 @@ export class OrderReportComponent {
     this.orderDetailService.changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
       .subscribe({
         next: (res) => {
-          console.log('Product status updated successfully', res);
-          this.setOrderReportType(this.selectedOrderReportType);
+          this.getOrdersReports(this.selectedOrderReportType);
         },
         error: (err) => {
           console.error('Error updating product status', err);
@@ -626,7 +593,7 @@ export class OrderReportComponent {
       .subscribe({
         next: (res) => {
           this.modalRef?.hide();
-          this.setOrderReportType(this.selectedOrderReportType);
+          this.getOrdersReports(this.selectedOrderReportType);
         },
         error: (err) => {
           console.error('Error saving weight', err);
@@ -635,6 +602,7 @@ export class OrderReportComponent {
   }
 
   onSearch() {
+    this.selectedVendor = '';
     this.getOrdersReports(this.selectedOrderReportType);
   }
 
@@ -644,19 +612,19 @@ export class OrderReportComponent {
       this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Jetro One') {
-      this.getJetroOneReport(this.searchText, this.pageNo, this.pageSize);
+      this.getJetroOneReport(this.selectedDate, this.searchText, this.selectedCustomerFilter, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Jetro Two') {
-      this.getJetroTwoReport(this.searchText, this.pageNo, this.pageSize);
+      this.getJetroTwoReport(this.selectedDate, this.searchText, this.selectedCustomerFilter, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Warehouse') {
-      this.getWarehouseReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
+      this.getWarehouseReport(this.selectedDate, this.searchText, this.selectedBinFilter, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Freezer One') {
-      this.getFreezerOneReport(this.searchText, this.pageNo, this.pageSize);
+      this.getFreezerOneReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
     if (this.selectedOrderReportType === 'Freezer Two') {
-      this.getFreezerTwoReport(this.searchText, this.pageNo, this.pageSize);
+      this.getFreezerTwoReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
   }
 
