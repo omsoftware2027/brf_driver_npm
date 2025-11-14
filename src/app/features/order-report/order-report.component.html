@@ -1,5 +1,8 @@
 <div class="container-fluid p-0">
-    <p class="fw-medium">Order Report</p>
+    <div class="d-flex justify-content-between gap-1 mb-2">
+        <p class="fw-medium m-0">Order Report</p>
+        <input type="date" lang="en-US" style="width: fit-content;" class="form-control form-control-sm" (input)="onDateChange($event)" [value]="selectedDate" />
+    </div>
     <!-- accordian -->
     <div class="accordion mb-3" id="orderType">
         <div class="accordion-item">
@@ -76,7 +79,6 @@
     </div>
 
     <div *ngIf="selectedOrderReportType === 'Pickup'" class="d-flex justify-content-end gap-2 flex-wrap">
-        <input type="date" lang="en-US" style="width: fit-content;" class="form-control form-control-sm" (input)="onDateChange($event, 'pickup')" [value]="selectedDate" />
         <div class="d-flex align-items-center">
             <select class="form-select form-select-sm" style="width: 140px;" [(ngModel)]="selectedVendor"
                 (change)="applyVendorFilter()">
@@ -89,7 +91,6 @@
 
     <div *ngIf="selectedOrderReportType === 'Warehouse'">
         <div class="d-flex justify-content-end gap-2 flex-wrap">
-            <input type="date" lang="en-US" style="width: fit-content;" class="form-control form-control-sm" (input)="onDateChange($event, 'warehouse')" [value]="selectedDate" />
             <div class="d-flex align-items-center">
                 <select class="form-select form-select-sm" style="width: 140px;" [(ngModel)]="selectedBinFilter"
                     (change)="applyBinFilter()">
@@ -120,13 +121,30 @@
         </div>
     </div>
 
-    <div *ngIf="selectedOrderReportType === 'Jetro One' || selectedOrderReportType === 'Jetro Two'" class="d-flex justify-content-end gap-2">
+    <div *ngIf="selectedOrderReportType === 'Jetro One'" class="d-flex justify-content-end gap-2">
         <div class="d-flex align-items-center">
             <select class="form-select form-select-sm" style="width: 140px;" [(ngModel)]="selectedCustomerFilter"
                 (change)="applyCustomerFilter()">
                 <option value="" disabled selected hidden>Customers</option>
                 <option value="">All</option>
-                <option *ngFor="let customer of customers" [value]="customer">{{ customer }}</option>
+                <option *ngFor="let customer of jetroOneCustomers" [value]="customer">{{ customer }}</option>
+            </select>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" (click)="sortByBinNumber()">
+            <i [ngClass]="{
+                'bi bi-sort-numeric-down': binSortAscending,
+                'bi bi-sort-numeric-up': !binSortAscending
+              }" class="me-1"></i>
+            BIN
+        </button>
+    </div>
+    <div *ngIf="selectedOrderReportType === 'Jetro Two'" class="d-flex justify-content-end gap-2">
+        <div class="d-flex align-items-center">
+            <select class="form-select form-select-sm" style="width: 140px;" [(ngModel)]="selectedCustomerFilter"
+                (change)="applyCustomerFilter()">
+                <option value="" disabled selected hidden>Customers</option>
+                <option value="">All</option>
+                <option *ngFor="let customer of jetroTwoCustomers" [value]="customer">{{ customer }}</option>
             </select>
         </div>
         <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" (click)="sortByBinNumber()">
