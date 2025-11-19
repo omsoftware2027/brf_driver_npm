@@ -62,7 +62,7 @@ export class OrderDetailService {
   }
 
   changeweight(weight: any, inventoryId: any, orderItemId: any) {
-    const url = `${environment.baseUrl}/order/saveWeight?weight=${weight}&inventoryId=${inventoryId}&orderItemId=${orderItemId}`;
+    const url = `${environment.baseUrl}/order/saveWeight?weight=${weight}&orderItemId=${orderItemId}`;
     return this.http.post(url, {});
   }
 
