@@ -337,10 +337,10 @@ export class OrderDetailComponent {
   }
   saveExpiryDate() {
     const payload = {
-      'ordersIdOrders': this.selectedProduct?.orderItemId,
-      'productId': this.selectedProduct?.productId,
       'dateType': this.selectedProduct?.dateType ?? 'expiry',
-      'expOrProdDate': this.expiryDateInput ? this.datePipe.transform(this.expiryDateInput, 'MM/dd/yyyy') : ''
+      'expOrProdDate': this.expiryDateInput ? this.datePipe.transform(this.expiryDateInput, 'MM/dd/yyyy') : '',
+      'orderItemId': this.selectedProduct?.orderItemId,
+      'productId': this.selectedProduct?.productId
     };
     this.orderDetailService.setProductExpiryDate(payload).subscribe({
       next: (res: any) => {
