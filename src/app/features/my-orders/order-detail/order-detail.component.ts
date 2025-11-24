@@ -51,6 +51,8 @@ export class OrderDetailComponent {
   productform!:FormGroup
   searchInput$ = new Subject<string>();
 
+  currentCardId: number | null = null;
+  currentScrollTop: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -178,12 +180,15 @@ export class OrderDetailComponent {
   }
 
   onStatusChange(product: any) {
+    this.saveCurrentCardPosition(product.orderItemId);
+
     const remark = product.remark || '';
     this.orderDetailService.changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
       .subscribe({
         next: (res) => {
           console.log('Product status updated successfully', res);
-          this.onSearch();
+          // this.onSearch();
+          this.onSearchWithRestore(product.orderItemId);
         },
         error: (err) => {
           console.error('Error updating product status', err);
@@ -413,5 +418,29 @@ export class OrderDetailComponent {
       }
     });
   }
+
+saveCurrentCardPosition(orderItemId: number) {
+  this.currentCardId = orderItemId;
+  this.currentScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+}
+
+onSearchWithRestore(orderItemId: number) {
+  this.onSearch();   // Run your existing search
+
+  setTimeout(() => {
+    this.restoreScroll(orderItemId);
+  }, 300);
+}
+
+restoreScroll(orderItemId: number) {
+  const element = document.getElementById("product-" + orderItemId);
+
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else if (this.currentScrollTop !== null) {
+    window.scrollTo({ top: this.currentScrollTop, behavior: 'smooth' });
+  }
+}
+
 
 }

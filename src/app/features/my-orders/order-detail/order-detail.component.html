@@ -64,7 +64,7 @@
 
   <div class="pt-3">
     <div *ngIf="orderDetail?.length; else noProducts">
-      <div *ngFor="let product of orderDetail" class="order-card px-3 py-4 mb-3 border rounded bg-white">
+      <div *ngFor="let product of orderDetail;" [attr.id]="'product-' + product.orderItemId" class="order-card px-3 py-4 mb-3 border rounded bg-white">
         <div class="row">
           <div class="text-warning fs-7 text-center fw-medium pb-2" *ngIf="product?.replaceProductCode">Replaced By {{ product?.replaceProductCode }} </div>
           <div class="col-2 p-0">
