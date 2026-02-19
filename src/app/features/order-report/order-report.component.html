@@ -381,7 +381,7 @@
       <div class="row">
         <div class="col-12 px-0 pb-2" *ngFor="let _ of generateArray(selectedProductQuantity); let i = index">
           <label for="wight" class="fw-semibold pb-0 fs-7">Item{{i+1}}/Weight(lbs)</label>
-          <input type="text" id="Property-title-input" class="form-control" placeholder="Enter weight"
+          <input type="number" inputmode="decimal" pattern="[0-9]*" id="Property-title-input" class="form-control" placeholder="Enter weight"
             [(ngModel)]="inputValues[i]" (keyup)="checkInventory(inputValues[i], i)">
           <span *ngIf="!checkInventoryStatus[i]" class="text-danger fs-8 fw-medium">
             Weight is not matching with the inventory in hand - Do you still want to proceed?
