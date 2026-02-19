@@ -198,10 +198,18 @@
                                 <span *ngIf="product?.confirmStatus === 'Pending'" class="badge badge-red fs-8">PENDING</span>
                                 <span *ngIf="product?.confirmStatus === 'Confirm'" class="badge badge-green fs-8">CONFIRMED</span>
                                 <span *ngIf="product?.confirmStatus === 'Missing'" class="badge badge-orange fs-8">MISSING</span>
-                                <span *ngIf="product?.remark" class="badge badge-outlined fs-8">Remark: {{product?.remark}}</span>
-                                <span *ngIf="product?.weight" class="badge badge-outlined fs-8">⚖️ {{product?.weight}}LBS</span>
+                                <!-- <span *ngIf="product?.remark" class="badge badge-outlined fs-8">Remark: {{product?.remark}}</span>
+                                <span *ngIf="product?.weight" class="badge badge-outlined fs-8">⚖️ {{product?.weight}}LBS</span> -->
                                 <span *ngIf="product?.expOrProdDate" class="badge badge-red fs-8">Expiry</span>
                             </div>
+                        </div>
+                        <div class="overflow-auto hiden-scrollbar p-0">
+                            <span *ngIf="product?.remark" class="badge badge-outlined fs-8" style="width: max-content;">Remark:
+                                {{product?.remark}}</span>
+                        </div>
+                        <div class="overflow-auto hiden-scrollbar p-0">
+                            <span *ngIf="product?.weight" class="badge badge-outlined fs-8" style="width: max-content">⚖️
+                                {{product?.weight}}LBS</span>
                         </div>
                         <!-- status change sec -->
                         <div class="row my-2 px-0">
