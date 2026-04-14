@@ -130,7 +130,7 @@
               <label [class.disabled]="product?.isProductReplaced" class="status-option w-100" [class.active]="product.confirmStatus === 'Missing'"
                 style="border-radius: 10px;">
                 <input [disabled]="product?.isProductReplaced" type="radio" [(ngModel)]="product.confirmStatus" [value]="'Missing'" name="status{{product.id}}"
-                  (change)="onStatusChange(product)" />
+                  (click)="onMissingClick($event, product, missingConfirmTemplate)" />
                 <i class="bi bi-x-circle me-1"></i>
                 <span>Missing</span>
                 <i class="bi ms-auto"
@@ -268,6 +268,23 @@
       <button type="submit" class="btn btn-danger" id="add-btn" (click)="changeproduct()">Change
         product
       </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #missingConfirmTemplate>
+  <div class="modal-header border-0 pb-0">
+    <h5 class="modal-title">Confirm Action</h5>
+    <button type="button" class="btn-close" (click)="onCancelMissing()"></button>
+  </div>
+  <div class="modal-body text-center pt-2">
+    <p class="mb-3 text-muted">
+      Are you sure you want to mark this item as
+      <strong>Missing</strong>?
+    </p>
+    <div class="d-flex justify-content-center gap-3 mt-3">
+      <button class="btn btn-outline-secondary px-4" (click)="onCancelMissing()">Cancel</button>
+      <button class="btn btn-success px-4" (click)="confirmMissing()"> Confirm </button>
     </div>
   </div>
 </ng-template>

@@ -54,6 +54,9 @@ export class OrderDetailComponent {
   currentCardId: number | null = null;
   currentScrollTop: number | null = null;
 
+  selectedProductForMissing: any = null;
+  previousStatusMap: any = {};
+
   constructor(
     private route: ActivatedRoute,
     public orderDetailService: OrderDetailService,
@@ -179,19 +182,46 @@ export class OrderDetailComponent {
     }
   }
 
-  onStatusChange(product: any) {
-    this.saveCurrentCardPosition(product.orderItemId);
+  onMissingClick(event: any, product: any, template: TemplateRef<any>) {
+    event.preventDefault();
+    this.selectedProductForMissing = product;
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-dialog-centered'
+    });
+  }
 
+  onStatusChange(product: any) {
+    this.previousStatusMap[product.orderItemId] = product.confirmStatus;
+    this.updateStatus(product);
+  }
+  confirmMissing() {
+    const product = this.selectedProductForMissing;
+    if (!product) return;
+
+    product.confirmStatus = 'Missing';
+
+    this.previousStatusMap[product.orderItemId] = 'Missing';
+
+    this.updateStatus(product);
+
+    this.modalRef?.hide();
+    this.selectedProductForMissing = null;
+  }
+  onCancelMissing() {
+    this.modalRef?.hide();
+    this.selectedProductForMissing = null;
+  }
+  updateStatus(product: any) {
+    this.saveCurrentCardPosition(product.orderItemId);
     const remark = product.remark || '';
-    this.orderDetailService.changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
+    this.orderDetailService
+      .changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
       .subscribe({
         next: (res) => {
-          console.log('Product status updated successfully', res);
-          // this.onSearch();
           this.onSearchWithRestore(product.orderItemId);
         },
         error: (err) => {
-          console.error('Error updating product status', err);
+          console.error(err);
         }
       });
   }
