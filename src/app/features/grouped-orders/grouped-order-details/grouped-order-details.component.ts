@@ -46,6 +46,8 @@ export class GroupedOrderDetailsComponent {
   productform!: FormGroup
   searchInput$ = new Subject<string>();
 
+  selectedProductForMissing: any = null;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -159,8 +161,34 @@ export class GroupedOrderDetailsComponent {
   }
 
   onStatusChange(product: any) {
+    if (product.confirmStatus === 'Missing') {
+      return;
+    }
+    this.updateStatus(product);
+  }
+  onMissingClick(event: any, product: any, template: TemplateRef<any>) {
+    event.preventDefault();
+    this.selectedProductForMissing = product;
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-dialog-centered'
+    });
+  }
+  confirmMissing() {
+    const product = this.selectedProductForMissing;
+    if (!product) return;
+    product.confirmStatus = 'Missing';
+    this.updateStatus(product);
+    this.modalRef?.hide();
+    this.selectedProductForMissing = null;
+  }
+  onCancelMissing() {
+    this.modalRef?.hide();
+    this.selectedProductForMissing = null;
+  }
+  updateStatus(product: any) {
     const remark = product.remark || '';
-    this.orderDetailService.changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
+    this.orderDetailService
+      .changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
       .subscribe({
         next: (res) => {
           console.log('Product status updated successfully', res);
@@ -171,7 +199,6 @@ export class GroupedOrderDetailsComponent {
         }
       });
   }
-
   openWeightModal(template: TemplateRef<any>, product: any) {
     this.selectedProduct = product;
     this.selectedProductQuantity = parseInt(product?.quantity, 10);

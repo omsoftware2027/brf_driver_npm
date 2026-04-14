@@ -60,6 +60,8 @@ export class OrderReportComponent {
   totalElements = 0;
   Math = Math;
 
+  selectedProductForMissing: any = null;
+
   constructor(
     public orderReportService: OrderReportService,
     public authService: AuthService,
@@ -540,7 +542,45 @@ export class OrderReportComponent {
 
 
 
+  // onStatusChange(product: any) {
+  //   const remark = product.remark || '';
+  //   this.orderDetailService.changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
+  //     .subscribe({
+  //       next: (res) => {
+  //         this.getOrdersReports(this.selectedOrderReportType);
+  //       },
+  //       error: (err) => {
+  //         console.error('Error updating product status', err);
+  //       }
+  //     });
+  // }
+
   onStatusChange(product: any) {
+    if (product.confirmStatus === 'Missing') {
+      return;
+    }
+    this.updateStatus(product);
+  }
+  onMissingClick(event: any, product: any, template: TemplateRef<any>) {
+    event.preventDefault();
+    this.selectedProductForMissing = product;
+    this.modalRef = this.modalService.show(template, {
+      class: 'modal-dialog-centered'
+    });
+  }
+  confirmMissing() {
+    const product = this.selectedProductForMissing;
+    if (!product) return;
+    product.confirmStatus = 'Missing';
+    this.updateStatus(product);
+    this.modalRef?.hide();
+    this.selectedProductForMissing = null;
+  }
+  onCancelMissing() {
+    this.modalRef?.hide();
+    this.selectedProductForMissing = null;
+  }
+  updateStatus(product: any) {
     const remark = product.remark || '';
     this.orderDetailService.changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
       .subscribe({
