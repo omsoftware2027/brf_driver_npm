@@ -59,12 +59,10 @@
       <div *ngFor="let product of orderDetail" class="order-card px-3 py-4 mb-3 border rounded bg-white">
         <div class="row">
           <div class="text-warning fs-7 text-center fw-medium pb-2" *ngIf="product?.replaceProductCode">Replaced By {{ product?.replaceProductCode }} </div>
-          <div class="col-2 p-0">
-            <span class="badge-green rounded-3 d-flex justify-content-center \" style="padding: 0.7rem;">
-              <img src="assets/icons/parcel-active.png" width="24" height="24" />
-            </span>
+          <div class="col-3 p-0 mt-1">
+              <img [src]="product?.image || 'assets/images/no-image-available-placeholder.jpg'" width="100%" height="auto" (error)="onImageError($event)"/>
           </div>
-          <div class="col-10 p-0 ps-2">
+          <div class="col-9 p-0 ps-2">
             <div *ngIf="!product?.isProductReplaced" class="fs-8 text-muted">
               <span class="text-success">{{product?.code}}</span> - <span
                 class="text-black fw-medium">{{product?.productName}}</span>
