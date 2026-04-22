@@ -472,5 +472,11 @@ restoreScroll(orderItemId: number) {
   }
 }
 
+onImageError(event: any) {
+  const img = event.target;
+  if (!img.src.includes('no-image-available-placeholder.jpg')) {
+    img.src = 'assets/images/no-image-available-placeholder.jpg';
+  }
+}
 
 }
