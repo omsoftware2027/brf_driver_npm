@@ -16,7 +16,7 @@ export class OrdersListComponent {
 
   Math = Math;
   pageNo = 0;
-  pageSize = 30;
+  pageSize = 30000;
   totalPages = 0;
   totalElements = 0;
 

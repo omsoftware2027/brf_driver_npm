@@ -100,7 +100,7 @@
         </ng-template>
     </div>
 
-    <div *ngIf="totalPages > 1 && !searchText && !selectedDriver && !selectedDate" class="d-flex justify-content-center align-items-center mt-3 mb-4">
+    <!-- <div *ngIf="totalPages > 1 && !searchText && !selectedDriver && !selectedDate" class="d-flex justify-content-center align-items-center mt-3 mb-4">
         <nav>
             <ul class="pagination pagination-sm mb-0">
                 <li class="page-item" [class.disabled]="pageNo === 0">
@@ -133,12 +133,12 @@
                 </li>
             </ul>
         </nav>
-    </div>
+    </div> -->
     <!-- Showing range -->
-    <div class="text-center text-muted small mb-4" *ngIf="totalElements && !searchText && !selectedDriver && !selectedDate && totalPages > 1">
+    <!-- <div class="text-center text-muted small mb-4" *ngIf="totalElements && !searchText && !selectedDriver && !selectedDate && totalPages > 1">
         Showing {{ pageNo * pageSize + 1 }} -
         {{ Math.min((pageNo + 1) * pageSize, totalElements) }} of {{ totalElements }} orders
-    </div>
+    </div> -->
 
 </div>
 
