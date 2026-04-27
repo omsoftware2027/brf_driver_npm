@@ -16,7 +16,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 export class MyOrdersComponent {
 
   pageNo = 0;
-  pageSize = 30;
+  pageSize = 30000;
   totalPages = 0;
   totalElements = 0;
 

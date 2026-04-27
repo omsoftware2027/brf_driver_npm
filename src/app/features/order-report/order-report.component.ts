@@ -55,7 +55,7 @@ export class OrderReportComponent {
 
   searchText: string = '';
   pageNo = 0;
-  pageSize = 30;
+  pageSize = 30000;
   totalPages = 0;
   totalElements = 0;
   Math = Math;
