@@ -23,7 +23,7 @@ export class OrderReportService {
     if (pageNo >= 0 && !search && !date) {
       params.push(`pageNo=${pageNo}`);
     }
-    if (pageSize && !search && !date) {
+    if (pageSize && !search) {
       params.push(`pageSize=${pageSize}`);
     }
     if (params.length > 0) {
@@ -48,7 +48,7 @@ export class OrderReportService {
     if (pageNo >= 0 && !search && !date) {
       params.push(`pageNo=${pageNo}`);
     }
-    if (pageSize && !search && !date) {
+    if (pageSize && !search) {
       params.push(`pageSize=${pageSize}`);
     }
     if (params.length > 0) {
@@ -98,7 +98,7 @@ export class OrderReportService {
     if (pageNo >= 0 && !search && !date && !binFilter) {
       params.push(`pageNo=${pageNo}`);
     }
-    if (pageSize && !search && !date && !binFilter) {
+    if (pageSize && !search && !binFilter) {
       params.push(`pageSize=${pageSize}`);
     }
     if (params.length > 0) {
