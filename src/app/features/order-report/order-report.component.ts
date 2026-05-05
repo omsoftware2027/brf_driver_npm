@@ -62,6 +62,8 @@ export class OrderReportComponent {
 
   selectedProductForMissing: any = null;
 
+  suggestedItemList: any[] = [];
+
   constructor(
     public orderReportService: OrderReportService,
     public authService: AuthService,
@@ -71,7 +73,8 @@ export class OrderReportComponent {
     private formBuilder: FormBuilder
   ) { 
     this.productform = this.formBuilder.group({
-      productId: [''],
+      suggestedProductId: [null],
+      productId: [null],
       quantity: [''],
     });
   };
@@ -87,6 +90,22 @@ export class OrderReportComponent {
         this.getallsampletype();
       }
     )
+
+    this.productform.get('suggestedProductId')?.valueChanges.subscribe(value => {
+      if (value) {
+        this.productform.get('productId')?.disable({ emitEvent: false });
+      } else {
+        this.productform.get('productId')?.enable({ emitEvent: false });
+      }
+    });
+
+    this.productform.get('productId')?.valueChanges.subscribe(value => {
+      if (value) {
+        this.productform.get('suggestedProductId')?.disable({ emitEvent: false });
+      } else {
+        this.productform.get('suggestedProductId')?.enable({ emitEvent: false });
+      }
+    });
   }
 
   getCustomers(jetroType: any) {
@@ -138,6 +157,15 @@ export class OrderReportComponent {
         console.log("items", this.itemsList);
       }
     });
+  }
+  getAllSuggestedItems(productId: number) {
+    this.orderDetailService.getSuggestedProductList(productId).subscribe((res) => {
+      if (Array.isArray(res)) {
+        this.suggestedItemList = res || [];
+      } else {
+        this.suggestedItemList = [];
+      }
+    })
   }
 
   setOrderReportType(type: string) {
@@ -594,6 +622,8 @@ export class OrderReportComponent {
   }
 
   showProductReplaceModal(template: TemplateRef<any>, product: any) {
+    this.productform.reset();
+    this.getAllSuggestedItems(product.productId);
     this.selectedProduct = product;
     this.modalRef = this.modalService.show(template, {
       class: 'modal-dialog-centered'
@@ -606,7 +636,10 @@ export class OrderReportComponent {
     }
   }
   changeproduct() {
-    this.orderDetailService.changeproduct(this.selectedProduct?.orderId, this.selectedProduct?.productId, this.productform.value.productId, this.selectedProduct?.orderItemId, this.productform.value.quantity).subscribe({
+    const form = this.productform.value;
+    const selectedProductId = form.suggestedProductId || form.productId;
+
+    this.orderDetailService.changeproduct(this.selectedProduct?.orderId, this.selectedProduct?.productId, selectedProductId, this.selectedProduct?.orderItemId, this.productform.value.quantity).subscribe({
       next: (res) => {
         if (res['status'] == 0) {
           this.modalRef?.hide();
@@ -684,5 +717,11 @@ export class OrderReportComponent {
     if (!img.src.includes('no-image-available-placeholder.jpg')) {
       img.src = 'assets/images/no-image-available-placeholder.jpg';
     }
+  }
+
+  customSearch(term: string, item: any) {
+    term = term.toLowerCase();
+    return item.productName.toLowerCase().includes(term) ||
+      item.sku.toLowerCase().includes(term);
   }
 }

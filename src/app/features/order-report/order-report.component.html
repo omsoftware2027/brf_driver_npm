@@ -407,6 +407,23 @@
     <i class="bi bi-x position-absolute" style="top: 6px; right: 6px" aria-label="Close" (click)="modalRef?.hide()"></i>
     <div class="p-0">
       <form [formGroup]="productform">
+                <div class="mb-3">
+          <label for="suggested-item" class="form-label">Suggested Replacement</label>
+          <ng-select [items]="suggestedItemList" bindValue="replacedProductId" formControlName="suggestedProductId"
+            placeholder="Select Product" [searchFn]="customSearch">
+            <ng-template ng-option-tmp let-item="item">
+              <div>
+                <div class="text-truncate"><b>{{ item.productName }}</b></div>
+                <small>SKU: {{ item.sku }}</small>  &nbsp; | &nbsp;
+                <small>Replaced: {{ item.replaceCount }} Times</small>
+              </div>
+            </ng-template>
+            <!-- Selected value display -->
+            <ng-template ng-label-tmp let-item="item">
+              {{ item.productName }}
+            </ng-template>
+          </ng-select>
+        </div>
         <div class="mb-3">
           <label for="product-category-input" class="form-label">Select Product</label>
           <ng-select [items]="itemsList" bindLabel="name" bindValue="productId" formControlName="productId"

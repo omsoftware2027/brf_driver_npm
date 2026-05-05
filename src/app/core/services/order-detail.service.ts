@@ -71,6 +71,10 @@ export class OrderDetailService {
     return this.http.get<any>(`${environment.baseUrl}/order/getAllProduct?pageNo=${page}&pageSize=${size}&search=${searchParam}`);
   }
 
+  getSuggestedProductList(productId: number) {
+    return this.http.get<any>(`${environment.baseUrl}/order/replacement-suggestions?productId=${productId}`);
+  }
+
   changeproduct(orderId: any, originalProductId: any, replaceProductId: any, orderItemId: any, quantity: any) {
     return this.http.get<any>(`${environment.baseUrl}/order/changeProduct?orderId=${orderId}&originalProductId=${originalProductId}&replaceProductId=${replaceProductId}&orderItemId=${orderItemId}&quantity=${quantity}`);
   }
