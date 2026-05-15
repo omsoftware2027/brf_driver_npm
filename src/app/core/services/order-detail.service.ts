@@ -11,7 +11,7 @@ export class OrderDetailService {
   constructor(public http: HttpClient) { }
 
   getAllproducts(orderId: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getAllProductsByOrderIdAndBinFilter?OrderId=${orderId}`)
+    return this.http.get<any>(`${environment.baseUrl}/driver/getAllProductsByOrderIdAndBinFilter?OrderId=${orderId}&pageSize=1000`)
   }
 
   getProductsByRoute(orderId: any, route: any): Observable<any> {
