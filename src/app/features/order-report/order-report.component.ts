@@ -17,7 +17,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
   providers: [DatePipe]
 })
 export class OrderReportComponent {
-  selectedOrderReportType: string = 'Pickup';
+  selectedOrderReportType: string = 'All';
   user: any;
   reports: any = {};
   allReportsBackup: any[] = [];
@@ -85,7 +85,7 @@ export class OrderReportComponent {
         this.user = user;
         const today = new Date();
         this.selectedDate = today.toISOString().split('T')[0] || '';
-        this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
+        this.getAllOrderItems(this.selectedDate);
         this.setupSearch();
         this.getallsampletype();
       }
@@ -154,7 +154,6 @@ export class OrderReportComponent {
             code: product.code,
           };
         });
-        console.log("items", this.itemsList);
       }
     });
   }
@@ -180,6 +179,10 @@ export class OrderReportComponent {
     this.totalElements = 0;
 
     this.selectedOrderReportType = type;
+
+    if (this.selectedOrderReportType === 'All') {
+      this.getAllOrderItems(this.selectedDate);
+    }
     if (this.selectedOrderReportType === 'Pickup') {
       this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
@@ -198,6 +201,27 @@ export class OrderReportComponent {
     if (this.selectedOrderReportType === 'Freezer Two') {
       this.getFreezerTwoReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
+  }
+
+  getAllOrderItems(date: string) {
+    this.orderReportService.getAllOrderReport(date).subscribe({
+      next: (res) => {
+        const data = res?.response || [];
+        this.reports = [
+          {
+            vendor: 'All Orders',
+            items: data
+          }
+        ];
+        this.allReportsBackup = [...this.reports];
+        this.vendors = ['All Orders'];
+      },
+      error: (err) => {
+        this.reports = [];
+        this.allReportsBackup = [];
+        this.vendors = [];
+      }
+    });
   }
 
   getPickupReport(date: string, searchText: string, pageNo: any, pageSize: any) {
@@ -681,6 +705,9 @@ export class OrderReportComponent {
 
   getOrdersReports(type: any) {
     this.selectedOrderReportType = type;
+    if (this.selectedOrderReportType === 'All') {
+      this.getAllOrderItems(this.selectedDate);
+    }
     if (this.selectedOrderReportType === 'Pickup') {
       this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
     }
