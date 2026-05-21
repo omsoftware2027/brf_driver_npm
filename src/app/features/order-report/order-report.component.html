@@ -427,11 +427,15 @@
           <ng-select [items]="suggestedItemList" bindValue="replacedProductId" formControlName="suggestedProductId"
             placeholder="Select Product" [searchFn]="customSearch">
             <ng-template ng-option-tmp let-item="item">
-              <div>
-                <div class="text-truncate"><b>{{ item.productName }}</b></div>
-                <small>SKU: {{ item.sku }}</small>  &nbsp; | &nbsp;
-                <small>Replaced: {{ item.replaceCount }} Times</small>
-              </div>
+                <div>
+                    <div class="text-truncate" style="font-size: 12px;"><b>{{ item.productName }}</b></div>
+                    <div> <b class="text-muted">Description: </b> {{item?.description}}</div>
+                    <div> <b class="text-muted">UPC: </b> {{item?.shortDescription}}</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div> <b class="text-muted">SKU: </b> {{ item.sku }}</div> &nbsp; | &nbsp;
+                        <div> <b class="text-muted">Replaced: </b> {{ item.replaceCount }} Times</div>
+                    </div>
+                </div>
             </ng-template>
             <!-- Selected value display -->
             <ng-template ng-label-tmp let-item="item">
@@ -440,7 +444,7 @@
           </ng-select>
         </div>
         <div class="mb-3">
-          <label for="product-category-input" class="form-label">Select Product</label>
+          <label for="product-category-input" class="form-label">Substitute Items</label>
           <ng-select [items]="itemsList" bindLabel="name" bindValue="productId" formControlName="productId"
             placeholder="Select Product" [typeahead]="searchInput$">
           </ng-select>
