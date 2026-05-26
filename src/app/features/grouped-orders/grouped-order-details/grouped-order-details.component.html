@@ -66,12 +66,12 @@
             <div *ngIf="!product?.isProductReplaced" class="fs-8 text-muted">
               <span class="text-success">{{product?.code}}</span> - <span
                 class="text-black fw-medium">{{product?.productName}}</span>
-                <div *ngIf="product?.description" class="text-muted fw-medium fs-8" style="font-size: 9px;">{{product?.description}}</div>
+                <div *ngIf="product?.shortDescription" class="text-muted fw-medium fs-8" style="font-size: 9px;">{{product?.shortDescription}}</div>
               </div>
             <s *ngIf="product?.isProductReplaced"  class="fs-8 text-muted">
               <span class="text-success">{{product?.code}}</span> - 
               <span class="text-black fw-medium">{{product?.productName}}</span>
-              <div *ngIf="product?.description" class="text-muted fw-medium fs-8" style="font-size: 9px;">{{product?.description}}</div>
+              <div *ngIf="product?.shortDescription" class="text-muted fw-medium fs-8" style="font-size: 9px;">{{product?.shortDescription}}</div>
             </s>
             <div *ngIf="product?.notes" class="fs-8">
               <b>Notes:</b> {{product?.notes}}
