@@ -207,12 +207,14 @@ export class OrderReportComponent {
     this.orderReportService.getAllOrderReport(date).subscribe({
       next: (res) => {
         const data = res?.response || [];
-        this.reports = [
-          {
-            vendor: 'All Orders',
-            items: data
-          }
-        ];
+        data.length > 0 ?
+          this.reports = [
+            {
+              vendor: 'All Orders',
+              items: data
+            }
+          ] : this.reports = [];
+        
         this.allReportsBackup = [...this.reports];
         this.vendors = ['All Orders'];
       },
