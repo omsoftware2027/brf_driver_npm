@@ -213,7 +213,7 @@ export class GroupedOrderDetailsComponent {
     this.modalRef?.hide();
     this.selectedProductForMissing = null;
   }
-  updateStatus(product: any) {
+  updateStatus(product: any) {  
     const remark = product.remark || '';
     this.orderDetailService
       .changeStatusOfProduct(product?.orderItemId, product?.confirmStatus, remark)
