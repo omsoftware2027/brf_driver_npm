@@ -60,7 +60,7 @@
         <div class="row">
           <div class="text-warning fs-7 text-center fw-medium pb-2" *ngIf="product?.replaceProductCode">Replaced By {{ product?.replaceProductCode }} </div>
           <div class="col-3 p-0 mt-1">
-              <img [src]="product?.image || 'assets/images/no-image-available-placeholder.jpg'" width="100%" height="auto" (error)="onImageError($event)"/>
+              <img [src]="product?.image || 'assets/images/no-image-available-placeholder.jpg'" width="100%" height="auto" class="product-image" (error)="onImageError($event)"/>
           </div>
           <div class="col-9 p-0 ps-2">
             <div *ngIf="!product?.isProductReplaced" class="fs-8 text-muted">
