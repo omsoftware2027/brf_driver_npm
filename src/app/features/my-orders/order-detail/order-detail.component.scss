@@ -101,6 +101,11 @@
     border-radius: 10px;
 }
 
+.product-image {
+    max-height: 150px;
+    object-fit: contain;
+}
+
 ::ng-deep .ng-dropdown-panel .ng-option {
   font-size: 10px !important;
 }
