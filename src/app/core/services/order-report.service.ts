@@ -10,8 +10,8 @@ export class OrderReportService {
 
   constructor(public http: HttpClient) { }
 
-  getAllOrderReport(date: any): Observable<any> {
-    return this.http.get<any>(`${environment.baseUrl}/driver/getAllItemByDeliveryDate?deliveryDate=${date}`)
+  getAllOrderReport(date: any, search: string): Observable<any> {
+    return this.http.get<any>(`${environment.baseUrl}/driver/getAllItemByDeliveryDate?deliveryDate=${date}&search=${search}`)
   }
 
   getPickupReports(date?: any, search?: string, pageNo?: any, pageSize?: any): Observable<any> {
