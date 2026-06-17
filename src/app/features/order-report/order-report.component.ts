@@ -85,7 +85,7 @@ export class OrderReportComponent {
         this.user = user;
         const today = new Date();
         this.selectedDate = today.toISOString().split('T')[0] || '';
-        this.getAllOrderItems(this.selectedDate);
+        this.getAllOrderItems(this.selectedDate, this.searchText);
         this.setupSearch();
         this.getallsampletype();
       }
@@ -181,7 +181,7 @@ export class OrderReportComponent {
     this.selectedOrderReportType = type;
 
     if (this.selectedOrderReportType === 'All') {
-      this.getAllOrderItems(this.selectedDate);
+      this.getAllOrderItems(this.selectedDate, this.searchText);
     }
     if (this.selectedOrderReportType === 'Pickup') {
       this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
@@ -203,8 +203,8 @@ export class OrderReportComponent {
     }
   }
 
-  getAllOrderItems(date: string) {
-    this.orderReportService.getAllOrderReport(date).subscribe({
+  getAllOrderItems(date: string, search: string) {
+    this.orderReportService.getAllOrderReport(date, search).subscribe({
       next: (res) => {
         const data = res?.response || [];
         data.length > 0 ?
@@ -708,7 +708,7 @@ export class OrderReportComponent {
   getOrdersReports(type: any) {
     this.selectedOrderReportType = type;
     if (this.selectedOrderReportType === 'All') {
-      this.getAllOrderItems(this.selectedDate);
+      this.getAllOrderItems(this.selectedDate, this.searchText);
     }
     if (this.selectedOrderReportType === 'Pickup') {
       this.getPickupReport(this.selectedDate, this.searchText, this.pageNo, this.pageSize);
