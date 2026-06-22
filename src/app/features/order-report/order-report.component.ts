@@ -175,7 +175,7 @@ export class OrderReportComponent {
     this.routeSortAscending = true;
     this.searchText = '';
     this.pageNo = 0;
-    this.pageSize = 30;
+    this.pageSize = 30000;
     this.totalElements = 0;
 
     this.selectedOrderReportType = type;
