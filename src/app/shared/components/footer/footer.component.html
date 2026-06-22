@@ -1,5 +1,5 @@
 <footer class="footer-nav d-flex justify-content-around align-items-center py-2 px-1">
-  <a class="nav-item" routerLink="/dashboard" routerLinkActive="active" #rla="routerLinkActive">
+  <a  *ngIf="hasPermission('dashboard')" class="nav-item" routerLink="/dashboard" routerLinkActive="active" #rla="routerLinkActive">
     <div class="nav-icon">
       <div>
         <img *ngIf="!rla.isActive" src="assets/icons/dashboard-inactive.png" alt="icon" width="20" height="20">
@@ -11,7 +11,7 @@
     <div class="nav-label">Dashboard</div>
   </a>
 
-  <a class="nav-item" routerLink="/my-orders" routerLinkActive="active" #drla="routerLinkActive">
+  <a *ngIf="hasPermission('allOrders')" class="nav-item" routerLink="/my-orders" routerLinkActive="active" #drla="routerLinkActive">
     <div class="nav-icon">
       <div>
         <img *ngIf="!drla.isActive" src="assets/icons/parcel-inactive.png" alt="icon" width="20" height="20">
@@ -23,7 +23,7 @@
     <div class="nav-label">All Orders</div>
   </a>
 
-  <a class="nav-item" routerLink="/order-report" routerLinkActive="active" #orla="routerLinkActive">
+  <a  *ngIf="hasPermission('allReports')" class="nav-item" routerLink="/order-report" routerLinkActive="active" #orla="routerLinkActive">
     <div class="nav-icon">
       <div>
         <img *ngIf="!orla.isActive" src="assets/icons/report-inactive.png" alt="icon" width="20" height="20">

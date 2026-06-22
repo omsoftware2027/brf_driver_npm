@@ -68,6 +68,11 @@ export class LoginComponent {
                 this.userInfo.id = data?.response?.teamId;
                 this.userInfo.token = data?.response?.token;
 
+                localStorage.setItem(
+                  'permissions',
+                  JSON.stringify(data?.response?.permissions || [])
+                );
+
                 this.authService.getTeamById(data.response.teamId).subscribe({
                   next: (teamData) => {
                     this.userInfo.profilePicture = teamData?.response?.profilePicture || '';
