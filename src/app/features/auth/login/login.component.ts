@@ -51,62 +51,76 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.userEmail = this.loginForm.value.email;
       this.isLoading = true;
-      const formData = {
-        email: this.loginForm.value.email,
-        password: this.loginForm.value.password,
-        loginType: 'driver'
-      }
 
-      this.authService.login(formData).subscribe({
-        next: (data) => {
-          this.isLoading = false;
-          if (data && data.status === 0) {
-            if (data.response && data.response.token) {
-              if (data?.response?.role?.toLowerCase() === 'driver') {
-                this.step = 'otp';
-                this.userInfo.name = data?.response?.name;
-                this.userInfo.id = data?.response?.teamId;
-                this.userInfo.token = data?.response?.token;
-
-                localStorage.setItem(
-                  'permissions',
-                  JSON.stringify(data?.response?.permissions || [])
-                );
-
-                this.authService.getTeamById(data.response.teamId).subscribe({
-                  next: (teamData) => {
-                    this.userInfo.profilePicture = teamData?.response?.profilePicture || '';
-                  },
-                  error: () => {
-                    console.log('Failed to fetch profile image');
-                  }
-                })
-
-                this.authService.sendOtp(this.loginForm.value.email).subscribe({
-                  next: () => {
-                    // this.step = 'otp';
-                    this.toastr.info('OTP sent to your registered contact', 'Info');
-                  },
-                  error: () => {
-                    this.toastr.error('Failed to send OTP', 'Error');
-                  }
-                })
-              } else {
-                this.toastr.error('You are not authorized as a driver', 'Access Denied');
-              }
+      this.authService.getLoginType(this.userEmail).subscribe({
+        next: (res: any) => {
+          if (res?.status === 0) {
+            const formData = {
+              email: this.loginForm.value.email,
+              password: this.loginForm.value.password,
+              loginType: res?.response || 'driver'
             }
+
+            this.authService.login(formData).subscribe({
+              next: (data) => {
+                this.isLoading = false;
+                if (data && data.status === 0) {
+                  if (data.response && data.response.token) {
+                    if (data?.response?.role?.toLowerCase() === 'driver' || data?.response?.role?.toLowerCase() === 'general driver') {
+                      this.step = 'otp';
+                      this.userInfo.name = data?.response?.name;
+                      this.userInfo.id = data?.response?.teamId;
+                      this.userInfo.token = data?.response?.token;
+
+                      localStorage.setItem(
+                        'permissions',
+                        JSON.stringify(data?.response?.permissions || [])
+                      );
+
+                      this.authService.getTeamById(data.response.teamId).subscribe({
+                        next: (teamData) => {
+                          this.userInfo.profilePicture = teamData?.response?.profilePicture || '';
+                        },
+                        error: () => {
+                          console.log('Failed to fetch profile image');
+                        }
+                      })
+
+                      this.authService.sendOtp(this.loginForm.value.email).subscribe({
+                        next: () => {
+                          // this.step = 'otp';
+                          this.toastr.info('OTP sent to your registered contact', 'Info');
+                        },
+                        error: () => {
+                          this.toastr.error('Failed to send OTP', 'Error');
+                        }
+                      })
+                    } else {
+                      this.toastr.error('You are not authorized as a driver', 'Access Denied');
+                    }
+                  }
+                }
+              },
+              error: (err) => {
+                this.isLoading = false;
+                if (err && err.error.status === -1) {
+                  this.toastr.error(err.error.response);
+                  this.loginForm.markAllAsTouched();
+                } else {
+                  this.toastr.error('Something went wrong');
+                  this.loginForm.reset();
+                  this.loginForm.markAllAsTouched();
+                }
+              }
+            })
+          } else {
+            this.isLoading = false;
+            this.toastr.error(res?.response || 'Unable to determine login type', 'Error');
           }
         },
-        error: (err) => {
+        error: () => {
           this.isLoading = false;
-          if (err && err.error.status === -1) {
-            this.toastr.error(err.error.response);
-            this.loginForm.markAllAsTouched();
-          } else {
-            this.toastr.error('Something went wrong');
-            this.loginForm.reset();
-            this.loginForm.markAllAsTouched();
-          }
+          this.toastr.error('Unable to determine login type', 'Error');
         }
       })
     }

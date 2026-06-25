@@ -49,4 +49,8 @@ export class AuthService {
   getTeamById(roleId: any): Observable<any> {
     return this.http.get<any>(`${environment.baseUrl}/masterData/getTeamById?teamId=` + roleId);
   }
+
+  getLoginType(email: string) {
+    return this.http.post<any>(`${environment.baseUrl}/auth/getLoginType?email=${encodeURIComponent(email)}`, {});
+  }
 }
