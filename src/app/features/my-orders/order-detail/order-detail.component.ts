@@ -58,6 +58,8 @@ export class OrderDetailComponent {
   selectedProductForMissing: any = null;
   previousStatusMap: any = {};
 
+  productReplacementError: string = '';
+
   constructor(
     private route: ActivatedRoute,
     public orderDetailService: OrderDetailService,
@@ -81,6 +83,7 @@ export class OrderDetailComponent {
     }
 
     this.productform.get('suggestedProductId')?.valueChanges.subscribe(value => {
+      this.productReplacementError = '';
       if (value) {
         this.productform.get('productId')?.disable({ emitEvent: false });
       } else {
@@ -89,6 +92,7 @@ export class OrderDetailComponent {
     });
 
     this.productform.get('productId')?.valueChanges.subscribe(value => {
+      this.productReplacementError = '';
       if (value) {
         this.productform.get('suggestedProductId')?.disable({ emitEvent: false });
       } else {
@@ -459,6 +463,7 @@ export class OrderDetailComponent {
   
   showProductReplaceModal(template: TemplateRef<any>, product: any) {
     this.productform.reset();
+    this.productReplacementError = '';
     this.getAllSuggestedItems(product.productId);
 
     this.selectedProduct = product;
@@ -476,6 +481,8 @@ export class OrderDetailComponent {
           this.modalRef?.hide();
           this.onSearch();
           this.productform.reset();
+        } else {
+          this.productReplacementError = res?.response || 'Something went wrong. Please try again.';
         }
       },
       error: (err) => {

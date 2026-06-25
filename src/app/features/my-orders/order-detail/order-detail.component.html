@@ -295,10 +295,17 @@
           <input type="text" id="quantity" class="form-control m-1" placeholder="Enter Quantity"
             formControlName="quantity" (keypress)="allowOnlyNumbers($event)">
         </div>
+
+          <div *ngIf="productReplacementError" class="my-2">
+            <div class="d-flex gap-1 align-items-baseline fs-8">
+              <i class="bi bi-info-circle text-danger"></i>
+              <div class="text-danger" style="font-size: 12px;">{{productReplacementError}}</div>
+            </div>
+          </div>
       </form>
-      <button type="submit" class="btn btn-danger" id="add-btn" (click)="changeproduct()">Change
-        product
-      </button>
+        <button type="submit" class="btn btn-danger" id="add-btn" [disabled]="!productform.get('quantity')?.value || (!productform.get('productId')?.value && !productform.get('suggestedProductId')?.value)" (click)="changeproduct()">Change
+          product
+        </button>
     </div>
   </div>
 </ng-template>
