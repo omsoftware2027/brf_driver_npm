@@ -215,18 +215,18 @@
                         <div class="row my-2 px-0">
                             <div class="col-12 p-0">
                                 <div class="d-flex w-100">
-                                    <label [class.disabled]="product?.isProductReplaced" class="status-option flex-fill"
+                                    <label [class.disabled]="product?.isProductReplaced || !permissionService.canEdit('DriverAppOrderReport')" class="status-option flex-fill"
                                         [class.active]="product.confirmStatus === 'Pending'" style="border-radius: 10px 0 0 10px;">
-                                        <input [disabled]="product?.isProductReplaced" type="radio" [(ngModel)]="product.confirmStatus"
+                                        <input [disabled]="product?.isProductReplaced || !permissionService.canEdit('DriverAppOrderReport')" type="radio" [(ngModel)]="product.confirmStatus"
                                             [value]="'Pending'" name="status{{product.id}}" (change)="onStatusChange(product)" />
                                         <i class="bi bi-clock me-1"></i>
                                         <span>Pending</span>
                                         <i class="bi ms-auto"
                                             [ngClass]="product.confirmStatus === 'Pending' ? 'bi-record-circle' : 'bi-circle'"></i>
                                     </label>
-                                    <label [class.disabled]="product?.isProductReplaced" class="status-option flex-fill"
+                                    <label [class.disabled]="product?.isProductReplaced || !permissionService.canEdit('DriverAppOrderReport')" class="status-option flex-fill"
                                         [class.active]="product.confirmStatus === 'Confirm'" style="border-radius: 0 10px 10px 0;">
-                                        <input [disabled]="product?.isProductReplaced" type="radio" [(ngModel)]="product.confirmStatus"
+                                        <input [disabled]="product?.isProductReplaced || !permissionService.canEdit('DriverAppOrderReport')" type="radio" [(ngModel)]="product.confirmStatus"
                                             [value]="'Confirm'" name="status{{product.id}}" (change)="onStatusChange(product)" />
                                         <i class="bi bi-check-circle me-1"></i>
                                         <span>Confirm</span>
@@ -235,16 +235,16 @@
                                     </label>
                                 </div>
                                 <div class="mt-2 d-flex flex-fill">
-                                    <label [class.disabled]="product?.isProductReplaced" class="status-option w-100"
+                                    <label [class.disabled]="product?.isProductReplaced || !permissionService.canEdit('DriverAppOrderReport')" class="status-option w-100"
                                         [class.active]="product.confirmStatus === 'Missing'" style="border-radius: 10px;">
-                                        <input [disabled]="product?.isProductReplaced" type="radio" [(ngModel)]="product.confirmStatus"
+                                        <input [disabled]="product?.isProductReplaced || !permissionService.canEdit('DriverAppOrderReport')" type="radio" [(ngModel)]="product.confirmStatus"
                                             [value]="'Missing'" name="status{{product.id}}" (click)="onMissingClick($event, product, missingConfirmTemplate)" />
                                         <i class="bi bi-x-circle me-1"></i>
                                         <span>Missing</span>
                                         <i class="bi ms-auto"
                                             [ngClass]="product.confirmStatus === 'Missing' ? 'bi-record-circle' : 'bi-circle'"></i>
                                     </label>
-                                    <button [disabled]="product?.isProductReplaced"
+                                    <button [disabled]="product?.isProductReplaced || !permissionService.canEdit('DriverAppOrderReport')"
                                         *ngIf="product.confirmStatus === 'Missing' && !product?.isProductReplaced"
                                         class="replace-button d-flex justify-content-center align-items-center gap-2 fs-7 fw-medium ms-2"
                                         (click)="showProductReplaceModal(RecordModal, product)">
@@ -273,16 +273,16 @@
                     <!-- Action buttons -->
                     <div class="d-flex justify-content-between mt-3">
                         <button class="btn btn-success btn-responsive" *ngIf="product?.unit == 'LBS' && product?.quantity > 0"
-                            (click)="openWeightModal(weightModal, product)">
+                            (click)="openWeightModal(weightModal, product)" [disabled]="!permissionService.canEdit('DriverAppOrderReport')">
                             <img src="assets/icons/outline_scale.png" alt="icon" width="15" height="15">
                             weight
                         </button>
                         <button class="btn btn-success btn-responsive" *ngIf="product?.dateType"
-                            (click)="openExpiryDateModal(expiryDateModal, product)">
+                            (click)="openExpiryDateModal(expiryDateModal, product)" [disabled]="!permissionService.canEdit('DriverAppOrderReport')">
                             <img src="assets/icons/pajamas_time-out.png" alt="icon" width="15" height="15">
                             Expiry
                         </button>
-                        <button class="btn btn-success btn-responsive" (click)="openRemarkModal(remarkModal, product)">
+                        <button class="btn btn-success btn-responsive" (click)="openRemarkModal(remarkModal, product)" [disabled]="!permissionService.canEdit('DriverAppOrderReport')">
                             <i class="bi bi-pencil"></i>
                             Remark
                         </button>

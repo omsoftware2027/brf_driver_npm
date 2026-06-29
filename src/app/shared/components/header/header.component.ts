@@ -2,6 +2,7 @@ import { Component, HostListener, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule, Location } from '@angular/common';
+import { PermissionService } from '../../../core/services/permission.service';
 
 @Component({
   selector: 'app-header',
@@ -14,17 +15,20 @@ export class HeaderComponent {
   @Input() showBack: boolean = false;
   menuOpen = false;
 
-  constructor(public authService: AuthService, private router: Router, public location: Location) { }
+  constructor(public authService: AuthService, private router: Router, public location: Location, public permissionService: PermissionService) { }
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
 
   logout() {
+    this.permissionService.clearPermissions();
     this.authService.clearUser();
     this.menuOpen = false;
-    this.router.navigate(['/login']);
-  }
+    this.router.navigateByUrl('/auth/login', {
+      replaceUrl: true
+    });
+}
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {

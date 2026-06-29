@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { PermissionService } from '../../../core/services/permission.service';
 
 @Component({
   selector: 'app-login',
@@ -31,7 +32,8 @@ export class LoginComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    public permissionService: PermissionService
   ) {
 
     this.loginForm = this.fb.group({
@@ -72,9 +74,8 @@ export class LoginComponent {
                       this.userInfo.id = data?.response?.teamId;
                       this.userInfo.token = data?.response?.token;
 
-                      localStorage.setItem(
-                        'permissions',
-                        JSON.stringify(data?.response?.permissions || [])
+                      this.permissionService.setPermissions(
+                        data?.response?.rolePriveleges || []
                       );
 
                       this.authService.getTeamById(data.response.teamId).subscribe({

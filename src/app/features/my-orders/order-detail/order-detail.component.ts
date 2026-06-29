@@ -7,6 +7,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import { PermissionService } from '../../../core/services/permission.service';
 
 
 @Component({
@@ -63,7 +64,8 @@ export class OrderDetailComponent {
     public orderDetailService: OrderDetailService,
     private modalService: BsModalService,
     private datePipe: DatePipe,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    public permissionService: PermissionService
   ) {
     this.productform = this.formBuilder.group({
       suggestedProductId: [null],

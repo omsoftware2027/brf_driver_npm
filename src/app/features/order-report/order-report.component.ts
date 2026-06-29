@@ -6,8 +6,9 @@ import { OrderDetailService } from '../../core/services/order-detail.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, switchMap, takeUntil } from 'rxjs';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { PermissionService } from '../../core/services/permission.service';
 
 @Component({
   selector: 'app-order-report',
@@ -50,6 +51,7 @@ export class OrderReportComponent {
   productList: any[] = [];
   productform!: FormGroup;
   searchInput$ = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   remarkInput: any
 
@@ -70,7 +72,8 @@ export class OrderReportComponent {
     public orderDetailService: OrderDetailService,
     public datePipe: DatePipe,
     public modalService: BsModalService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    public permissionService: PermissionService
   ) { 
     this.productform = this.formBuilder.group({
       suggestedProductId: [null],
@@ -126,6 +129,7 @@ export class OrderReportComponent {
       .pipe(
         debounceTime(300),
         distinctUntilChanged(),
+        takeUntil(this.destroy$),
         switchMap(term => this.orderDetailService.getallproductlist(0, 600, term))
       )
       .subscribe(res => {
@@ -139,6 +143,11 @@ export class OrderReportComponent {
           }));
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getallsampletype() {

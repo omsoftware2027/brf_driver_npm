@@ -11,18 +11,27 @@ export const routes: Routes = [
     {
         path: 'dashboard',
         canActivate: [authGuard],
+        data: {
+            permission: 'DriverApp-Dashboard'
+        },
         loadChildren: () =>
             import('./features/dashboard/dashboard.module').then(m => m.DashboardModule)
     },
     {
         path: 'my-orders',
         canActivate: [authGuard],
+        data: {
+            permission: 'DriverAppAllOrder'
+        },
         loadChildren: () =>
             import('./features/my-orders/my-orders.module').then(m => m.MyOrdersModule)
     },
     {
         path: 'order-report',
         canActivate: [authGuard],
+        data: {
+            permission: 'DriverAppOrderReport'
+        },
         loadChildren: () =>
             import('./features/order-report/order-report.module').then(m => m.OrderReportModule)
     },
@@ -35,6 +44,9 @@ export const routes: Routes = [
     {
         path: 'my-orders/grouped-orders',
         canActivate: [authGuard],
+        data: {
+            permission: 'DriverAppAllOrder'
+        },
         loadChildren: () =>
             import('./features/grouped-orders/grouped-orders.module').then(m => m.GroupedOrdersModule)
     },

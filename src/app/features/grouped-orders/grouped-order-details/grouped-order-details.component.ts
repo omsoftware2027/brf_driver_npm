@@ -5,6 +5,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { OrderDetailService } from '../../../core/services/order-detail.service';
 import { DatePipe } from '@angular/common';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import { PermissionService } from '../../../core/services/permission.service';
 
 @Component({
   selector: 'app-grouped-order-details',
@@ -56,7 +57,8 @@ export class GroupedOrderDetailsComponent {
     private modalService: BsModalService,
     private datePipe: DatePipe,
     private formBuilder: FormBuilder,
-    public router: Router
+    public router: Router,
+    public permissionService: PermissionService
   ) {
     this.productform = this.formBuilder.group({
       suggestedProductId: [null],
