@@ -415,6 +415,7 @@ export class OrderDetailComponent {
         if (res.status === 0) {
           this.modalRef?.hide();
           this.expiryDateInput = null;
+          this.onSearch();
         }
       },
       error: (err) => {

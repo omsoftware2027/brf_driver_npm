@@ -208,7 +208,7 @@
                                 <span *ngIf="product?.confirmStatus === 'Missing'" class="badge badge-orange fs-8">MISSING</span>
                                 <!-- <span *ngIf="product?.remark" class="badge badge-outlined fs-8">Remark: {{product?.remark}}</span>
                                 <span *ngIf="product?.weight" class="badge badge-outlined fs-8">⚖️ {{product?.weight}}LBS</span> -->
-                                <span *ngIf="product?.expOrProdDate" class="badge badge-red fs-8">Expiry</span>
+                                <span *ngIf="product?.expOrProdDate" class="badge fs-8" [ngClass]="product?.dateType === 'Production' ? 'badge-green' : 'badge-red'"><i class="bi bi-calendar-date me-1"></i> {{product?.expOrProdDate? (product?.expOrProdDate | date: 'MM/dd/yyyy') : product?.dateType}}</span>
                             </div>
                         </div>
                         <div class="overflow-auto hiden-scrollbar p-0">
@@ -288,7 +288,7 @@
                         <button class="btn btn-success btn-responsive" *ngIf="product?.dateType"
                             (click)="openExpiryDateModal(expiryDateModal, product)">
                             <img src="assets/icons/pajamas_time-out.png" alt="icon" width="15" height="15">
-                            Expiry
+                            {{product?.dateType}}
                         </button>
                         <button class="btn btn-success btn-responsive" (click)="openRemarkModal(remarkModal, product)">
                             <i class="bi bi-pencil"></i>
@@ -359,10 +359,10 @@
   <div class="modal-body p-4 position-relative">
     <i class="bi bi-x position-absolute fs-3" style="top: 6px; right: 6px" aria-label="Close"
       (click)="modalRef?.hide()"></i>
-    <p class="modal-title fs-6 fw-semibold">Expiry Date - <span
-        class="text-light-emphasis fs-7">{{selectedProduct?.title}}</span></p>
+    <p class="modal-title fs-6 fw-semibold mb-3"> Set {{selectedProduct?.dateType}} Date </p>
+    <div class="text-light-emphasis fs-7">{{selectedProduct?.title}}</div> 
     <p class="fs-7 text-muted">{{selectedProduct?.sku}}</p>
-    <label for="expiryDate" class="fw-semibold pb-1">Expiry Date</label>
+    <label for="expiryDate" class="fw-normal pb-1 text-black">Select Date</label>
     <input type="text"
        class="form-control"
        bsDatepicker
@@ -371,8 +371,7 @@
        [(ngModel)]="expiryDateInput"
        placeholder="MM/DD/YYYY" />
     <div class="d-flex pt-3 gap-2">
-      <button class="btn btn-success flex-fill" [disabled]="!expiryDateInput" (click)="saveExpiryDate()">Add Expiry
-        Date</button>
+      <button class="btn btn-success flex-fill" [disabled]="!expiryDateInput" (click)="saveExpiryDate()">Save {{selectedProduct?.dateType}} Date</button>
       <button class="btn btn-outline-danger flex-fill" (click)="modalRef?.hide()">Cancel</button>
     </div>
   </div>

@@ -382,6 +382,7 @@ export class OrderReportComponent {
         if (res.status === 0) {
           this.modalRef?.hide();
           this.expiryDateInput = null;
+          this.getOrdersReports(this.selectedOrderReportType);
         }
       },
       error: (err) => {
