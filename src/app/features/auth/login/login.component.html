@@ -14,7 +14,7 @@
                             <i class="bi bi-person"></i>
                         </span>
                         <input type="text" formControlName="email" class="form-control" style="padding-left: 2rem;"
-                            placeholder="Enter email">
+                            placeholder="Enter your email">
                     </div>
                     <div class="text-danger small">
                         <div class="fs-8"
@@ -27,8 +27,11 @@
                         <span class="position-absolute" style="top: 7px; left: 10px">
                             <i class="bi bi-lock"></i>
                         </span>
-                        <input type="password" formControlName="password" class="form-control"
+                        <input [type]="showPassword ? 'text' : 'password'" formControlName="password" class="form-control"
                             style="padding-left: 2rem;" placeholder="Enter your password">
+                        <span (click)="showPassword = !showPassword" class="position-absolute" style="top: 7px; right: 10px">
+                            <i class="bi" [ngClass]="showPassword? 'bi-eye-slash' : 'bi-eye'"></i>
+                        </span>
                     </div>
                     <div class="text-danger small"
                         [ngStyle]="{ 'visibility': (password?.touched && (password?.errors?.['required'] || password?.errors?.['minlength'] )) ? 'visible' : 'hidden' }">
