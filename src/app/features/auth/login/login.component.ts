@@ -23,6 +23,7 @@ export class LoginComponent {
 
   userInfo: any = {};
 
+  showPassword: boolean = false;
 
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef>;
 
