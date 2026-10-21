@@ -1,4 +1,5 @@
 <div class="container-fluid p-0">
+    <div *ngIf="weightNotice" class="alert alert-warning py-2 px-3 mb-2" role="status">{{weightNotice}}</div>
     <div class="d-flex justify-content-between gap-1 mb-2">
         <p class="fw-medium m-0">Order Report</p>
         <input type="date" lang="en-US" style="width: fit-content;" class="form-control form-control-sm" (input)="onDateChange($event)" [value]="selectedDate" />
@@ -390,7 +391,10 @@
           <label for="wight" class="fw-semibold pb-0 fs-7">Item{{i+1}}/Weight(lbs)</label>
           <input type="number" inputmode="decimal" pattern="[0-9]*" id="Property-title-input" class="form-control" placeholder="Enter weight"
             [(ngModel)]="inputValues[i]" (keyup)="checkInventory(inputValues[i], i)">
-          <span *ngIf="!checkInventoryStatus[i]" class="text-danger fs-8 fw-medium">
+          <span *ngIf="lookupFailed[i]" class="text-warning fs-8 fw-medium">
+            Inventory lookup failed. The entered weight will still be saved.
+          </span>
+          <span *ngIf="!lookupFailed[i] && !checkInventoryStatus[i]" class="text-danger fs-8 fw-medium">
             Weight is not matching with the inventory in hand - Do you still want to proceed?
           </span>
         </div>

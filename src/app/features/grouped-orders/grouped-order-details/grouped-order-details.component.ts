@@ -36,6 +36,8 @@ export class GroupedOrderDetailsComponent {
   inputIndexToInventoryId: { [key: number]: number } = {};
   selectedInventoryIds: number[] = [];
   inventorylist: any;
+  weightNotice = '';
+  lookupFailed: boolean[] = [];
   weightInput: any = null;
   expiryDateInput: any;
   remarkInput: any
@@ -232,6 +234,9 @@ export class GroupedOrderDetailsComponent {
     this.selectedProductQuantity = parseInt(product?.quantity, 10);
     this.inputValues = new Array(parseInt(product?.quantity, 10)).fill('');
     this.checkInventoryStatus = new Array(this.inputValues.length).fill(true);
+    this.lookupFailed = new Array(this.inputValues.length).fill(false);
+    this.selectedInventoryIds = [];
+    this.inputIndexToInventoryId = {};
     this.orderDetailService.getOrderProductInventoryedit(product?.productId, product?.orderItemId).subscribe(
       (res) => {
         if (res['status'] == 0) {
@@ -253,84 +258,81 @@ export class GroupedOrderDetailsComponent {
     });
   }
   sumbitInventory() {
-    const weights: number[] = [];
-    const inventoryIds: number[] = [];
+    const weights: string[] = [];
     const maxQuantity = this.selectedProductQuantity;
     for (let i = 0; i < maxQuantity; i++) {
       const value = this.inputValues[i];
-      const weight = this.isValidNumber(value) ? parseFloat(value) : 0;
-      const inventoryId = this.selectedInventoryIds[i] || this.inputIndexToInventoryId[i] || 0;
-      weights.push(weight);
-      inventoryIds.push(inventoryId);
+      const text = value === null || value === undefined ? '' : String(value).trim();
+      weights.push(text === '' ? '0' : text);
     }
-    // Log the extracted inventory IDs and weights
-    console.log('Inventory IDs:', inventoryIds);
-    console.log('Weights:', weights);
-    // Use the limited inventoryIds and weights arrays when calling the service
-    this.orderDetailService.changeweight(weights, inventoryIds, this.selectedProduct?.orderItemId).subscribe((res) => {
-      this.getAllProducts();
-      this.modalRef?.hide();
+    this.orderDetailService.changeweight(weights, [], this.selectedProduct?.orderItemId).subscribe({
+      next: (res: any) => {
+        this.weightNotice = this.weightSaveNotice(res?.response);
+        this.getAllProducts();
+        this.modalRef?.hide();
+      },
+      error: () => {
+        this.weightNotice = 'Inventory lookup failed. The entered weight is unchanged.';
+      }
     });
+  }
+  weightSaveNotice(message: any): string {
+    if (message === 'Weight saved successfully. No matching inventory was found.'
+      || message === 'Weight saved successfully. Inventory lookup failed.') {
+      return message;
+    }
+    return '';
   }
   generateArray(length: number): any[] {
     return new Array(length);
   }
   patchInventoryWeights(inventoryItems: any) {
-    console.log('Starting patchInventoryWeights');
-    const seenWeights = new Set<string>();
-    for (const inventoryItem of inventoryItems) {
-      const weight = String(inventoryItem.weight);
-      const inventoryId = (inventoryItem.inventoryId);
-      const index = this.inventorylist.findIndex((item: any) => item.inventoryId === inventoryId);
-      if (index !== -1) {
-        if (!seenWeights.has(weight)) {
-          seenWeights.add(weight);
-          this.inputValues[index] = weight;
-        } else {
-          this.inputValues[index] = weight;
-          console.log('Duplicate Record:', weight);
-        }
-        console.log('Patched Weight:', weight);
-      } else {
-        // if inventoryCodeAndWeightProjections is [] set weight from the selectedProduct.inventoryItems[];
-        if (this.selectedProduct?.inventoryItems?.length > 0) {
-          this.selectedProduct?.inventoryItems.forEach((item: any, index: number) => {
-            if (index < this.inputValues.length) {
-              this.inputValues[index] = String(item.weight ?? '');
-            }
-          });
-        }
-        console.log('Inventory item not found:', inventoryItem);
-      }
+    if (!inventoryItems || !inventoryItems.length) {
+      return;
     }
-    console.log('Finished patchInventoryWeights');
-    console.log('Updated inputValues:', this.inputValues);
+    inventoryItems.forEach((item: any, slot: number) => {
+      if (slot >= this.inputValues.length) {
+        return;
+      }
+      const raw = item?.weight;
+      const text = raw === null || raw === undefined ? '' : String(raw);
+      this.inputValues[slot] = text === '0' ? '' : text;
+    });
   }
   checkInventory(weightValue: any, index: number) {
-    console.log('Checking Inventory for weight:', weightValue);
-    const weight = this.isValidNumber(weightValue) ? parseFloat(weightValue) : 0;
     if (!this.inventoryIds) {
       this.inventoryIds = [];
     }
     if (!this.checkInventoryStatus) {
       this.checkInventoryStatus = [];
     }
+    if (!this.lookupFailed) {
+      this.lookupFailed = [];
+    }
     if (!this.inputIndexToInventoryId) {
       this.inputIndexToInventoryId = [];
     }
     if (weightValue === '' || weightValue === null || weightValue === undefined) {
-      // Clear the input value and reset the inventory status when weightValue is empty
       this.inputValues[index] = '';
-      this.checkInventoryStatus[index] = undefined as unknown as boolean; // Use 'undefined as boolean' to explicitly set it as boolean or undefined
+      this.checkInventoryStatus[index] = undefined as unknown as boolean;
+      this.lookupFailed[index] = false;
       this.inputIndexToInventoryId[index] = 0;
     } else {
-      // Perform inventory check when weightValue is not empty
       this.inputValues[index] = weightValue;
-      this.orderDetailService.checkWeightExists(weight, this.selectedProduct?.productCode, this.selectedProduct?.orderItemId).subscribe((res) => {
-        this.checkInventoryStatus[index] = !!res.response; // Convert to boolean
-        const inventoryId = res.response !== undefined ? res.response : 0;
-        console.log('Received inventoryId:', inventoryId);
-        this.inputIndexToInventoryId[index] = inventoryId;
+      const entered = String(weightValue).trim();
+      this.orderDetailService.checkWeightExists(entered, this.selectedProduct?.productCode, this.selectedProduct?.orderItemId).subscribe({
+        next: (res) => {
+          this.lookupFailed[index] = false;
+          this.checkInventoryStatus[index] = !!res.response;
+          const inventoryId = res.response !== undefined && res.response !== null ? res.response : 0;
+          this.inputIndexToInventoryId[index] = inventoryId;
+        },
+        error: () => {
+          this.inputValues[index] = weightValue;
+          this.lookupFailed[index] = true;
+          this.inputIndexToInventoryId[index] = 0;
+          this.weightNotice = 'Inventory lookup failed. The entered weight is unchanged.';
+        }
       });
     }
   }
